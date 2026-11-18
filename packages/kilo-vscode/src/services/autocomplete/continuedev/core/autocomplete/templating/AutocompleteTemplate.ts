@@ -1,7 +1,8 @@
 // Fill in the middle prompts
 //
-// We only expose Codestral as an autocomplete model — every other FIM template
-// in the upstream continuedev list is unreachable.
+// Codestral is the only Gateway autocomplete model. The StarCoder, Qwen and
+// CodeLlama templates below are used for local models (Ollama, llama.cpp,
+// LM Studio), where the FIM prompt is assembled client-side.
 
 import { CompletionOptions } from "../../index.js"
 import { getLastNUriRelativePathParts, getShortestUniqueRelativeUriPaths } from "../../util/uri.js"
@@ -28,6 +29,8 @@ export interface AutocompleteTemplate {
   ) => [string, string]
   template: TemplateRenderer
   completionOptions?: Partial<CompletionOptions>
+  /** Default local server API for this template; "generate" is Ollama-native. */
+  endpoint?: "completions" | "generate"
 }
 
 export const codestralTemplate = {
@@ -61,3 +64,48 @@ export const codestralTemplate = {
     stop: ["[PREFIX]", "[SUFFIX]", "\n+++++ "],
   },
 } satisfies AutocompleteTemplate
+
+export const starcoderTemplate = {
+  template: (prefix: string, suffix: string): string => {
+    return `<fim_prefix>${prefix}<fim_suffix>${suffix}<fim_middle>`
+  },
+  completionOptions: {
+    stop: ["<fim_prefix>", "<fim_suffix>", "<fim_middle>", "<|endoftext|>", "<file_sep>"],
+  },
+  endpoint: "completions",
+} satisfies AutocompleteTemplate
+
+export const qwenTemplate = {
+  template: (prefix: string, suffix: string): string => {
+    return `<|fim_prefix|>${prefix}<|fim_suffix|>${suffix}<|fim_middle|>`
+  },
+  completionOptions: {
+    stop: ["<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", "<|endoftext|>", "<file_sep>"],
+  },
+  endpoint: "generate",
+} satisfies AutocompleteTemplate
+
+export const codeLlamaTemplate = {
+  template: (prefix: string, suffix: string): string => {
+    return `<PRE> ${prefix} <SUF> ${suffix} <MID>`
+  },
+  completionOptions: {
+    stop: ["<PRE>", "<SUF>", "<MID>", "<EOT>"],
+  },
+  endpoint: "generate",
+} satisfies AutocompleteTemplate
+
+export const fimTemplates = {
+  starcoder: starcoderTemplate,
+  qwen: qwenTemplate,
+  codellama: codeLlamaTemplate,
+}
+
+export type FimTemplateID = keyof typeof fimTemplates
+
+export function inferFimTemplate(model: string): FimTemplateID {
+  const name = model.toLowerCase()
+  if (name.includes("starcoder")) return "starcoder"
+  if (name.includes("llama")) return "codellama"
+  return "qwen"
+}

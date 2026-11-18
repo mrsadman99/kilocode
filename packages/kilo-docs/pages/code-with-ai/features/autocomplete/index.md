@@ -9,9 +9,9 @@ Kilo Code's autocomplete feature provides intelligent code suggestions and compl
 
 ## How Autocomplete Works
 
-The extension uses **Fill-in-the-Middle (FIM)** completion routed through the **Kilo Gateway**. It analyzes the code before and after your cursor to generate contextually accurate inline suggestions.
+The extension uses **Fill-in-the-Middle (FIM)** completion routed through the **Kilo Gateway** or a local model server. It analyzes the code before and after your cursor to generate contextually accurate inline suggestions.
 
-Autocomplete uses **Codestral** (`mistralai/codestral-2508`) by Mistral AI, billed through your Kilo account.
+By default, autocomplete uses **Codestral** (`mistralai/codestral-2508`) by Mistral AI, billed through your Kilo account. Local FIM models are also supported — see [Local models](#local-models).
 
 ## Triggering Options
 
@@ -30,6 +30,17 @@ This keybinding requires `kilo-code.new.autocomplete.enableSmartInlineTaskKeybin
 ## Provider and Model
 
 Autocomplete requests are routed through the **Kilo Gateway** and use **Codestral** (`mistralai/codestral-2508`). It uses Kilo credits unless you add a Mistral API key via BYOK. With BYOK, your Mistral plan and usage limits apply; autocomplete is not guaranteed to be free. See [Setting up Mistral for autocomplete](/docs/code-with-ai/features/autocomplete/mistral-setup).
+
+### Local models
+
+You can also run autocomplete fully locally with a FIM-trained code model served by [Ollama](https://ollama.com/), llama.cpp, or LM Studio. In **Settings → Models**, pick **Local (Ollama)** as the autocomplete model, then configure:
+
+- **Local model** — the model name as served by your server, e.g. `qwen2.5-coder:7b`, `starcoder2:7b`, or `codellama:7b`.
+- **Local server URL** — defaults to `http://127.0.0.1:11434` (Ollama).
+- **FIM template** — the fill-in-the-middle prompt format: StarCoder, Qwen, or CodeLlama. **Auto** infers it from the model name.
+- **API endpoint** — Ollama-native `/api/generate` (raw prompts) or OpenAI-compatible `/v1/completions`. **Auto** uses the template default.
+
+Local completions run on your machine and do not use Kilo credits or provider API keys. Use a small FIM-trained model (1.5B–7B) for responsive suggestions; general chat models without FIM training produce poor completions.
 
 ## Status Bar
 

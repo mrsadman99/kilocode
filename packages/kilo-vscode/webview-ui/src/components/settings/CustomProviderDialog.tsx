@@ -16,7 +16,12 @@ import { useVSCode } from "../../context/vscode"
 import type { ExtensionMessage, ProviderAuthState, ProviderConfig } from "../../types/messages"
 import { createProviderAction } from "../../utils/provider-action"
 import { configMessage } from "../../utils/open-config"
-import { MASKED_CUSTOM_PROVIDER_KEY, resolveCustomProviderKey } from "../../../../src/shared/custom-provider"
+import {
+  MASKED_CUSTOM_PROVIDER_KEY,
+  resolveCustomProviderKey,
+  parseProxyURL,
+  composeProxyURL,
+} from "../../../../src/shared/custom-provider"
 import {
   CUSTOM_PROVIDER_PACKAGE,
   isCustomProviderPackage,
@@ -149,12 +154,17 @@ function resolveAuth(existing: ExistingProvider | undefined, states: Record<stri
 
 function initForm(existing: ExistingProvider | undefined, auth: ProviderAuthState | undefined): FormState {
   const npm = existing?.config?.npm
+  const options = existing?.config?.options as { baseURL?: string; proxy?: string } | undefined
+  const proxy = parseProxyURL(options?.proxy)
   return {
     providerID: existing?.providerID ?? "",
     name: existing?.name ?? "",
     npm: isCustomProviderPackage(npm) ? npm : CUSTOM_PROVIDER_PACKAGE,
-    baseURL: (existing?.config?.options as { baseURL?: string } | undefined)?.baseURL ?? "",
+    baseURL: options?.baseURL ?? "",
     apiKey: resolveCustomProviderKey(auth),
+    proxy: proxy.address,
+    proxyUser: proxy.user,
+    proxyPassword: proxy.password,
     models: initModels(existing?.config),
     headers: initHeaders(existing?.config),
     saving: false,
@@ -185,6 +195,7 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
     providerID: undefined,
     name: undefined,
     baseURL: undefined,
+    proxy: undefined,
     models: form.models.map((m) => ({ variants: m.variants.map(() => ({})) })),
     headers: form.headers.map(() => ({})),
   })
@@ -226,6 +237,8 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
   const [fetchPackage, setFetchPackage] = createSignal(form.npm)
   const [fetchURL, setFetchURL] = createSignal(form.baseURL)
   const [fetchKey, setFetchKey] = createSignal("")
+  const [fetchProxy, setFetchProxy] = createSignal(composeProxyURL(form.proxy, form.proxyUser, form.proxyPassword) ?? "")
+  const syncFetchProxy = () => setFetchProxy(composeProxyURL(form.proxy, form.proxyUser, form.proxyPassword) ?? "")
   let fetchVersion = 0
 
   // Whether a model-listing fetch is possible for the current package + URL.
@@ -237,6 +250,7 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
     const url = fetchURL()
     const key = fetchKey()
     void key // subscribe to key changes without using the value here
+    void fetchProxy() // re-run the auto-fetch when the proxy changes
 
     // Invalidate any in-flight fetch (including a manual one) as soon as the
     // connection details change, so a stale response can't land after the
@@ -281,6 +295,7 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
       .map((h) => ({ key: h.key.trim(), value: h.value.trim() }))
       .filter((h) => !!h.key && !!h.value)
     const headers = hdrs.length > 0 ? Object.fromEntries(hdrs.map((h) => [h.key, h.value])) : undefined
+    const proxy = composeProxyURL(form.proxy, form.proxyUser, form.proxyPassword)
 
     // Bump version so any in-flight response from a previous fetch is ignored
     fetchVersion++
@@ -335,6 +350,7 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
       apiKey,
       providerID,
       headers,
+      proxy,
     })
   }
 
@@ -671,6 +687,43 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
                 setFetchKey(key)
               }}
             />
+            <TextField
+              label={language.t("provider.custom.field.proxy.label")}
+              placeholder={language.t("provider.custom.field.proxy.placeholder")}
+              description={language.t("provider.custom.field.proxy.description")}
+              value={form.proxy}
+              onChange={(v) => {
+                setForm("proxy", v)
+                syncFetchProxy()
+              }}
+              validationState={errors.proxy ? "invalid" : undefined}
+              error={errors.proxy}
+            />
+            <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ flex: 1 }}>
+                <TextField
+                  label={language.t("provider.custom.field.proxyUser.label")}
+                  placeholder={language.t("provider.custom.field.proxyUser.placeholder")}
+                  value={form.proxyUser}
+                  onChange={(v) => {
+                    setForm("proxyUser", v)
+                    syncFetchProxy()
+                  }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <TextField
+                  type="password"
+                  label={language.t("provider.custom.field.proxyPassword.label")}
+                  placeholder={language.t("provider.custom.field.proxyPassword.placeholder")}
+                  value={form.proxyPassword}
+                  onChange={(v) => {
+                    setForm("proxyPassword", v)
+                    syncFetchProxy()
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Models */}

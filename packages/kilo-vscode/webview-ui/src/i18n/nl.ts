@@ -896,6 +896,18 @@ export const dict = {
     "Toon suggesties voor automatisch aanvullen in het chat tekstveld",
   "settings.autocomplete.modelsHint":
     "Om te kiezen welk model wordt gebruikt voor automatisch aanvullen, zie de Modellen-instellingen.",
+  "settings.autocomplete.local.model.title": "Lokaal model",
+  "settings.autocomplete.local.model.description":
+    "Modelnaam zoals aangeboden door je lokale server (bijv. een Ollama-tag)",
+  "settings.autocomplete.local.baseUrl.title": "URL van lokale server",
+  "settings.autocomplete.local.baseUrl.description": "Basis-URL van de lokale server waarop het model draait",
+  "settings.autocomplete.local.template.title": "FIM-sjabloon",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle-promptformaat; 'Auto' wordt afgeleid uit de modelnaam",
+  "settings.autocomplete.local.endpoint.title": "API-eindpunt",
+  "settings.autocomplete.local.endpoint.description":
+    "'Auto' gebruikt de standaard van het sjabloon: Ollama-native of OpenAI-compatibel",
+  "settings.autocomplete.local.auto": "Auto",
 
   "settings.notifications.sounds": "Geluiden",
   "settings.notifications.enable.title": "Geluidsmeldingen inschakelen",

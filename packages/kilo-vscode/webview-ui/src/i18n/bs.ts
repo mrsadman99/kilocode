@@ -901,6 +901,18 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Prikaži prijedloge automatskog dovršavanja u polju chata",
   "settings.autocomplete.modelsHint":
     "Da odaberete koji se model koristi za automatsko dovršavanje, pogledajte postavke Modela.",
+  "settings.autocomplete.local.model.title": "Lokalni model",
+  "settings.autocomplete.local.model.description":
+    "Naziv modela kako ga poslužuje vaš lokalni server (npr. Ollama oznaka)",
+  "settings.autocomplete.local.baseUrl.title": "URL lokalnog servera",
+  "settings.autocomplete.local.baseUrl.description": "Osnovni URL lokalnog servera na kojem model radi",
+  "settings.autocomplete.local.template.title": "FIM šablon",
+  "settings.autocomplete.local.template.description":
+    "Format fill-in-the-middle prompta; „Auto“ se otkriva iz naziva modela",
+  "settings.autocomplete.local.endpoint.title": "API endpoint",
+  "settings.autocomplete.local.endpoint.description":
+    "„Auto“ koristi zadanu vrijednost šablona: Ollama izvorni ili OpenAI kompatibilan",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Zvukovi",
   "settings.notifications.enable.title": "Omogući zvučne obavijesti",
   "settings.notifications.enable.description":

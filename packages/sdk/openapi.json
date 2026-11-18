@@ -14031,6 +14031,19 @@
                   },
                   "temperature": {
                     "type": "number"
+                  },
+                  "baseURL": {
+                    "type": "string"
+                  },
+                  "endpoint": {
+                    "type": "string",
+                    "enum": ["completions", "generate"]
+                  },
+                  "stop": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": ["prefix", "suffix"],
@@ -38399,6 +38412,9 @@
                 "type": "string"
               },
               "baseURL": {
+                "type": "string"
+              },
+              "proxy": {
                 "type": "string"
               },
               "enterpriseUrl": {

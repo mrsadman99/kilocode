@@ -123,9 +123,44 @@ const ModelsTab: Component = () => {
       updateSetting("autocomplete.model", null)
       return
     }
+    if (providerID === "local") {
+      // The local model name lives in its own free-form setting, not the
+      // whitelisted `model` enum.
+      updateSetting("autocomplete.provider", "local")
+      updateSetting("autocomplete.model", null)
+      return
+    }
     updateSetting("autocomplete.provider", providerID)
     updateSetting("autocomplete.model", modelID)
   }
+
+  const localModel = () => {
+    const v = settings()["autocomplete.localModel"]
+    return typeof v === "string" ? v : ""
+  }
+  const localBaseURL = () => {
+    const v = settings()["autocomplete.localBaseURL"]
+    return typeof v === "string" ? v : ""
+  }
+  const localTemplate = () => {
+    const v = settings()["autocomplete.localTemplate"]
+    return typeof v === "string" ? v : "auto"
+  }
+  const localEndpoint = () => {
+    const v = settings()["autocomplete.localEndpoint"]
+    return typeof v === "string" ? v : "auto"
+  }
+  const templateOptions = [
+    { value: "auto", label: language.t("settings.autocomplete.local.auto") },
+    { value: "starcoder", label: "StarCoder" },
+    { value: "qwen", label: "Qwen" },
+    { value: "codellama", label: "CodeLlama" },
+  ]
+  const endpointOptions = [
+    { value: "auto", label: language.t("settings.autocomplete.local.auto") },
+    { value: "completions", label: "/v1/completions (OpenAI-compatible)" },
+    { value: "generate", label: "/api/generate (Ollama)" },
+  ]
 
   return (
     <div>
@@ -221,6 +256,64 @@ const ModelsTab: Component = () => {
             description={language.t("settings.autocomplete.model.description")}
           />
         </SettingsRow>
+        <Show when={autocompleteProvider() === "local"}>
+          <SettingsRow
+            title={language.t("settings.autocomplete.local.model.title")}
+            description={language.t("settings.autocomplete.local.model.description")}
+          >
+            <TextField
+              value={localModel()}
+              placeholder="qwen2.5-coder:7b"
+              onChange={(value: string) => updateSetting("autocomplete.localModel", value.trim() || null)}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.local.baseUrl.title")}
+            description={language.t("settings.autocomplete.local.baseUrl.description")}
+          >
+            <TextField
+              value={localBaseURL()}
+              placeholder="http://127.0.0.1:11434"
+              onChange={(value: string) => updateSetting("autocomplete.localBaseURL", value.trim() || null)}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.local.template.title")}
+            description={language.t("settings.autocomplete.local.template.description")}
+          >
+            <Select
+              options={templateOptions}
+              current={templateOptions.find((item) => item.value === localTemplate())}
+              value={(item) => item.value}
+              label={(item) => item.label}
+              onSelect={(item) => updateSetting("autocomplete.localTemplate", item?.value ?? "auto")}
+              variant="secondary"
+              size="small"
+              triggerVariant="settings"
+              triggerProps={{
+                "aria-label": `${language.t("settings.autocomplete.local.template.title")}: ${localTemplate()}`,
+              }}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.local.endpoint.title")}
+            description={language.t("settings.autocomplete.local.endpoint.description")}
+          >
+            <Select
+              options={endpointOptions}
+              current={endpointOptions.find((item) => item.value === localEndpoint())}
+              value={(item) => item.value}
+              label={(item) => item.label}
+              onSelect={(item) => updateSetting("autocomplete.localEndpoint", item?.value ?? "auto")}
+              variant="secondary"
+              size="small"
+              triggerVariant="settings"
+              triggerProps={{
+                "aria-label": `${language.t("settings.autocomplete.local.endpoint.title")}: ${localEndpoint()}`,
+              }}
+            />
+          </SettingsRow>
+        </Show>
         <SettingsRow
           title={language.t("settings.models.speechToTextBaseUrl.title")}
           description={language.t("settings.models.speechToTextBaseUrl.description")}

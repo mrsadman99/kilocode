@@ -922,6 +922,18 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Afficher les suggestions d'autocomplétion dans le chat",
   "settings.autocomplete.modelsHint":
     "Pour choisir le modèle utilisé pour l'autocomplétion, consultez les paramètres des Modèles.",
+  "settings.autocomplete.local.model.title": "Modèle local",
+  "settings.autocomplete.local.model.description":
+    "Nom du modèle tel que servi par votre serveur local (p. ex. un tag Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL du serveur local",
+  "settings.autocomplete.local.baseUrl.description": "URL de base du serveur local qui exécute le modèle",
+  "settings.autocomplete.local.template.title": "Modèle FIM",
+  "settings.autocomplete.local.template.description":
+    "Format de prompt fill-in-the-middle ; « Auto » est détecté depuis le nom du modèle",
+  "settings.autocomplete.local.endpoint.title": "Point de terminaison API",
+  "settings.autocomplete.local.endpoint.description":
+    "« Auto » utilise la valeur par défaut du modèle : natif Ollama ou compatible OpenAI",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Sons",
   "settings.notifications.enable.title": "Activer les notifications sonores",
   "settings.notifications.enable.description":

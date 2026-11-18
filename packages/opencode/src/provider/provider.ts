@@ -39,6 +39,9 @@ import {
   patchModelsDevModel as patchKiloModel,
   patchConfigModel as patchKiloConfigModel,
   customProviderVariants,
+  providerProxy,
+  isSocks,
+  socksFetch,
   patchCustomLoaderResult,
   patchKiloProviderPrivacy,
   patchKiloProviderAuth,
@@ -1903,8 +1906,10 @@ const layer = Layer.effect(
         const customFetch = options["fetch"]
         const chunkTimeout = options["chunkTimeout"]
         const headerTimeout = options["headerTimeout"]
+        const proxy = providerProxy(options) // kilocode_change - per-provider HTTP proxy
         delete options["chunkTimeout"]
         delete options["headerTimeout"]
+        delete options["proxy"] // kilocode_change - consumed by the fetch wrapper, not an SDK option
 
         options["fetch"] = async (input: any, init?: BunFetchRequestInit) => {
           const fetchFn = customFetch ?? fetch
@@ -1931,11 +1936,19 @@ const layer = Layer.effect(
 
           // kilocode_change start - clear connection-phase timeout once headers arrive
           try {
-            const res = await fetchFn(input, {
-              ...opts,
-              // @ts-ignore see here: https://github.com/oven-sh/bun/issues/16682
-              timeout: false,
-            }).finally(() => headerTimeoutCtl?.clear())
+            // kilocode_change start - route through the configured proxy; SOCKS needs a manual tunnel.
+            // When a plugin supplies its own fetch (e.g. Codex OAuth), hand it the proxy via init so it
+            // can keep its URL rewrite / token injection and tunnel the transport itself.
+            const res = await (proxy && isSocks(proxy) && !customFetch
+              ? socksFetch(proxy, input, opts)
+              : fetchFn(input, {
+                  ...opts,
+                  ...(proxy ? { proxy } : {}),
+                  // @ts-ignore see here: https://github.com/oven-sh/bun/issues/16682
+                  timeout: false,
+                })
+            ).finally(() => headerTimeoutCtl?.clear())
+            // kilocode_change end
             timeout.clear()
             // kilocode_change start - hand the remaining deadline to the first-byte guard
             const remaining = deadline !== undefined ? deadline - Date.now() : undefined

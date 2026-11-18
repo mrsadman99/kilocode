@@ -1,5 +1,17 @@
-export type AutocompleteProviderID = "kilo" | "mistral"
-export type DirectAutocompleteProviderID = Exclude<AutocompleteProviderID, "kilo">
+export type AutocompleteProviderID = "kilo" | "mistral" | "local"
+export type DirectAutocompleteProviderID = Exclude<AutocompleteProviderID, "kilo" | "local">
+
+/** FIM prompt templates for local models, assembled client-side. */
+export type FimTemplateID = "starcoder" | "qwen" | "codellama"
+export const FIM_TEMPLATE_IDS: readonly FimTemplateID[] = ["starcoder", "qwen", "codellama"]
+
+/** Local server API used for FIM requests. */
+export type LocalFimEndpoint = "completions" | "generate"
+export const LOCAL_FIM_ENDPOINTS: readonly LocalFimEndpoint[] = ["completions", "generate"]
+
+export const DEFAULT_LOCAL_MODEL = "qwen2.5-coder:7b"
+export const DEFAULT_LOCAL_BASE_URL = "http://127.0.0.1:11434"
+export const LOCAL_PROVIDER_LABEL = "Local (Ollama)"
 
 export interface AutocompleteModelDef {
   /** Stable combined value for internal comparisons. */
@@ -59,12 +71,27 @@ export const DEFAULT_AUTOCOMPLETE_MODEL: AutocompleteModelDef = (() => {
   return found
 })()
 
+/** Local models are user-defined, so their defs are synthesized instead of whitelisted. */
+function localModel(model?: string): AutocompleteModelDef {
+  const name = model?.trim() || DEFAULT_LOCAL_MODEL
+  return {
+    id: `local/${name}`,
+    modelID: name,
+    label: name,
+    providerID: "local",
+    provider: LOCAL_PROVIDER_LABEL,
+    requestModel: name,
+    temperature: 0.2,
+  }
+}
+
 export function getAutocompleteModel(provider?: string, model?: string): AutocompleteModelDef {
   // When provider is unset, always default to Kilo Gateway. Direct-provider
   // use must be opted into explicitly via the provider setting — never inferred
   // from a model name, since the same plain model id can exist on multiple
   // providers and we don't want to silently route legacy settings to BYOK.
   const pid = provider ?? "kilo"
+  if (pid === "local") return localModel(model)
   for (const m of models) {
     if (m.providerID === pid && m.modelID === model) return m
   }
@@ -72,6 +99,7 @@ export function getAutocompleteModel(provider?: string, model?: string): Autocom
 }
 
 export function getAutocompleteModelById(id: string): AutocompleteModelDef {
+  if (id.startsWith("local/")) return localModel(id.slice("local/".length))
   for (const m of models) {
     if (m.id === id) return m
   }
@@ -80,10 +108,21 @@ export function getAutocompleteModelById(id: string): AutocompleteModelDef {
 
 export function validAutocompleteProvider(value: unknown) {
   if (typeof value !== "string") return false
+  if (value === "local") return true
   return models.some((m) => m.providerID === value)
 }
 
 export function validAutocompleteModel(value: unknown) {
   if (typeof value !== "string") return false
   return models.some((m) => m.modelID === value)
+}
+
+export function validFimTemplate(value: unknown) {
+  if (typeof value !== "string") return false
+  return FIM_TEMPLATE_IDS.includes(value as FimTemplateID)
+}
+
+export function validLocalFimEndpoint(value: unknown) {
+  if (typeof value !== "string") return false
+  return LOCAL_FIM_ENDPOINTS.includes(value as LocalFimEndpoint)
 }

@@ -859,6 +859,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Włącz autouzupełnianie czatu",
   "settings.autocomplete.chatAutocomplete.description": "Pokaż sugestie autouzupełniania w polu czatu",
   "settings.autocomplete.modelsHint": "Aby wybrać model używany do autouzupełniania, zobacz Ustawienia modeli.",
+  "settings.autocomplete.local.model.title": "Model lokalny",
+  "settings.autocomplete.local.model.description": "Nazwa modelu udostępnianego przez lokalny serwer (np. tag Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL lokalnego serwera",
+  "settings.autocomplete.local.baseUrl.description": "Bazowy URL lokalnego serwera, na którym działa model",
+  "settings.autocomplete.local.template.title": "Szablon FIM",
+  "settings.autocomplete.local.template.description":
+    "Format promptu fill-in-the-middle; „Auto” jest wykrywany z nazwy modelu",
+  "settings.autocomplete.local.endpoint.title": "Punkt końcowy API",
+  "settings.autocomplete.local.endpoint.description":
+    "„Auto” używa domyślnego dla szablonu: natywnego Ollama lub zgodnego z OpenAI",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Dźwięki",
   "settings.notifications.enable.title": "Włącz powiadomienia dźwiękowe",
   "settings.notifications.enable.description":

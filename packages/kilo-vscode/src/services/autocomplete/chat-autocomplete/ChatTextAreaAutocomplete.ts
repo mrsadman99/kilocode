@@ -77,7 +77,9 @@ export class ChatTextAreaAutocomplete {
 
   async getCompletion(userText: string, visibleCodeContext?: VisibleCodeContext): Promise<{ suggestion: string }> {
     const cfg = vscode.workspace.getConfiguration("kilo-code.new.autocomplete")
-    const entry = getAutocompleteModel(cfg.get<string>("provider"), cfg.get<string>("model"))
+    const provider = cfg.get<string>("provider")
+    const model = provider === "local" ? cfg.get<string>("localModel") : cfg.get<string>("model")
+    const entry = getAutocompleteModel(provider, model)
     const startTime = Date.now()
 
     // Build context for telemetry

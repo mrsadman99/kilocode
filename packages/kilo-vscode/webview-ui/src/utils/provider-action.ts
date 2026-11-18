@@ -8,7 +8,9 @@ import type {
   ProviderConnectedMessage,
   ProviderDisconnectedMessage,
   ProviderOAuthReadyMessage,
+  ProviderProxySavedMessage,
   SaveCustomProviderMessage,
+  SetProviderProxyMessage,
   WebviewMessage,
 } from "../types/messages"
 
@@ -18,6 +20,7 @@ type ProviderRequest =
   | CompleteProviderOAuthMessage
   | DisconnectProviderMessage
   | SaveCustomProviderMessage
+  | SetProviderProxyMessage
 
 type ProviderRequestInput =
   | Omit<ConnectProviderMessage, "requestId">
@@ -25,6 +28,7 @@ type ProviderRequestInput =
   | Omit<CompleteProviderOAuthMessage, "requestId">
   | Omit<DisconnectProviderMessage, "requestId">
   | Omit<SaveCustomProviderMessage, "requestId">
+  | Omit<SetProviderProxyMessage, "requestId">
 
 type Transport = {
   postMessage: (message: WebviewMessage) => void
@@ -35,6 +39,7 @@ type Handlers = {
   onOAuthReady?: (message: ProviderOAuthReadyMessage) => void
   onConnected?: (message: ProviderConnectedMessage) => void
   onDisconnected?: (message: ProviderDisconnectedMessage) => void
+  onProxySaved?: (message: ProviderProxySavedMessage) => void
   onError?: (message: ProviderActionErrorMessage) => void
 }
 
@@ -59,6 +64,11 @@ export function createProviderAction(vscode: Transport) {
 
     if (message.type === "providerDisconnected") {
       item.onDisconnected?.(message)
+      return
+    }
+
+    if (message.type === "providerProxySaved") {
+      item.onProxySaved?.(message)
       return
     }
 

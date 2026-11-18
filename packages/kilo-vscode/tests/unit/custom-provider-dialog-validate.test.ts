@@ -12,6 +12,9 @@ function base(): FormState {
     npm: "@ai-sdk/openai-compatible",
     baseURL: "https://example.com/v1",
     apiKey: "",
+    proxy: "",
+    proxyUser: "",
+    proxyPassword: "",
     models: [
       { id: "model-1", name: "Model One", reasoning: false, supportsImages: false, modalities: {}, variants: [] },
     ],
@@ -307,5 +310,39 @@ describe("validateCustomProvider – variant name validation", () => {
     expect(m1.modalities).toEqual({ input: ["text", "image"] })
     expect(m2.reasoning).toBe(true)
     expect(m2.modalities).toBeUndefined()
+  })
+})
+
+describe("validateCustomProvider – proxy", () => {
+  it("omits proxy when the address is empty", () => {
+    const out = validateCustomProvider(args(base()))
+    expect(out.result).toBeDefined()
+    expect(out.result!.config.options.proxy).toBeUndefined()
+    expect(out.errors.proxy).toBeUndefined()
+  })
+
+  it("composes a proxy URL with credentials", () => {
+    const form = base()
+    form.proxy = "socks5://proxy.example.com:1080"
+    form.proxyUser = "user"
+    form.proxyPassword = "pass"
+    const out = validateCustomProvider(args(form))
+    expect(out.errors.proxy).toBeUndefined()
+    expect(out.result!.config.options.proxy).toBe("socks5://user:pass@proxy.example.com:1080")
+  })
+
+  it("uses an unauthenticated proxy when no credentials are given", () => {
+    const form = base()
+    form.proxy = "http://127.0.0.1:8080"
+    const out = validateCustomProvider(args(form))
+    expect(out.result!.config.options.proxy).toBe("http://127.0.0.1:8080")
+  })
+
+  it("rejects an invalid proxy address", () => {
+    const form = base()
+    form.proxy = "ftp://proxy.example.com:21"
+    const out = validateCustomProvider(args(form))
+    expect(out.result).toBeUndefined()
+    expect(out.errors.proxy).toBe("provider.custom.error.proxy.format")
   })
 })

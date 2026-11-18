@@ -2401,6 +2401,7 @@ export type ProviderConfig = {
   options?: {
     apiKey?: string
     baseURL?: string
+    proxy?: string
     enterpriseUrl?: string
     setCacheKey?: boolean
     /**
@@ -17291,6 +17292,9 @@ export type KiloFimData = {
     model?: string
     maxTokens?: number
     temperature?: number
+    baseURL?: string
+    endpoint?: "completions" | "generate"
+    stop?: Array<string>
   }
   path?: never
   query?: {

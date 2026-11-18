@@ -886,6 +886,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "เปิดใช้งานเติมอัตโนมัติแชท",
   "settings.autocomplete.chatAutocomplete.description": "แสดงข้อเสนอแนะเติมอัตโนมัติในช่องแชท",
   "settings.autocomplete.modelsHint": "เลือกโมเดลที่ใช้สำหรับการเติมอัตโนมัติได้ที่การตั้งค่าโมเดล",
+  "settings.autocomplete.local.model.title": "โมเดลในเครื่อง",
+  "settings.autocomplete.local.model.description": "ชื่อโมเดลตามที่เซิร์ฟเวอร์ในเครื่องให้บริการ (เช่น แท็ก Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL ของเซิร์ฟเวอร์ในเครื่อง",
+  "settings.autocomplete.local.baseUrl.description": "URL หลักของเซิร์ฟเวอร์ในเครื่องที่รันโมเดล",
+  "settings.autocomplete.local.template.title": "เทมเพลต FIM",
+  "settings.autocomplete.local.template.description":
+    "รูปแบบพรอมต์ fill-in-the-middle; 'อัตโนมัติ' ตรวจจับจากชื่อโมเดล",
+  "settings.autocomplete.local.endpoint.title": "จุดปลาย API",
+  "settings.autocomplete.local.endpoint.description":
+    "'อัตโนมัติ' ใช้ค่าเริ่มต้นของเทมเพลต: Ollama ดั้งเดิมหรือเข้ากันได้กับ OpenAI",
+  "settings.autocomplete.local.auto": "อัตโนมัติ",
   "settings.notifications.sounds": "เสียง",
   "settings.notifications.enable.title": "เปิดใช้การแจ้งเตือนด้วยเสียง",
   "settings.notifications.enable.description":

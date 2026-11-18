@@ -890,6 +890,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Sohbet metin alanında otomatik tamamlama önerileri göster",
   "settings.autocomplete.modelsHint":
     "Otomatik tamamlama için kullanılacak modeli seçmek için Modeller ayarlarına bakın.",
+  "settings.autocomplete.local.model.title": "Yerel model",
+  "settings.autocomplete.local.model.description": "Yerel sunucunuzun sunduğu model adı (ör. bir Ollama etiketi)",
+  "settings.autocomplete.local.baseUrl.title": "Yerel sunucu URL'si",
+  "settings.autocomplete.local.baseUrl.description": "Modeli çalıştıran yerel sunucunun temel URL'si",
+  "settings.autocomplete.local.template.title": "FIM şablonu",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle istem biçimi; 'Otomatik' model adından algılanır",
+  "settings.autocomplete.local.endpoint.title": "API uç noktası",
+  "settings.autocomplete.local.endpoint.description":
+    "'Otomatik' şablon varsayılanını kullanır: Ollama yerel veya OpenAI uyumlu",
+  "settings.autocomplete.local.auto": "Otomatik",
 
   "settings.notifications.sounds": "Sesler",
   "settings.notifications.enable.title": "Sesli bildirimleri etkinleştir",

@@ -5,6 +5,7 @@ import {
   fetchProviderData,
   resolveStoredKey,
   saveCustomProvider,
+  saveProviderProxy,
 } from "../../src/provider-actions"
 
 type ExistingGlobal = { disabled_providers?: string[]; provider?: Record<string, unknown> }
@@ -818,5 +819,60 @@ describe("resolveStoredKey", () => {
     expect(resolveStoredKey(storedKeys, "other", "https://example.com/v1")).toBeUndefined()
     expect(resolveStoredKey(storedKeys, undefined, "https://example.com/v1")).toBeUndefined()
     expect(resolveStoredKey(storedKeys, "", "https://example.com/v1")).toBeUndefined()
+  })
+})
+
+describe("saveProviderProxy", () => {
+  it("writes options.proxy for a standard provider and confirms", async () => {
+    const { ctx, calls, setCachedConfig } = createCtx()
+    await saveProviderProxy(ctx, "req", "openai", "http://127.0.0.1:8080", setCachedConfig)
+    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } }])
+    expect(calls.posts.at(-1)).toEqual({ type: "providerProxySaved", requestId: "req", providerID: "openai" })
+  })
+
+  it("removes the proxy with a null sentinel when unset", async () => {
+    const { ctx, calls, setCachedConfig } = createCtx()
+    await saveProviderProxy(ctx, "req", "openai", undefined, setCachedConfig)
+    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: null } } } } }])
+    expect(calls.posts.at(-1)).toEqual({ type: "providerProxySaved", requestId: "req", providerID: "openai" })
+  })
+
+  it("rejects an unsupported proxy scheme without writing config", async () => {
+    const { ctx, calls, setCachedConfig } = createCtx()
+    await saveProviderProxy(ctx, "req", "openai", "ftp://127.0.0.1:21", setCachedConfig)
+    expect(calls.config).toEqual([])
+    expect(calls.posts.at(-1)).toMatchObject({ type: "providerActionError", providerID: "openai" })
+  })
+})
+
+describe("connectProvider with proxy", () => {
+  it("applies the proxy to config before storing the key", async () => {
+    const { ctx, calls, setCachedConfig } = createCtx()
+    await connectProvider(ctx, "req", "openai", "sk-test", undefined, "http://127.0.0.1:8080", setCachedConfig)
+    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } }])
+    expect(calls.set).toEqual([{ providerID: "openai", auth: { type: "api", key: "sk-test" } }])
+    expect(calls.posts.at(-1)).toEqual({ type: "providerConnected", requestId: "req", providerID: "openai" })
+  })
+
+  it("clears the proxy with a null sentinel when the field is empty", async () => {
+    const { ctx, calls, setCachedConfig } = createCtx()
+    await connectProvider(ctx, "req", "openai", "sk-test", undefined, "", setCachedConfig)
+    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: null } } } } }])
+    expect(calls.posts.at(-1)).toEqual({ type: "providerConnected", requestId: "req", providerID: "openai" })
+  })
+
+  it("does not touch config when no proxy is provided", async () => {
+    const { ctx, calls } = createCtx()
+    await connectProvider(ctx, "req", "openai", "sk-test")
+    expect(calls.config).toEqual([])
+    expect(calls.set).toEqual([{ providerID: "openai", auth: { type: "api", key: "sk-test" } }])
+  })
+
+  it("rejects an invalid proxy without storing the key", async () => {
+    const { ctx, calls, setCachedConfig } = createCtx()
+    await connectProvider(ctx, "req", "openai", "sk-test", undefined, "ftp://127.0.0.1:21", setCachedConfig)
+    expect(calls.config).toEqual([])
+    expect(calls.set).toEqual([])
+    expect(calls.posts.at(-1)).toMatchObject({ type: "providerActionError", providerID: "openai" })
   })
 })

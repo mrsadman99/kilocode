@@ -884,6 +884,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "فعال‌سازی تکمیل خودکار متن چت",
   "settings.autocomplete.chatAutocomplete.description": "نمایش پیشنهادات تکمیل خودکار در کادر متنی چت",
   "settings.autocomplete.modelsHint": "برای انتخاب مدل مورد استفاده در تکمیل خودکار، به تنظیمات مدل‌ها مراجعه کنید.",
+  "settings.autocomplete.local.model.title": "مدل محلی",
+  "settings.autocomplete.local.model.description": "نام مدل آن‌گونه که سرور محلی ارائه می‌دهد (مثلاً برچسب Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "نشانی سرور محلی",
+  "settings.autocomplete.local.baseUrl.description": "نشانی پایه سرور محلی که مدل را اجرا می‌کند",
+  "settings.autocomplete.local.template.title": "الگوی FIM",
+  "settings.autocomplete.local.template.description":
+    "قالب اعلان fill-in-the-middle؛ «خودکار» از نام مدل تشخیص داده می‌شود",
+  "settings.autocomplete.local.endpoint.title": "نقطه پایانی API",
+  "settings.autocomplete.local.endpoint.description":
+    "«خودکار» از پیش‌فرض الگو استفاده می‌کند: بومی Ollama یا سازگار با OpenAI",
+  "settings.autocomplete.local.auto": "خودکار",
 
   "settings.notifications.sounds": "صداها",
   "settings.notifications.enable.title": "فعال‌سازی اعلان‌های صوتی",

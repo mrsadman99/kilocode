@@ -896,6 +896,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "チャットの自動補完を有効にする",
   "settings.autocomplete.chatAutocomplete.description": "チャットテキストエリアに自動補完の提案を表示",
   "settings.autocomplete.modelsHint": "オートコンプリートに使用するモデルを選択するには、モデル設定をご覧ください。",
+  "settings.autocomplete.local.model.title": "ローカルモデル",
+  "settings.autocomplete.local.model.description": "ローカルサーバーが提供するモデル名（例: Ollama のタグ）",
+  "settings.autocomplete.local.baseUrl.title": "ローカルサーバー URL",
+  "settings.autocomplete.local.baseUrl.description": "モデルを実行するローカルサーバーのベース URL",
+  "settings.autocomplete.local.template.title": "FIM テンプレート",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle プロンプト形式。「自動」はモデル名から判別します",
+  "settings.autocomplete.local.endpoint.title": "API エンドポイント",
+  "settings.autocomplete.local.endpoint.description":
+    "「自動」はテンプレートの既定値を使用: Ollama ネイティブまたは OpenAI 互換",
+  "settings.autocomplete.local.auto": "自動",
   "settings.notifications.sounds": "サウンド",
   "settings.notifications.enable.title": "サウンド通知を有効にする",
   "settings.notifications.enable.description":

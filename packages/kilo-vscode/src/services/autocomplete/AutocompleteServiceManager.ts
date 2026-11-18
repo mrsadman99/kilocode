@@ -27,7 +27,9 @@ export interface AutocompleteServiceSettings {
 
 function readSettings(): AutocompleteServiceSettings {
   const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
-  const info = getAutocompleteModel(config.get<string>("provider"), config.get<string>("model"))
+  const provider = config.get<string>("provider")
+  const model = provider === "local" ? config.get<string>("localModel") : config.get<string>("model")
+  const info = getAutocompleteModel(provider, model)
   return {
     enableAutoTrigger: config.get<boolean>("enableAutoTrigger") ?? true,
     enableSmartInlineTaskKeybinding: config.get<boolean>("enableSmartInlineTaskKeybinding") ?? true,

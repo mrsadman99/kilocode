@@ -891,6 +891,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Увімкнути автодоповнення в полі чату",
   "settings.autocomplete.chatAutocomplete.description": "Показувати підказки автодоповнення в полі введення чату",
   "settings.autocomplete.modelsHint": "Щоб вибрати модель для автодоповнення, див. Налаштування моделей.",
+  "settings.autocomplete.local.model.title": "Локальна модель",
+  "settings.autocomplete.local.model.description": "Ім'я моделі на вашому локальному сервері (наприклад, тег Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
+  "settings.autocomplete.local.baseUrl.description": "Базовий URL локального сервера, на якому запущено модель",
+  "settings.autocomplete.local.template.title": "Шаблон FIM",
+  "settings.autocomplete.local.template.description":
+    "Формат fill-in-the-middle промпту; «Авто» визначається за назвою моделі",
+  "settings.autocomplete.local.endpoint.title": "Ендпоінт API",
+  "settings.autocomplete.local.endpoint.description":
+    "«Авто» використовує типове значення шаблону: Ollama або OpenAI-сумісний",
+  "settings.autocomplete.local.auto": "Авто",
 
   "settings.notifications.sounds": "Звуки",
   "settings.notifications.enable.title": "Увімкнути звукові сповіщення",

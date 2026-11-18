@@ -1,4 +1,5 @@
 import type { CustomProviderPackage } from "../../../../src/shared/provider-model"
+import { composeProxyURL, isProxyURL } from "../../../../src/shared/custom-provider"
 import type { Modalities, ModelEntry, VariantEntry } from "./CustomProviderModelCard"
 
 type Translator = (key: string, params?: Record<string, string>) => string
@@ -14,6 +15,9 @@ export type FormState = {
   npm: CustomProviderPackage
   baseURL: string
   apiKey: string
+  proxy: string
+  proxyUser: string
+  proxyPassword: string
   models: ModelEntry[]
   headers: HeaderRow[]
   saving: boolean
@@ -23,6 +27,7 @@ export type FormErrors = {
   providerID: string | undefined
   name: string | undefined
   baseURL: string | undefined
+  proxy: string | undefined
   models: Array<{ id?: string; name?: string; variants?: Array<{ name?: string }> }>
   headers: Array<{ key?: string; value?: string }>
 }
@@ -47,7 +52,7 @@ type ValidateResult = {
       npm: CustomProviderPackage
       name: string
       env?: string[]
-      options: { baseURL: string; headers?: Record<string, string> }
+      options: { baseURL: string; headers?: Record<string, string>; proxy?: string }
       models: Record<string, unknown>
     }
   }
@@ -155,16 +160,35 @@ function resolveEnv(rawEnv: string | undefined, savedEnv: string[] | undefined) 
   return {}
 }
 
+function resolveKey(apiKey: string, editing: boolean, existingEnv?: string[]) {
+  const rawEnv = apiKey.match(/^\{env:([^}]+)\}$/)?.[1]?.trim()
+  // When editing and apiKey is empty, preserve existing env from the original config
+  const savedEnv = editing && !apiKey ? existingEnv : undefined
+  const key = apiKey && !rawEnv ? apiKey : undefined
+  return { rawEnv, savedEnv, key }
+}
+
+function checkBaseURL(baseURL: string, t: Translator) {
+  if (!baseURL) return t("provider.custom.error.baseURL.required")
+  if (!/^https?:\/\//.test(baseURL)) return t("provider.custom.error.baseURL.format")
+  return undefined
+}
+
+function checkProxy(form: FormState, t: Translator) {
+  const address = form.proxy.trim()
+  if (!address) return { proxy: undefined, error: undefined }
+  const proxy = composeProxyURL(address, form.proxyUser, form.proxyPassword)
+  const error = !proxy || !isProxyURL(proxy) ? t("provider.custom.error.proxy.format") : undefined
+  return { proxy, error }
+}
+
 export function validateCustomProvider(input: ValidateArgs): ValidateResult {
   const providerID = input.form.providerID.trim()
   const name = input.form.name.trim()
   const baseURL = input.form.baseURL.trim()
   const apiKey = input.form.apiKey.trim()
 
-  const rawEnv = apiKey.match(/^\{env:([^}]+)\}$/)?.[1]?.trim()
-  // When editing and apiKey is empty, preserve existing env from the original config
-  const savedEnv = input.editing && !apiKey ? input.existingEnv : undefined
-  const key = apiKey && !rawEnv ? apiKey : undefined
+  const { rawEnv, savedEnv, key } = resolveKey(apiKey, input.editing, input.existingEnv)
 
   const { idErr, existsErr } = checkProviderID(
     providerID,
@@ -175,11 +199,8 @@ export function validateCustomProvider(input: ValidateArgs): ValidateResult {
   )
 
   const nameError = !name ? input.t("provider.custom.error.name.required") : undefined
-  const urlError = !baseURL
-    ? input.t("provider.custom.error.baseURL.required")
-    : !/^https?:\/\//.test(baseURL)
-      ? input.t("provider.custom.error.baseURL.format")
-      : undefined
+  const urlError = checkBaseURL(baseURL, input.t)
+  const { proxy, error: proxyError } = checkProxy(input.form, input.t)
 
   const seenModels = new Set<string>()
   const modelErrors = input.form.models.map((m) => checkModel(m, seenModels, input.t))
@@ -193,11 +214,12 @@ export function validateCustomProvider(input: ValidateArgs): ValidateResult {
     providerID: idErr ?? existsErr,
     name: nameError,
     baseURL: urlError,
+    proxy: proxyError,
     models: modelErrors,
     headers: headerErrors,
   }
 
-  const ok = !idErr && !existsErr && !nameError && !urlError && modelsValid && headersValid
+  const ok = !idErr && !existsErr && !nameError && !urlError && !proxyError && modelsValid && headersValid
   if (!ok) return { errors }
 
   const headers = Object.fromEntries(
@@ -210,6 +232,7 @@ export function validateCustomProvider(input: ValidateArgs): ValidateResult {
   const options = {
     baseURL,
     ...(Object.keys(headers).length ? { headers } : {}),
+    ...(proxy ? { proxy } : {}),
   }
 
   return {

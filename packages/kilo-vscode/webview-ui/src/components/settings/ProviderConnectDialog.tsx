@@ -8,6 +8,7 @@ import { showToast } from "@kilocode/kilo-ui/toast"
 import type { ProviderAuthAuthorization, ProviderAuthMethod } from "@kilocode/sdk/v2/client"
 import { Component, For, Match, Show, Switch, createMemo, createSignal, onCleanup, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
+import { useConfig } from "../../context/config"
 import { useLanguage } from "../../context/language"
 import { useProvider } from "../../context/provider"
 import { useVSCode } from "../../context/vscode"
@@ -17,6 +18,7 @@ import {
   isLocalProviderOptionalApiKey,
   LOCAL_PROVIDER_API_KEY_PLACEHOLDER,
 } from "../../utils/local-providers"
+import { composeProxyURL, isProxyURL, parseProxyURL } from "../../../../src/shared/custom-provider"
 import AnacondaDesktopDialog from "./AnacondaDesktopDialog"
 
 interface ProviderConnectDialogProps {
@@ -59,9 +61,69 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
   const language = useLanguage()
   const provider = useProvider()
   const vscode = useVSCode()
+  const { config } = useConfig()
   const action = createProviderAction(vscode)
 
   const [state, setState] = createStore<ViewState>({})
+
+  const existingProxy = parseProxyURL(
+    (config().provider?.[props.providerID]?.options as { proxy?: string } | undefined)?.proxy,
+  )
+  const [proxyAddress, setProxyAddress] = createSignal(existingProxy.address)
+  const [proxyUser, setProxyUser] = createSignal(existingProxy.user)
+  const [proxyPassword, setProxyPassword] = createSignal(existingProxy.password)
+  const [proxyError, setProxyError] = createSignal<string | undefined>()
+
+  function resolveProxy(): string | undefined {
+    const proxy = composeProxyURL(proxyAddress(), proxyUser(), proxyPassword())
+    if (proxyAddress().trim() && (!proxy || !isProxyURL(proxy))) {
+      setProxyError(language.t("provider.custom.error.proxy.format"))
+      return undefined
+    }
+    setProxyError(undefined)
+    return proxy ?? ""
+  }
+
+  const ProxyFields: Component = () => (
+    <div style={{ display: "flex", "flex-direction": "column", gap: "8px" }}>
+      <TextField
+        type="text"
+        autocomplete="off"
+        spellcheck={false}
+        label={language.t("provider.custom.field.proxy.label")}
+        placeholder={language.t("provider.custom.field.proxy.placeholder")}
+        description={language.t("provider.custom.field.proxy.description")}
+        value={proxyAddress()}
+        onChange={(next) => setProxyAddress(next)}
+        validationState={proxyError() ? "invalid" : undefined}
+        error={proxyError()}
+      />
+      <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ flex: 1 }}>
+          <TextField
+            type="text"
+            autocomplete="off"
+            spellcheck={false}
+            label={language.t("provider.custom.field.proxyUser.label")}
+            placeholder={language.t("provider.custom.field.proxyUser.placeholder")}
+            value={proxyUser()}
+            onChange={(next) => setProxyUser(next)}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <TextField
+            type="password"
+            autocomplete="off"
+            spellcheck={false}
+            label={language.t("provider.custom.field.proxyPassword.label")}
+            placeholder={language.t("provider.custom.field.proxyPassword.placeholder")}
+            value={proxyPassword()}
+            onChange={(next) => setProxyPassword(next)}
+          />
+        </div>
+      </div>
+    </div>
+  )
 
   const item = createMemo(() => provider.providers()[props.providerID])
   const name = () => item()?.name ?? props.providerID
@@ -330,6 +392,9 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
     const index = state.methodIndex
     if (index === undefined) return
 
+    const proxy = resolveProxy()
+    if (proxy === undefined) return
+
     setState({
       ...state,
       phase: "authorizing",
@@ -343,6 +408,7 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
         providerID: props.providerID,
         method: index,
         inputs,
+        proxy,
       },
       {
         onOAuthReady: (message) => {
@@ -376,7 +442,7 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
     authorize()
   }
 
-  function connect(apiKey: string, metadata?: Record<string, string>) {
+  function connect(apiKey: string, metadata?: Record<string, string>, proxy?: string) {
     setState({
       ...state,
       phase: "connecting",
@@ -390,6 +456,7 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
         providerID: props.providerID,
         apiKey,
         metadata,
+        proxy,
       },
       {
         onConnected: succeed,
@@ -415,6 +482,7 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
         providerID: props.providerID,
         method: index,
         code,
+        proxy: composeProxyURL(proxyAddress(), proxyUser(), proxyPassword()) ?? "",
       },
       {
         onConnected: succeed,
@@ -438,6 +506,7 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
             )}
           </For>
         </div>
+        <ProxyFields />
         <div class="dialog-confirm-actions">
           <Button variant="ghost" size="large" onClick={() => dialog.close()}>
             {language.t("common.cancel")}
@@ -540,7 +609,9 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
       }
       if (bedrockKeys()) metadata.authType = "accessKey"
       if (vertexCredentials()) metadata.authType = "serviceAccount"
-      connect(apiKey, Object.keys(metadata).length > 0 ? metadata : undefined)
+      const proxy = resolveProxy()
+      if (proxy === undefined) return
+      connect(apiKey, Object.keys(metadata).length > 0 ? metadata : undefined, proxy)
     }
 
     return (
@@ -582,6 +653,7 @@ const ProviderConnectDialog: Component<ProviderConnectDialogProps> = (props) => 
           invalidKey={state.field}
           error={state.error}
         />
+        <ProxyFields />
         <div class="dialog-confirm-actions provider-connect-actions">
           <div class="provider-connect-byok">
             {language.t("provider.connect.kiloGateway.byok.prefix")}

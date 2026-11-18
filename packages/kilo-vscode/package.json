@@ -1027,13 +1027,57 @@
           "type": "string",
           "enum": [
             "kilo",
-            "mistral"
+            "mistral",
+            "local"
           ],
           "enumDescriptions": [
             "Use autocomplete models through Kilo Gateway",
-            "Use autocomplete models through your connected Mistral provider API key"
+            "Use autocomplete models through your connected Mistral provider API key",
+            "Use a local FIM model (Ollama, llama.cpp, LM Studio) via a local server"
           ],
           "description": "Provider to use for inline autocomplete suggestions. If unset, Kilo Gateway is used."
+        },
+        "kilo-code.new.autocomplete.localModel": {
+          "type": "string",
+          "default": "qwen2.5-coder:7b",
+          "description": "Local model name for autocomplete, as served by your local server (e.g. an Ollama model tag). Used when the autocomplete provider is 'local'."
+        },
+        "kilo-code.new.autocomplete.localBaseURL": {
+          "type": "string",
+          "default": "http://127.0.0.1:11434",
+          "description": "Base URL of the local server used for autocomplete when the provider is 'local'."
+        },
+        "kilo-code.new.autocomplete.localTemplate": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "starcoder",
+            "qwen",
+            "codellama"
+          ],
+          "enumDescriptions": [
+            "Infer the FIM template from the local model name",
+            "StarCoder FIM tokens (<fim_prefix>/<fim_suffix>/<fim_middle>)",
+            "Qwen / Qwen2.5-Coder FIM tokens (<|fim_prefix|>/<|fim_suffix|>/<|fim_middle|>)",
+            "CodeLlama FIM tokens (<PRE>/<SUF>/<MID>)"
+          ],
+          "default": "auto",
+          "description": "Fill-in-the-middle prompt template used to assemble local autocomplete prompts."
+        },
+        "kilo-code.new.autocomplete.localEndpoint": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "completions",
+            "generate"
+          ],
+          "enumDescriptions": [
+            "Use the template default (Ollama native for Qwen/CodeLlama, OpenAI-compatible for StarCoder)",
+            "OpenAI-compatible /v1/completions endpoint (Ollama, llama.cpp, LM Studio, vLLM)",
+            "Ollama-native /api/generate endpoint with raw prompts"
+          ],
+          "default": "auto",
+          "description": "Local server API endpoint used for autocomplete when the provider is 'local'."
         },
         "kilo-code.new.autocomplete.enableAutoTrigger": {
           "type": "boolean",
@@ -1414,6 +1458,7 @@
     "playwright-core": "1.64.1",
     "quick-lru": "^7.0.0",
     "simple-git": "4.0.2",
+    "socks": "2.8.9",
     "solid-js": "^1.9.11",
     "uri-js": "^4.4.1",
     "virtua": "catalog:",

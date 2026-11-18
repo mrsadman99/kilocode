@@ -522,6 +522,19 @@ export const dict = {
   "provider.custom.field.apiKey.placeholder": "API-ключ",
   "provider.custom.field.apiKey.description":
     "Необязательно. Оставьте пустым, если вы управляете аутентификацией через заголовки.",
+  "provider.custom.field.proxy.label": "HTTP-прокси",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Необязательно. Оставьте пустым для прямого подключения. Поддерживаются http://, https:// и socks5://.",
+  "provider.custom.field.proxyUser.label": "Имя пользователя прокси",
+  "provider.custom.field.proxyUser.placeholder": "Необязательно",
+  "provider.custom.field.proxyPassword.label": "Пароль прокси",
+  "provider.custom.field.proxyPassword.placeholder": "Необязательно",
+  "provider.proxy.action": "Прокси",
+  "provider.proxy.title": "Прокси для {{provider}}",
+  "provider.proxy.description":
+    "Направлять запросы к этому провайдеру через прокси. Оставьте пустым для прямого подключения.",
+  "provider.proxy.toast.saved.title": "Прокси сохранён для {{provider}}",
   "provider.custom.models.label": "Модели",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -559,6 +572,7 @@ export const dict = {
   "provider.custom.error.name.required": "Отображаемое имя обязательно",
   "provider.custom.error.baseURL.required": "Базовый URL обязателен",
   "provider.custom.error.baseURL.format": "Должен начинаться с http:// или https://",
+  "provider.custom.error.proxy.format": "Прокси должен быть URL вида http://, https:// или socks5://",
   "provider.custom.error.required": "Обязательно",
   "provider.custom.error.duplicate": "Дубликат",
   "settings.openLocalConfig": "Локальный конфиг",
@@ -898,6 +912,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Включить автодополнение чата",
   "settings.autocomplete.chatAutocomplete.description": "Показывать предложения автодополнения в поле чата",
   "settings.autocomplete.modelsHint": "Чтобы выбрать модель для автодополнения, см. настройки Моделей.",
+  "settings.autocomplete.local.model.title": "Локальная модель",
+  "settings.autocomplete.local.model.description": "Имя модели на вашем локальном сервере (например, тег Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
+  "settings.autocomplete.local.baseUrl.description": "Базовый URL локального сервера, на котором запущена модель",
+  "settings.autocomplete.local.template.title": "Шаблон FIM",
+  "settings.autocomplete.local.template.description":
+    "Формат fill-in-the-middle промпта; «Авто» определяется по имени модели",
+  "settings.autocomplete.local.endpoint.title": "Эндпоинт API",
+  "settings.autocomplete.local.endpoint.description":
+    "«Авто» использует значение по умолчанию для шаблона: Ollama или OpenAI-совместимый",
+  "settings.autocomplete.local.auto": "Авто",
   "settings.notifications.sounds": "Звуки",
   "settings.notifications.enable.title": "Включить звуковые уведомления",
   "settings.notifications.enable.description":

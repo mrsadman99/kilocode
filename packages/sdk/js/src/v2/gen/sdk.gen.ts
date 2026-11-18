@@ -7305,6 +7305,9 @@ export class Kilo extends HeyApiClient {
       model?: string
       maxTokens?: number
       temperature?: number
+      baseURL?: string
+      endpoint?: "completions" | "generate"
+      stop?: Array<string>
     },
     options?: Options<never, ThrowOnError, KiloFimResponse>,
   ) {
@@ -7321,6 +7324,9 @@ export class Kilo extends HeyApiClient {
             { in: "body", key: "model" },
             { in: "body", key: "maxTokens" },
             { in: "body", key: "temperature" },
+            { in: "body", key: "baseURL" },
+            { in: "body", key: "endpoint" },
+            { in: "body", key: "stop" },
           ],
         },
       ],

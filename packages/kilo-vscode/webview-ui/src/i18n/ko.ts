@@ -891,6 +891,16 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "채팅 텍스트 영역 자동완성 활성화",
   "settings.autocomplete.chatAutocomplete.description": "채팅 텍스트 영역에서 자동완성 제안 표시",
   "settings.autocomplete.modelsHint": "자동 완성에 사용되는 모델을 선택하려면 모델 설정을 참조하세요.",
+  "settings.autocomplete.local.model.title": "로컬 모델",
+  "settings.autocomplete.local.model.description": "로컬 서버에서 제공하는 모델 이름 (예: Ollama 태그)",
+  "settings.autocomplete.local.baseUrl.title": "로컬 서버 URL",
+  "settings.autocomplete.local.baseUrl.description": "모델을 실행하는 로컬 서버의 기본 URL",
+  "settings.autocomplete.local.template.title": "FIM 템플릿",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle 프롬프트 형식; '자동'은 모델 이름에서 감지합니다",
+  "settings.autocomplete.local.endpoint.title": "API 엔드포인트",
+  "settings.autocomplete.local.endpoint.description": "'자동'은 템플릿 기본값을 사용: Ollama 네이티브 또는 OpenAI 호환",
+  "settings.autocomplete.local.auto": "자동",
   "settings.notifications.sounds": "소리",
   "settings.notifications.enable.title": "소리 알림 활성화",
   "settings.notifications.enable.description":

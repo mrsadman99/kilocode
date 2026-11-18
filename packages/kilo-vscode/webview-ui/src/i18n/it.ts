@@ -1377,6 +1377,18 @@ export const dict = {
   // Autocomplete hint
   "settings.autocomplete.modelsHint":
     "Per scegliere quale modello usare per l'autocompletamento, vedi le impostazioni Modelli.",
+  "settings.autocomplete.local.model.title": "Modello locale",
+  "settings.autocomplete.local.model.description":
+    "Nome del modello come fornito dal server locale (es. un tag Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL del server locale",
+  "settings.autocomplete.local.baseUrl.description": "URL base del server locale che esegue il modello",
+  "settings.autocomplete.local.template.title": "Template FIM",
+  "settings.autocomplete.local.template.description":
+    "Formato del prompt fill-in-the-middle; «Auto» viene rilevato dal nome del modello",
+  "settings.autocomplete.local.endpoint.title": "Endpoint API",
+  "settings.autocomplete.local.endpoint.description":
+    "«Auto» usa il valore predefinito del template: nativo Ollama o compatibile OpenAI",
+  "settings.autocomplete.local.auto": "Auto",
 
   // Indexing
   "settings.indexing.globalEnable.title": "Abilita globalmente",

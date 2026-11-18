@@ -19,6 +19,8 @@
     ".": "./src/index.ts",
     "./autocomplete": "./src/autocomplete.ts",
     "./fim": "./src/fim.ts",
+    "./local-fim": "./src/local-fim.ts",
+    "./proxy-tunnel": "./src/proxy-tunnel.ts",
     "./provider-usage": "./src/provider-usage.ts",
     "./event-service": "./src/event-service/client.ts",
     "./tui": "./src/tui.ts"

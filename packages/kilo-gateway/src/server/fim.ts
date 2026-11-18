@@ -2,6 +2,7 @@ import { HEADER_FEATURE } from "../api/constants.js"
 import type { DirectAutocompleteProviderID } from "../autocomplete.js"
 import { DIRECT_FIM_ENV, requestMistralFim, resolveFimTarget, type FimTarget } from "../fim.js"
 import { buildKiloHeaders } from "../headers.js"
+import { requestLocalFim } from "../local-fim.js"
 import type { AuthStore } from "./handlers.js"
 
 type Auth = Pick<AuthStore, "get">
@@ -64,12 +65,49 @@ async function fetchFim(
   return run(target.url)
 }
 
+function fimStream(response: Response) {
+  return new Response(response.body, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  })
+}
+
 export function createFimHandler(Auth: Auth) {
   return async (c: any) => {
-    const { prefix, suffix, provider, model, maxTokens, temperature } = c.req.valid("json")
-    const target = resolveFimTarget(provider, model)
+    const { prefix, suffix, provider, model, maxTokens, temperature, baseURL, endpoint, stop } = c.req.valid("json")
+    const target = resolveFimTarget(provider, model, { baseURL, endpoint })
     const fimMaxTokens = maxTokens ?? 256
     const fimTemperature = temperature ?? 0.2
+    const signal = AbortSignal.any([c.req.raw.signal, AbortSignal.timeout(FIM_TIMEOUT_MS)])
+
+    if (target.provider === "local") {
+      const url = URL.parse(target.url)
+      if (!url || (url.protocol !== "http:" && url.protocol !== "https:")) {
+        return c.json({ error: "Invalid local base URL" }, 400)
+      }
+      try {
+        const response = await requestLocalFim(
+          target,
+          { prefix, maxTokens: fimMaxTokens, temperature: fimTemperature, stop },
+          signal,
+        )
+        if (!response.ok) {
+          const text = await response.text()
+          return c.json({ error: `FIM request failed: ${response.status} ${text}` }, response.status as any)
+        }
+        return fimStream(response)
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "TimeoutError") {
+          return c.json({ error: "FIM request timed out" }, 504 as any)
+        }
+        if (signal.aborted) return c.json({ error: "FIM request canceled" }, 499 as any)
+        throw err
+      }
+    }
+
     const proxy = target.provider === "kilo" ? await getProxyAuth(Auth) : undefined
     const token = target.provider === "kilo" ? proxy?.token : await getProviderKey(Auth, target.provider)
 
@@ -84,8 +122,6 @@ export function createFimHandler(Auth: Auth) {
     if (!token) {
       return c.json({ error: `Missing ${target.provider} provider API key` }, 401)
     }
-
-    const signal = AbortSignal.any([c.req.raw.signal, AbortSignal.timeout(FIM_TIMEOUT_MS)])
 
     try {
       const response = await fetchFim(target, token, {
@@ -102,13 +138,7 @@ export function createFimHandler(Auth: Auth) {
         return c.json({ error: `FIM request failed: ${response.status} ${text}` }, response.status as any)
       }
 
-      return new Response(response.body, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      })
+      return fimStream(response)
     } catch (err) {
       if (err instanceof DOMException && err.name === "TimeoutError") {
         return c.json({ error: "FIM request timed out" }, 504 as any)

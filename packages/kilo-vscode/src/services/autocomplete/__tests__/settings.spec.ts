@@ -88,4 +88,52 @@ describe("autocomplete settings", () => {
 
     expect(validAutocompleteSetting("enableAutoTrigger", "true")).toBe(false)
   })
+
+  it("includes local provider settings in loaded settings", async () => {
+    state.set("provider", "local")
+    state.set("localModel", "starcoder2:7b")
+    state.set("localBaseURL", "http://127.0.0.1:11434")
+    state.set("localTemplate", "starcoder")
+    state.set("localEndpoint", "completions")
+    const { buildAutocompleteSettingsMessage } = await import("../settings")
+
+    const settings = buildAutocompleteSettingsMessage().settings
+    expect(settings.provider).toBe("local")
+    expect(settings.localModel).toBe("starcoder2:7b")
+    expect(settings.localBaseURL).toBe("http://127.0.0.1:11434")
+    expect(settings.localTemplate).toBe("starcoder")
+    expect(settings.localEndpoint).toBe("completions")
+  })
+
+  it("returns null for unset local settings", async () => {
+    const { buildAutocompleteSettingsMessage } = await import("../settings")
+
+    const settings = buildAutocompleteSettingsMessage().settings
+    expect(settings.localModel).toBeNull()
+    expect(settings.localBaseURL).toBeNull()
+    expect(settings.localTemplate).toBeNull()
+    expect(settings.localEndpoint).toBeNull()
+  })
+
+  it("accepts the local provider and its settings", async () => {
+    const { validAutocompleteSetting } = await import("../settings")
+
+    expect(validAutocompleteSetting("provider", "local")).toBe(true)
+    expect(validAutocompleteSetting("localModel", "qwen2.5-coder:7b")).toBe(true)
+    expect(validAutocompleteSetting("localModel", null)).toBe(true)
+    expect(validAutocompleteSetting("localBaseURL", "http://127.0.0.1:11434")).toBe(true)
+    expect(validAutocompleteSetting("localTemplate", "auto")).toBe(true)
+    expect(validAutocompleteSetting("localTemplate", "qwen")).toBe(true)
+    expect(validAutocompleteSetting("localEndpoint", "auto")).toBe(true)
+    expect(validAutocompleteSetting("localEndpoint", "generate")).toBe(true)
+  })
+
+  it("rejects invalid local setting values", async () => {
+    const { validAutocompleteSetting } = await import("../settings")
+
+    expect(validAutocompleteSetting("localModel", 42)).toBe(false)
+    expect(validAutocompleteSetting("localBaseURL", false)).toBe(false)
+    expect(validAutocompleteSetting("localTemplate", "codestral")).toBe(false)
+    expect(validAutocompleteSetting("localEndpoint", "chat")).toBe(false)
+  })
 })

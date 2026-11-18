@@ -901,6 +901,16 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofuldførelsesforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For at vælge hvilken model der bruges til autofuldførelse, se Modelindstillinger.",
+  "settings.autocomplete.local.model.title": "Lokal model",
+  "settings.autocomplete.local.model.description": "Modelnavn som serveret af din lokale server (f.eks. et Ollama-tag)",
+  "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
+  "settings.autocomplete.local.baseUrl.description": "Basis-URL for den lokale server, der kører modellen",
+  "settings.autocomplete.local.template.title": "FIM-skabelon",
+  "settings.autocomplete.local.template.description": "Fill-in-the-middle-promptformat; 'Auto' udledes af modelnavnet",
+  "settings.autocomplete.local.endpoint.title": "API-endpoint",
+  "settings.autocomplete.local.endpoint.description":
+    "'Auto' bruger skabelonens standard: Ollama-native eller OpenAI-kompatibel",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Lyde",
   "settings.notifications.enable.title": "Aktivér lydnotifikationer",
   "settings.notifications.enable.description":

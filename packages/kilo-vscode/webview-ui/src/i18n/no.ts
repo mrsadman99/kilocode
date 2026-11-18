@@ -863,6 +863,18 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofullføringsforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For å velge hvilken modell som brukes til autofullføring, se Modellinnstillinger.",
+  "settings.autocomplete.local.model.title": "Lokal modell",
+  "settings.autocomplete.local.model.description":
+    "Modellnavn slik den lokale serveren tilbyr det (f.eks. en Ollama-tagg)",
+  "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
+  "settings.autocomplete.local.baseUrl.description": "Grunn-URL til den lokale serveren som kjører modellen",
+  "settings.autocomplete.local.template.title": "FIM-mal",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle-promptformat; «Auto» utledes fra modellnavnet",
+  "settings.autocomplete.local.endpoint.title": "API-endepunkt",
+  "settings.autocomplete.local.endpoint.description":
+    "«Auto» bruker malens standard: Ollama-nativ eller OpenAI-kompatibel",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Lyder",
   "settings.notifications.enable.title": "Aktiver lydvarsler",
   "settings.notifications.enable.description":
