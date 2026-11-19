@@ -1580,6 +1580,8 @@ export interface ConnectProviderMessage {
   providerID: string
   apiKey: string
   metadata?: Record<string, string>
+  /** Composed proxy URL to apply before connecting; empty string clears it. */
+  proxy?: string
 }
 
 export interface AuthorizeProviderOAuthMessage {
@@ -1588,6 +1590,8 @@ export interface AuthorizeProviderOAuthMessage {
   providerID: string
   method: number
   inputs?: Record<string, string>
+  /** Composed proxy URL to persist before the OAuth token exchange; empty string clears it. */
+  proxy?: string
 }
 
 export interface CompleteProviderOAuthMessage {
@@ -1596,6 +1600,8 @@ export interface CompleteProviderOAuthMessage {
   providerID: string
   method: number
   code?: string
+  /** Composed proxy URL to apply before the provider reloads; empty string clears it. */
+  proxy?: string
 }
 
 export interface DisconnectProviderMessage {
@@ -1613,6 +1619,14 @@ export interface SaveCustomProviderMessage {
   apiKeyChanged?: boolean
 }
 
+export interface SetProviderProxyMessage {
+  type: "setProviderProxy"
+  requestId: string
+  providerID: string
+  /** Composed proxy URL, or undefined to remove the proxy. */
+  proxy?: string
+}
+
 export interface FetchCustomProviderModelsMessage {
   type: "fetchCustomProviderModels"
   requestId: string
@@ -1626,6 +1640,7 @@ export interface FetchCustomProviderModelsMessage {
    */
   providerID?: string
   headers?: Record<string, string>
+  proxy?: string
 }
 
 export interface PersistRecentsRequest {
@@ -1999,6 +2014,7 @@ export type WebviewMessage =
   | DisconnectProviderMessage
   | AnacondaDesktopWebviewMessage
   | SaveCustomProviderMessage
+  | SetProviderProxyMessage
   | FetchCustomProviderModelsMessage
   | PersistRecentsRequest
   | RequestRecentsMessage

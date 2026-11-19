@@ -1,4 +1,8 @@
-import { AUTOCOMPLETE_MODELS, getAutocompleteModel } from "../../../../src/shared/autocomplete-models"
+import {
+  AUTOCOMPLETE_MODELS,
+  getAutocompleteModel,
+  LOCAL_PROVIDER_LABEL,
+} from "../../../../src/shared/autocomplete-models"
 import type { EnrichedModel } from "../../context/provider"
 
 /**
@@ -8,14 +12,24 @@ import type { EnrichedModel } from "../../context/provider"
  * `DEFAULT_AUTOCOMPLETE_MODEL` separately.
  */
 export function getAutocompleteSelection(provider?: string, modelID?: string) {
+  if (provider === "local") return { providerID: "local", modelID: "local" }
   if (!provider && !modelID) return null
   const model = getAutocompleteModel(provider, modelID)
+  if (!model) return null
   return { providerID: model.providerID, modelID: model.modelID }
 }
 
-export const AUTOCOMPLETE_SELECTOR_MODELS: EnrichedModel[] = AUTOCOMPLETE_MODELS.map((m) => ({
-  id: m.modelID,
-  name: m.label,
-  providerID: m.providerID,
-  providerName: m.provider,
-}))
+export const AUTOCOMPLETE_SELECTOR_MODELS: EnrichedModel[] = [
+  ...AUTOCOMPLETE_MODELS.map((m) => ({
+    id: m.modelID,
+    name: m.label,
+    providerID: m.providerID,
+    providerName: m.provider,
+  })),
+  {
+    id: "local",
+    name: "Local FIM model",
+    providerID: "local",
+    providerName: LOCAL_PROVIDER_LABEL,
+  },
+]

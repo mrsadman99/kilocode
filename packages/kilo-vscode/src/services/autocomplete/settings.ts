@@ -1,5 +1,10 @@
 import * as vscode from "vscode"
-import { validAutocompleteModel, validAutocompleteProvider } from "../../shared/autocomplete-models"
+import {
+  validAutocompleteModel,
+  validAutocompleteProvider,
+  validFimTemplate,
+  validLocalFimEndpoint,
+} from "../../shared/autocomplete-models"
 
 type Message = {
   type: string
@@ -29,6 +34,10 @@ export function buildAutocompleteSettingsMessage() {
       enableChatAutocomplete: config.get<boolean>("enableChatAutocomplete", false),
       provider: config.get<string>("provider") ?? null,
       model: config.get<string>("model") ?? null,
+      localModel: config.get<string>("localModel") ?? null,
+      localBaseURL: config.get<string>("localBaseURL") ?? null,
+      localTemplate: config.get<string>("localTemplate") ?? null,
+      localEndpoint: config.get<string>("localEndpoint") ?? null,
     },
   }
 }
@@ -40,6 +49,14 @@ export function watchAutocompleteConfig(post: Post): vscode.Disposable {
       post(buildAutocompleteSettingsMessage())
     }
   })
+}
+
+function validLocalSetting(key: string, value: unknown) {
+  if (value === null || value === undefined) return true
+  if (key === "localModel" || key === "localBaseURL") return typeof value === "string"
+  if (key === "localTemplate") return value === "auto" || validFimTemplate(value)
+  if (key === "localEndpoint") return value === "auto" || validLocalFimEndpoint(value)
+  return false
 }
 
 export function validAutocompleteSetting(key: string, value: unknown) {
@@ -57,6 +74,8 @@ export function validAutocompleteSetting(key: string, value: unknown) {
   if (key === "enableAutoTrigger") return typeof value === "boolean"
   if (key === "enableSmartInlineTaskKeybinding") return typeof value === "boolean"
   if (key === "enableChatAutocomplete") return typeof value === "boolean"
+
+  if (key.startsWith("local")) return validLocalSetting(key, value)
 
   return false
 }

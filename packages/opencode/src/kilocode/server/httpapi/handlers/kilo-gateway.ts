@@ -38,6 +38,7 @@ import { InstanceStore } from "@/project/instance-store"
 import { ModelCache } from "@/provider/model-cache"
 import { InstanceHttpApi } from "@/server/routes/instance/httpapi/api"
 import { AudioTranscriptionsBody, CloudSessionImportError, FimBody } from "../groups/kilo-gateway"
+import { requestLocalFim } from "@kilocode/kilo-gateway/local-fim"
 
 const FIM_TIMEOUT_MS = 30_000
 const log = Log.create({ service: "kilo-gateway" })
@@ -110,17 +111,27 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
     })
 
     const fim = Effect.fn("KiloGatewayHttpApi.fim")(function* (ctx: { payload: typeof FimBody.Type }) {
-      const target = resolveFimTarget(ctx.payload.provider, ctx.payload.model)
+      const target = resolveFimTarget(ctx.payload.provider, ctx.payload.model, {
+        baseURL: ctx.payload.baseURL,
+        endpoint: ctx.payload.endpoint,
+      })
+      if (!target) return yield* Effect.fail(new HttpApiError.BadRequest({}))
+      if (target.provider === "local") {
+        const url = yield* Effect.try({ try: () => new URL(target.url), catch: () => new HttpApiError.BadRequest({}) })
+        if (url.protocol !== "http:" && url.protocol !== "https:")
+          return yield* Effect.fail(new HttpApiError.BadRequest({}))
+      }
       const info = target.provider === "kilo" ? yield* proxyAuth() : undefined
       const token = yield* Effect.gen(function* () {
         if (target.provider === "kilo") return info?.token
+        if (target.provider === "local") return undefined
         const item = yield* auth.get(target.provider).pipe(Effect.mapError(() => new HttpApiError.Unauthorized({})))
         if (item?.type === "api") return item.key
         return DIRECT_FIM_ENV[target.provider].map((key) => process.env[key]).find(Boolean)
       })
 
       if (target.provider === "kilo" && !info?.auth) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
-      if (!token) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
+      if (target.provider !== "local" && !token) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
 
       const request = yield* HttpServerRequest.HttpServerRequest
       const signal =
@@ -129,6 +140,7 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
           : AbortSignal.timeout(FIM_TIMEOUT_MS)
       const response = yield* Effect.promise(async () => {
         try {
+          if (target.provider === "local") return await requestLocalFim(target, ctx.payload, signal)
           const run = async (url: string): Promise<Response> => {
             console.info(`[FIM] request provider=${target.provider} model=${target.model} url=${url}`)
             return fetch(url, {

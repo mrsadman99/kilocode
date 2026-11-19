@@ -128,6 +128,12 @@ export const FimBody = Schema.Struct({
   model: Schema.optional(Schema.String),
   maxTokens: Schema.optional(Schema.Finite),
   temperature: Schema.optional(Schema.Finite),
+  /** Local provider only: base URL of the local server (e.g. Ollama). */
+  baseURL: Schema.optional(Schema.String),
+  /** Local provider only: which local API to call. */
+  endpoint: Schema.optional(Schema.Union([Schema.Literal("completions"), Schema.Literal("generate")])),
+  /** Local provider only: stop sequences for the assembled FIM prompt. */
+  stop: Schema.optional(Schema.Array(Schema.String)),
 })
 
 export const AudioTranscriptionsBody = Schema.Struct({

@@ -5,6 +5,7 @@
 import type { Config, KiloClient } from "@kilocode/sdk/v2"
 import { validateProviderID as validateProviderIDShared } from "./shared/custom-provider"
 import {
+  isProxyURL,
   resolveCustomProviderAuth,
   sanitizeCustomProviderConfig,
   withCustomProviderDeletions,
@@ -319,14 +320,27 @@ export async function connectProvider(
   providerID: string,
   apiKey: string,
   metadata?: Record<string, unknown>,
+  proxy?: string,
+  setCachedConfig?: (msg: unknown) => void,
 ) {
   const id = validateID(ctx, requestId, providerID, "connect")
   if (!id) return
+  const proxyValue = proxy?.trim()
+  if (proxyValue && !isProxyURL(proxyValue)) {
+    postError(ctx, requestId, providerID, "connect", "Proxy must be an http://, https:// or socks5:// URL")
+    return
+  }
   try {
+    // Apply the proxy before connecting so the provider's first requests after
+    // auth (model listing, inference) already route through it.
+    if (proxy !== undefined) {
+      await saveGlobal(ctx, { provider: { [id]: { options: { proxy: proxyValue || null } } } } as unknown as Config)
+    }
     const meta = cleanMetadata(metadata)
     const auth = meta ? { type: "api" as const, key: apiKey, metadata: meta } : { type: "api" as const, key: apiKey }
     await ctx.client.auth.set({ providerID: id, auth }, { throwOnError: true })
     await ctx.disposeGlobal(`provider connect (${id})`)
+    if (proxy !== undefined && setCachedConfig) await refreshConfig(ctx, setCachedConfig)
     await ctx.fetchAndSendProviders()
     ctx.postMessage({ type: "providerConnected", requestId, providerID: id })
   } catch (error) {
@@ -340,10 +354,23 @@ export async function authorizeProviderOAuth(
   providerID: string,
   method: number,
   inputs?: Record<string, string>,
+  proxy?: string,
+  setCachedConfig?: (msg: unknown) => void,
 ) {
   const id = validateID(ctx, requestId, providerID, "authorize")
   if (!id) return
+  const proxyValue = proxy?.trim()
+  if (proxyValue && !isProxyURL(proxyValue)) {
+    postError(ctx, requestId, providerID, "authorize", "Proxy must be an http://, https:// or socks5:// URL")
+    return
+  }
   try {
+    // Persist the proxy before starting OAuth so the Codex token exchange (which reads it from
+    // config) already routes through it; saving it only at callback completion would be too late.
+    if (proxy !== undefined) {
+      await saveGlobal(ctx, { provider: { [id]: { options: { proxy: proxyValue || null } } } } as unknown as Config)
+      if (setCachedConfig) await refreshConfig(ctx, setCachedConfig)
+    }
     const { data: authorization } = await ctx.client.provider.oauth.authorize(
       { providerID: id, method, directory: ctx.workspaceDir, inputs },
       { throwOnError: true },
@@ -370,15 +397,27 @@ export async function completeProviderOAuth(
   providerID: string,
   method: number,
   code?: string,
+  proxy?: string,
+  setCachedConfig?: (msg: unknown) => void,
 ) {
   const id = validateID(ctx, requestId, providerID, "connect")
   if (!id) return
+  const proxyValue = proxy?.trim()
+  if (proxyValue && !isProxyURL(proxyValue)) {
+    postError(ctx, requestId, providerID, "connect", "Proxy must be an http://, https:// or socks5:// URL")
+    return
+  }
   try {
     await ctx.client.provider.oauth.callback(
       { providerID: id, method, code, directory: ctx.workspaceDir },
       { throwOnError: true },
     )
+    // Persist the proxy before the reload so the connected provider routes through it.
+    if (proxy !== undefined) {
+      await saveGlobal(ctx, { provider: { [id]: { options: { proxy: proxyValue || null } } } } as unknown as Config)
+    }
     await ctx.disposeGlobal(`provider oauth (${id})`)
+    if (proxy !== undefined && setCachedConfig) await refreshConfig(ctx, setCachedConfig)
     await ctx.fetchAndSendProviders()
     ctx.postMessage({ type: "providerConnected", requestId, providerID: id })
   } catch (error) {
@@ -494,5 +533,36 @@ export async function saveCustomProvider(
     ctx.postMessage({ type: "providerConnected", requestId, providerID: id })
   } catch (error) {
     postError(ctx, requestId, providerID, "connect", ctx.getErrorMessage(error) || "Failed to save custom provider")
+  }
+}
+
+/**
+ * Set or remove the HTTP/SOCKS proxy for any provider (standard or custom) by
+ * writing `provider.<id>.options.proxy`. The CLI deep-merges options, so other
+ * options (baseURL, headers, …) are preserved; a null proxy is stripped on save.
+ */
+export async function saveProviderProxy(
+  ctx: ActionContext,
+  requestId: string,
+  providerID: string,
+  proxy: string | undefined,
+  setCachedConfig: (msg: unknown) => void,
+) {
+  const id = validateID(ctx, requestId, providerID, "connect")
+  if (!id) return
+  const value = proxy?.trim()
+  if (value && !isProxyURL(value)) {
+    postError(ctx, requestId, providerID, "connect", "Proxy must be an http://, https:// or socks5:// URL")
+    return
+  }
+  try {
+    const patch = { provider: { [id]: { options: { proxy: value || null } } } }
+    await saveGlobal(ctx, patch as unknown as Config)
+    await ctx.disposeGlobal(`provider proxy save (${id})`)
+    await refreshConfig(ctx, setCachedConfig)
+    await ctx.fetchAndSendProviders()
+    ctx.postMessage({ type: "providerProxySaved", requestId, providerID: id })
+  } catch (error) {
+    postError(ctx, requestId, providerID, "connect", ctx.getErrorMessage(error) || "Failed to save provider proxy")
   }
 }

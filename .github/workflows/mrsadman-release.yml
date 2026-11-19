@@ -1,0 +1,71 @@
+name: mrsadman-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (e.g. 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # ставит pinned Bun 1.4.4 (script/kilocode/bun.json) + bun install
+      - uses: ./.github/actions/setup-bun
+      # syft для SBOM-сайдкаров (без SBOM_ENFORCE падения SBOM не блокируют)
+      - uses: ./.github/actions/setup-sbom
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - run: bun install -g @vscode/vsce
+
+      # zig нужен для linux sandbox helpers при сборке CLI
+      - name: Setup Zig
+        run: |
+          curl --fail --location --retry 3 \
+            https://ziglang.org/download/0.14.0/zig-linux-x86_64-0.14.0.tar.xz \
+            --output "$RUNNER_TEMP/zig.tar.xz"
+          echo "473ec26806133cf4d1918caf1a410f8403a13d979726a9045b421b685031a982  $RUNNER_TEMP/zig.tar.xz" | sha256sum --check --status
+          tar -xJf "$RUNNER_TEMP/zig.tar.xz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/zig-linux-x86_64-0.14.0" >> "$GITHUB_PATH"
+
+      - name: Create draft release
+        run: gh release view "v$VERSION" >/dev/null 2>&1 || gh release create "v$VERSION" -d --title "v$VERSION" --notes ""
+
+      # собирает 12 таргетов; при KILO_RELEASE сам пакует архивы
+      # и загружает их в draft-релиз (script/kilocode/release.ts)
+      - name: Build CLI
+        run: ./packages/opencode/script/build.ts
+        env:
+          KILO_VERSION: ${{ inputs.version }}
+          KILO_RELEASE: "1"
+
+      # пакует 8 VSIX (по одному на платформу) в packages/kilo-vscode/out
+      - name: Build VSIX
+        working-directory: packages/kilo-vscode
+        run: bun script/build.ts
+        env:
+          CLI_DIST_DIR: ../../packages/opencode/dist
+          KILO_VERSION: ${{ inputs.version }}
+
+      - name: Upload VSIX to release
+        working-directory: packages/kilo-vscode
+        run: gh release upload "v$VERSION" out/*.vsix --clobber
+
+      - name: Publish release
+        run: gh release edit "v$VERSION" --draft=false

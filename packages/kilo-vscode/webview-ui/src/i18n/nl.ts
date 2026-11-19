@@ -477,6 +477,18 @@ export const dict = {
   "provider.custom.field.apiKey.label": "API-sleutel",
   "provider.custom.field.apiKey.placeholder": "API-sleutel",
   "provider.custom.field.apiKey.description": "Optioneel. Laat leeg als je authenticatie via headers beheert.",
+  "provider.custom.field.proxy.label": "HTTP-proxy",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Optioneel. Laat leeg voor directe verbinding. Ondersteunt http://, https:// en socks5://.",
+  "provider.custom.field.proxyUser.label": "Proxy-gebruikersnaam",
+  "provider.custom.field.proxyUser.placeholder": "Optioneel",
+  "provider.custom.field.proxyPassword.label": "Proxy-wachtwoord",
+  "provider.custom.field.proxyPassword.placeholder": "Optioneel",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "Proxy voor {{provider}}",
+  "provider.proxy.description": "Stuur verzoeken naar deze provider via een proxy. Laat leeg voor directe verbinding.",
+  "provider.proxy.toast.saved.title": "Proxy opgeslagen voor {{provider}}",
   "provider.custom.models.label": "Modellen",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -515,6 +527,7 @@ export const dict = {
   "provider.custom.error.name.required": "Weergavenaam is vereist",
   "provider.custom.error.baseURL.required": "Basis-URL is vereist",
   "provider.custom.error.baseURL.format": "Moet beginnen met http:// of https://",
+  "provider.custom.error.proxy.format": "Proxy moet een http://-, https://- of socks5://-URL zijn",
   "provider.custom.error.required": "Vereist",
   "provider.custom.error.duplicate": "Duplicaat",
   "settings.openLocalConfig": "Lokale config",
@@ -896,6 +909,18 @@ export const dict = {
     "Toon suggesties voor automatisch aanvullen in het chat tekstveld",
   "settings.autocomplete.modelsHint":
     "Om te kiezen welk model wordt gebruikt voor automatisch aanvullen, zie de Modellen-instellingen.",
+  "settings.autocomplete.local.model.title": "Lokaal model",
+  "settings.autocomplete.local.model.description":
+    "Modelnaam zoals aangeboden door je lokale server (bijv. een Ollama-tag)",
+  "settings.autocomplete.local.baseUrl.title": "URL van lokale server",
+  "settings.autocomplete.local.baseUrl.description": "Basis-URL van de lokale server waarop het model draait",
+  "settings.autocomplete.local.template.title": "FIM-sjabloon",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle-promptformaat; 'Auto' wordt afgeleid uit de modelnaam",
+  "settings.autocomplete.local.endpoint.title": "API-eindpunt",
+  "settings.autocomplete.local.endpoint.description":
+    "'Auto' gebruikt de standaard van het sjabloon: Ollama-native of OpenAI-compatibel",
+  "settings.autocomplete.local.auto": "Auto",
 
   "settings.notifications.sounds": "Geluiden",
   "settings.notifications.enable.title": "Geluidsmeldingen inschakelen",

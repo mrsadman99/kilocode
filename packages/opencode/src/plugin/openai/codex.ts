@@ -7,6 +7,7 @@ import os from "os"
 import { setTimeout as sleep } from "node:timers/promises"
 import { createServer } from "http"
 import { refreshCodexAuth } from "@/kilocode/provider/codex-refresh" // kilocode_change
+import { proxiedFetch, type FetchFn } from "@/kilocode/provider/proxy" // kilocode_change - route ChatGPT/Codex requests through the configured proxy
 import { OpenAIWebSocketPool } from "./ws-pool"
 
 const log = Log.create({ service: "plugin.codex" }) // kilocode_change
@@ -131,8 +132,14 @@ interface CodexAuthPluginOptions {
   experimentalWebSockets?: boolean
 }
 
-async function exchangeCodeForTokens(code: string, redirectUri: string, pkce: PkceCodes): Promise<TokenResponse> {
-  const response = await fetch(`${ISSUER}/oauth/token`, {
+// kilocode_change start - proxy-aware token exchange
+async function exchangeCodeForTokens(
+  code: string,
+  redirectUri: string,
+  pkce: PkceCodes,
+  fetchFn: FetchFn = fetch,
+): Promise<TokenResponse> {
+  const response = await fetchFn(`${ISSUER}/oauth/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -148,10 +155,16 @@ async function exchangeCodeForTokens(code: string, redirectUri: string, pkce: Pk
   }
   return response.json()
 }
+// kilocode_change end
 
 // kilocode_change start
-async function refreshAccessToken(refreshToken: string, issuer = ISSUER, signal?: AbortSignal): Promise<TokenResponse> {
-  const response = await fetch(`${issuer}/oauth/token`, {
+async function refreshAccessToken(
+  refreshToken: string,
+  issuer = ISSUER,
+  signal?: AbortSignal,
+  fetchFn: FetchFn = fetch, // kilocode_change - proxy-aware transport
+): Promise<TokenResponse> {
+  const response = await fetchFn(`${issuer}/oauth/token`, {
     method: "POST",
     signal,
     headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": `kilo/${InstallationVersion}` },
@@ -269,6 +282,7 @@ export const renderOAuthError = (error: string) => `<!doctype html>
 interface PendingOAuth {
   pkce: PkceCodes
   state: string
+  fetchFn: FetchFn // kilocode_change - proxy-aware transport for the token exchange
   resolve: (tokens: TokenResponse) => void
   reject: (error: Error) => void
 }
@@ -320,9 +334,11 @@ async function startOAuthServer(): Promise<{ port: number; redirectUri: string }
       const current = pendingOAuth
       pendingOAuth = undefined
 
-      exchangeCodeForTokens(code, `http://localhost:${OAUTH_PORT}/auth/callback`, current.pkce)
+      // kilocode_change start - proxy-aware token exchange
+      exchangeCodeForTokens(code, `http://localhost:${OAUTH_PORT}/auth/callback`, current.pkce, current.fetchFn)
         .then((tokens) => current.resolve(tokens))
         .catch((err) => current.reject(err))
+      // kilocode_change end
 
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
       res.end(HTML_SUCCESS) // kilocode_change - shared callback page is currently OpenCode-branded
@@ -358,7 +374,7 @@ function stopOAuthServer() {
   }
 }
 
-function waitForOAuthCallback(pkce: PkceCodes, state: string): Promise<TokenResponse> {
+function waitForOAuthCallback(pkce: PkceCodes, state: string, fetchFn: FetchFn = fetch): Promise<TokenResponse> { // kilocode_change
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(
       () => {
@@ -373,6 +389,7 @@ function waitForOAuthCallback(pkce: PkceCodes, state: string): Promise<TokenResp
     pendingOAuth = {
       pkce,
       state,
+      fetchFn, // kilocode_change
       resolve: (tokens) => {
         clearTimeout(timeout)
         resolve(tokens)
@@ -388,6 +405,15 @@ function waitForOAuthCallback(pkce: PkceCodes, state: string): Promise<TokenResp
 export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPluginOptions = {}): Promise<Hooks> {
   const issuer = options.issuer ?? ISSUER
   const codexApiEndpoint = options.codexApiEndpoint ?? CODEX_API_ENDPOINT
+  // kilocode_change start - read the per-provider proxy so OAuth/token calls honor it too
+  async function readProxy(): Promise<string | undefined> {
+    const result = await input.client.config.get().catch(() => undefined)
+    const opts = (result?.data as { provider?: Record<string, { options?: Record<string, unknown> }> } | undefined)
+      ?.provider?.openai?.options
+    const value = opts?.proxy
+    return typeof value === "string" && value.trim() ? value.trim() : undefined
+  }
+  // kilocode_change end
   let websocketFetchInstalled = false
   const websocketFetches: Array<ReturnType<typeof OpenAIWebSocketPool.createWebSocketFetch>> = []
 
@@ -482,9 +508,15 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
               }
             }
 
+            // kilocode_change start - honor the proxy handed down via init (http/https native, SOCKS tunnel)
+            const proxyValue = (init as { proxy?: unknown } | undefined)?.proxy
+            const proxy = typeof proxyValue === "string" && proxyValue ? proxyValue : undefined
+            const pfetch = proxiedFetch(proxy)
+            // kilocode_change end
+
             const currentAuth = await getAuth()
             if (currentAuth.type !== "oauth")
-              return websocketFetch ? websocketFetch(requestInput, init) : fetch(requestInput, init)
+              return websocketFetch && !proxy ? websocketFetch(requestInput, init) : pfetch(requestInput, init) // kilocode_change
 
             const authWithAccount = currentAuth as typeof currentAuth & { accountId?: string }
 
@@ -496,7 +528,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
                   input,
                   getAuth,
                   auth: currentAuth,
-                  refresh: (token, signal) => refreshAccessToken(token, issuer, signal),
+                  refresh: (token, signal) => refreshAccessToken(token, issuer, signal, pfetch),
                   account: extractAccountId,
                 })
                   .then((auth) => ({
@@ -549,8 +581,11 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
               body: init?.body,
               headers,
             }
-            if (websocketFetch && parsed.pathname.endsWith("/responses")) return websocketFetch(url, requestInit)
-            return fetch(url, OpenAIWebSocketPool.withoutInternalHeaders(requestInit))
+            // kilocode_change start - skip the WebSocket optimization when a proxy is set so all traffic is proxied
+            if (websocketFetch && !proxy && parsed.pathname.endsWith("/responses"))
+              return websocketFetch(url, requestInit)
+            return pfetch(url, OpenAIWebSocketPool.withoutInternalHeaders(requestInit))
+            // kilocode_change end
           },
         }
       },
@@ -564,7 +599,9 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
             const state = base64UrlEncode(crypto.getRandomValues(new Uint8Array(32)).buffer)
             const authUrl = buildAuthorizeUrl(redirectUri, pkce, state)
 
-            const callbackPromise = waitForOAuthCallback(pkce, state)
+            // kilocode_change start - exchange the OAuth code through the configured proxy
+            const callbackPromise = waitForOAuthCallback(pkce, state, proxiedFetch(await readProxy()))
+            // kilocode_change end
 
             return {
               url: authUrl,
@@ -589,7 +626,9 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
           label: "ChatGPT Pro/Plus (headless)",
           type: "oauth",
           authorize: async () => {
-            const deviceResponse = await fetch(`${ISSUER}/api/accounts/deviceauth/usercode`, {
+            // kilocode_change start - run the device flow through the configured proxy
+            const pfetch = proxiedFetch(await readProxy())
+            const deviceResponse = await pfetch(`${ISSUER}/api/accounts/deviceauth/usercode`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -597,6 +636,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
               },
               body: JSON.stringify({ client_id: CLIENT_ID }),
             })
+            // kilocode_change end
 
             if (!deviceResponse.ok) throw new Error("Failed to initiate device authorization")
 
@@ -613,7 +653,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
               method: "auto" as const,
               async callback() {
                 while (true) {
-                  const response = await fetch(`${ISSUER}/api/accounts/deviceauth/token`, {
+                  const response = await pfetch(`${ISSUER}/api/accounts/deviceauth/token`, { // kilocode_change
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -631,7 +671,7 @@ export async function CodexAuthPlugin(input: PluginInput, options: CodexAuthPlug
                       code_verifier: string
                     }
 
-                    const tokenResponse = await fetch(`${ISSUER}/oauth/token`, {
+                    const tokenResponse = await pfetch(`${ISSUER}/oauth/token`, { // kilocode_change
                       method: "POST",
                       headers: { "Content-Type": "application/x-www-form-urlencoded" },
                       body: new URLSearchParams({

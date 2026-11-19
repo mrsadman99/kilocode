@@ -593,6 +593,11 @@ export interface AutocompleteSettingsLoadedMessage {
     provider: string | null
     /** `null` means "no explicit setting — use the resolved default." */
     model: string | null
+    /** Local provider settings; `null` means "no explicit setting — use the default." */
+    localModel: string | null
+    localBaseURL: string | null
+    localTemplate: string | null
+    localEndpoint: string | null
   }
 }
 
@@ -1582,6 +1587,12 @@ export interface ProviderDisconnectedMessage {
   providerID: string
 }
 
+export interface ProviderProxySavedMessage {
+  type: "providerProxySaved"
+  requestId: string
+  providerID: string
+}
+
 export interface ProviderActionErrorMessage {
   type: "providerActionError"
   requestId: string
@@ -2000,6 +2011,7 @@ export type ExtensionMessage =
   | ProviderOAuthReadyMessage
   | ProviderConnectedMessage
   | ProviderDisconnectedMessage
+  | ProviderProxySavedMessage
   | ProviderActionErrorMessage
   | AnacondaDesktopExtensionMessage
   | CustomProviderModelsFetchedMessage

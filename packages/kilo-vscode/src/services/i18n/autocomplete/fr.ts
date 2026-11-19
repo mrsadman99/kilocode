@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Ajouter des crédits",
   "kilocode:autocomplete.authError.message":
     "La saisie semi-automatique de Kilo Code a été mise en pause en raison d’un problème d’authentification. Causes possibles : vous n’êtes pas connecté à Kilo, ou votre clé API (BYOK) est invalide ou manquante. Reconnectez-vous ou vérifiez les paramètres de clé API de votre fournisseur.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "L’autocomplétion Kilo Code est en pause : le fournisseur configuré « {{provider}} » n’est pas pris en charge. Ouvrez Paramètres → Modèles et choisissez Kilo Gateway, Mistral ou Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "L’autocomplétion Kilo Code a été suspendue : le modèle d’autocomplétion ou le point de terminaison API est introuvable (404). Vérifiez le nom du modèle et le point de terminaison dans Paramètres → Modèles. Pour les modèles locaux, assurez-vous que le modèle est installé et que l’URL du serveur est correcte.",
 }

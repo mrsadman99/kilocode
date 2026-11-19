@@ -7,6 +7,9 @@ import {
   sanitizeCustomProviderConfig,
   validateProviderID,
   withCustomProviderDeletions,
+  composeProxyURL,
+  parseProxyURL,
+  isProxyURL,
 } from "../../src/shared/custom-provider"
 import { isCustomProviderPackage } from "../../src/shared/provider-model"
 
@@ -316,5 +319,80 @@ describe("withCustomProviderDeletions", () => {
     const result = withCustomProviderDeletions(existing, baseNext)
     const models = result.models as Record<string, unknown>
     expect(models.gone).toBeNull()
+  })
+
+  it("emits null for a proxy removed from options", () => {
+    const existing = { options: { baseURL: "https://example.com/v1", proxy: "http://127.0.0.1:8080" } }
+    const result = withCustomProviderDeletions(existing, baseNext)
+    expect((result.options as Record<string, unknown>).proxy).toBeNull()
+  })
+
+  it("keeps a proxy that is still present", () => {
+    const existing = { options: { baseURL: "https://example.com/v1", proxy: "http://127.0.0.1:8080" } }
+    const next = {
+      ...baseNext,
+      options: { baseURL: "https://example.com/v1", proxy: "socks5://127.0.0.1:1080" },
+    } as typeof baseNext
+    const result = withCustomProviderDeletions(existing, next)
+    expect(result.options.proxy).toBe("socks5://127.0.0.1:1080")
+  })
+})
+
+describe("proxy helpers", () => {
+  it("isProxyURL accepts http/https/socks schemes and rejects others", () => {
+    expect(isProxyURL("http://127.0.0.1:8080")).toBe(true)
+    expect(isProxyURL("https://proxy.example.com:8443")).toBe(true)
+    expect(isProxyURL("socks5://127.0.0.1:1080")).toBe(true)
+    expect(isProxyURL("socks5h://user:pass@proxy:1080")).toBe(true)
+    expect(isProxyURL("ftp://proxy:21")).toBe(false)
+    expect(isProxyURL("not a url")).toBe(false)
+  })
+
+  it("composeProxyURL returns undefined for an empty address", () => {
+    expect(composeProxyURL("", "user", "pass")).toBeUndefined()
+    expect(composeProxyURL("   ", "", "")).toBeUndefined()
+  })
+
+  it("composeProxyURL defaults to http when no scheme is given", () => {
+    expect(composeProxyURL("127.0.0.1:8080", "", "")).toBe("http://127.0.0.1:8080")
+  })
+
+  it("composeProxyURL embeds credentials and parseProxyURL round-trips them", () => {
+    const url = composeProxyURL("socks5://proxy.example.com:1080", "user", "p@ss:word")
+    expect(url).toBeDefined()
+    const parsed = parseProxyURL(url)
+    expect(parsed.address).toBe("socks5://proxy.example.com:1080")
+    expect(parsed.user).toBe("user")
+    expect(parsed.password).toBe("p@ss:word")
+  })
+
+  it("composeProxyURL without credentials yields an unauthenticated proxy", () => {
+    const url = composeProxyURL("http://127.0.0.1:8080", "", "")
+    expect(url).toBe("http://127.0.0.1:8080")
+    expect(parseProxyURL(url)).toEqual({ address: "http://127.0.0.1:8080", user: "", password: "" })
+  })
+
+  it("parseProxyURL handles an empty proxy", () => {
+    expect(parseProxyURL(undefined)).toEqual({ address: "", user: "", password: "" })
+  })
+})
+
+describe("sanitizeCustomProviderConfig proxy", () => {
+  it("accepts a valid proxy option", () => {
+    const result = sanitizeCustomProviderConfig({
+      name: "Proxy Provider",
+      options: { baseURL: "https://example.com/v1", proxy: "socks5://user:pass@127.0.0.1:1080" },
+      models: { "model-1": { name: "Model One" } },
+    })
+    expect("value" in result && result.value.options.proxy).toBe("socks5://user:pass@127.0.0.1:1080")
+  })
+
+  it("rejects an unsupported proxy scheme", () => {
+    const result = sanitizeCustomProviderConfig({
+      name: "Proxy Provider",
+      options: { baseURL: "https://example.com/v1", proxy: "ftp://127.0.0.1:21" },
+      models: { "model-1": { name: "Model One" } },
+    })
+    expect("error" in result).toBe(true)
   })
 })

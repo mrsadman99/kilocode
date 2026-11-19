@@ -133,6 +133,18 @@ export function customProviderVariants(model: Provider.Model, npm: unknown, gene
   )
 }
 
+// Reads the per-provider HTTP proxy option. Returns a trimmed proxy URL, or
+// undefined when unset/blank so the request falls back to the default transport
+// (and any HTTP_PROXY/HTTPS_PROXY environment variables Bun applies).
+export function providerProxy(options: Record<string, unknown>): string | undefined {
+  const value = options["proxy"]
+  if (typeof value !== "string") return undefined
+  const proxy = value.trim()
+  return proxy === "" ? undefined : proxy
+}
+
+export { isSocks, socksFetch } from "./proxy"
+
 // ---------------------------------------------------------------------------
 // Custom loaders (new or fully-replaced loaders)
 // ---------------------------------------------------------------------------

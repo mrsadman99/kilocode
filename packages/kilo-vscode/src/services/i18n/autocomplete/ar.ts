@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "إضافة أرصدة",
   "kilocode:autocomplete.authError.message":
     "تم إيقاف الإكمال التلقائي في Kilo Code مؤقتا بسبب مشكلة مصادقة. الأسباب المحتملة: لم تسجل الدخول إلى Kilo، أو أن مفتاح API (BYOK) غير صالح أو مفقود. يرجى تسجيل الدخول مرة أخرى أو التحقق من إعدادات مفتاح API للمزود.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "تم إيقاف الإكمال التلقائي في Kilo Code مؤقتًا: المزوّد «{{provider}}» غير مدعوم. افتح الإعدادات → النماذج واختر Kilo Gateway أو Mistral أو Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "تم إيقاف الإكمال التلقائي في Kilo Code مؤقتًا: لم يتم العثور على نموذج الإكمال التلقائي أو نقطة نهاية API (404). تحقق من اسم النموذج ونقطة النهاية في الإعدادات → النماذج. بالنسبة للنماذج المحلية، تأكد من تثبيت النموذج وصحة عنوان URL للخادم.",
 }

@@ -363,6 +363,19 @@ export const dict = {
   "provider.custom.field.apiKey.label": "API key",
   "provider.custom.field.apiKey.placeholder": "API key",
   "provider.custom.field.apiKey.description": "Opzionale. Lascia vuoto se gestisci l'autenticazione tramite header.",
+  "provider.custom.field.proxy.label": "Proxy HTTP",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Opzionale. Lascia vuoto per connetterti direttamente. Supporta http://, https:// e socks5://.",
+  "provider.custom.field.proxyUser.label": "Nome utente del proxy",
+  "provider.custom.field.proxyUser.placeholder": "Opzionale",
+  "provider.custom.field.proxyPassword.label": "Password del proxy",
+  "provider.custom.field.proxyPassword.placeholder": "Opzionale",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "Proxy per {{provider}}",
+  "provider.proxy.description":
+    "Instrada le richieste a questo provider tramite un proxy. Lascia vuoto per connetterti direttamente.",
+  "provider.proxy.toast.saved.title": "Proxy salvato per {{provider}}",
   "provider.custom.models.label": "Modelli",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -400,6 +413,7 @@ export const dict = {
   "provider.custom.error.name.required": "Nome visualizzato obbligatorio",
   "provider.custom.error.baseURL.required": "URL base obbligatorio",
   "provider.custom.error.baseURL.format": "Deve iniziare con http:// o https://",
+  "provider.custom.error.proxy.format": "Il proxy deve essere un URL http://, https:// o socks5://",
   "provider.custom.error.required": "Obbligatorio",
   "provider.custom.error.duplicate": "Duplicato",
   "settings.openLocalConfig": "Config locale",
@@ -1377,6 +1391,18 @@ export const dict = {
   // Autocomplete hint
   "settings.autocomplete.modelsHint":
     "Per scegliere quale modello usare per l'autocompletamento, vedi le impostazioni Modelli.",
+  "settings.autocomplete.local.model.title": "Modello locale",
+  "settings.autocomplete.local.model.description":
+    "Nome del modello come fornito dal server locale (es. un tag Ollama)",
+  "settings.autocomplete.local.baseUrl.title": "URL del server locale",
+  "settings.autocomplete.local.baseUrl.description": "URL base del server locale che esegue il modello",
+  "settings.autocomplete.local.template.title": "Template FIM",
+  "settings.autocomplete.local.template.description":
+    "Formato del prompt fill-in-the-middle; «Auto» viene rilevato dal nome del modello",
+  "settings.autocomplete.local.endpoint.title": "Endpoint API",
+  "settings.autocomplete.local.endpoint.description":
+    "«Auto» usa il valore predefinito del template: nativo Ollama o compatibile OpenAI",
+  "settings.autocomplete.local.auto": "Auto",
 
   // Indexing
   "settings.indexing.globalEnable.title": "Abilita globalmente",

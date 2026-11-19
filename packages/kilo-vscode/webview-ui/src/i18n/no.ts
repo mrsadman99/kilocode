@@ -488,6 +488,19 @@ export const dict = {
   "provider.custom.field.apiKey.label": "API-nøkkel",
   "provider.custom.field.apiKey.placeholder": "API-nøkkel",
   "provider.custom.field.apiKey.description": "Valgfritt. La stå tomt hvis du administrerer autentisering via headere.",
+  "provider.custom.field.proxy.label": "HTTP-proxy",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Valgfritt. La stå tomt for direkte tilkobling. Støtter http://, https:// og socks5://.",
+  "provider.custom.field.proxyUser.label": "Proxy-brukernavn",
+  "provider.custom.field.proxyUser.placeholder": "Valgfritt",
+  "provider.custom.field.proxyPassword.label": "Proxy-passord",
+  "provider.custom.field.proxyPassword.placeholder": "Valgfritt",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "Proxy for {{provider}}",
+  "provider.proxy.description":
+    "Send forespørsler til denne leverandøren via en proxy. La stå tomt for direkte tilkobling.",
+  "provider.proxy.toast.saved.title": "Proxy lagret for {{provider}}",
   "provider.custom.models.label": "Modeller",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -525,6 +538,7 @@ export const dict = {
   "provider.custom.error.name.required": "Visningsnavn er påkrevd",
   "provider.custom.error.baseURL.required": "Basis-URL er påkrevd",
   "provider.custom.error.baseURL.format": "Må starte med http:// eller https://",
+  "provider.custom.error.proxy.format": "Proxy må være en http://-, https://- eller socks5://-URL",
   "provider.custom.error.required": "Påkrevd",
   "provider.custom.error.duplicate": "Duplikat",
   "settings.openLocalConfig": "Lokal konfig",
@@ -863,6 +877,18 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofullføringsforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For å velge hvilken modell som brukes til autofullføring, se Modellinnstillinger.",
+  "settings.autocomplete.local.model.title": "Lokal modell",
+  "settings.autocomplete.local.model.description":
+    "Modellnavn slik den lokale serveren tilbyr det (f.eks. en Ollama-tagg)",
+  "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
+  "settings.autocomplete.local.baseUrl.description": "Grunn-URL til den lokale serveren som kjører modellen",
+  "settings.autocomplete.local.template.title": "FIM-mal",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle-promptformat; «Auto» utledes fra modellnavnet",
+  "settings.autocomplete.local.endpoint.title": "API-endepunkt",
+  "settings.autocomplete.local.endpoint.description":
+    "«Auto» bruker malens standard: Ollama-nativ eller OpenAI-kompatibel",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Lyder",
   "settings.notifications.enable.title": "Aktiver lydvarsler",
   "settings.notifications.enable.description":

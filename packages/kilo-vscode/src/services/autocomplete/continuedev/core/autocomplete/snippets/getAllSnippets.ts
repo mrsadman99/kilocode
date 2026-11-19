@@ -84,7 +84,8 @@ export const getAllSnippetsWithoutRace = async ({
   const [root, imports, clipboard, opened, staticSnippet] = await Promise.all([
     contextRetrievalService.getRootPathSnippets(helper),
     contextRetrievalService.getSnippetsFromImportDefinitions(helper),
-    getClipboardSnippets(ide),
+    // Only read the clipboard when it can actually be used as context.
+    helper.options.experimental_includeClipboard ? getClipboardSnippets(ide) : Promise.resolve([]),
     getSnippetsFromRecentlyOpenedFiles(helper, ide),
     helper.options.experimental_enableStaticContextualization
       ? contextRetrievalService.getStaticContextSnippets(helper)

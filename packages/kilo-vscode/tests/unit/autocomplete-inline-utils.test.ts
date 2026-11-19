@@ -7,6 +7,7 @@ import {
   getFirstLine,
   calcDebounceDelay,
   findCoveringPendingRequest,
+  insertionIsCurrent,
 } from "../../src/services/autocomplete/classic-auto-complete/inline-utils"
 import type { FillInAtCursorSuggestion, PendingRequest } from "../../src/services/autocomplete/types"
 
@@ -203,5 +204,30 @@ describe("calcDebounceDelay", () => {
   it("rounds to nearest integer", () => {
     const result = calcDebounceDelay([300, 301])
     expect(Number.isInteger(result)).toBe(true)
+  })
+})
+
+describe("insertionIsCurrent", () => {
+  const before = { uri: "file:///a.ts", version: 3, line: 10, character: 4 }
+
+  it("allows insertion when document, version and cursor are unchanged", () => {
+    expect(insertionIsCurrent(before, { ...before })).toBe(true)
+  })
+
+  it("rejects insertion when there is no active editor", () => {
+    expect(insertionIsCurrent(before, undefined)).toBe(false)
+  })
+
+  it("rejects insertion after the document changed", () => {
+    expect(insertionIsCurrent(before, { ...before, version: 4 })).toBe(false)
+  })
+
+  it("rejects insertion after the cursor moved", () => {
+    expect(insertionIsCurrent(before, { ...before, character: 5 })).toBe(false)
+    expect(insertionIsCurrent(before, { ...before, line: 11 })).toBe(false)
+  })
+
+  it("rejects insertion into a different document", () => {
+    expect(insertionIsCurrent(before, { ...before, uri: "file:///b.ts" })).toBe(false)
   })
 })

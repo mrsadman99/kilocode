@@ -109,3 +109,26 @@ export function calcDebounceDelay(latencyHistory: number[]): number {
   const avg = Math.round(sum / latencyHistory.length)
   return Math.max(MIN_DEBOUNCE_DELAY_MS, Math.min(avg, MAX_DEBOUNCE_DELAY_MS))
 }
+
+export interface InsertionSnapshot {
+  uri: string
+  version: number
+  line: number
+  character: number
+}
+
+/**
+ * Whether a manual completion may still be inserted: the editor must still
+ * show the same document at the same version and cursor position as when the
+ * request started. Prevents inserting stale text after the user typed or moved
+ * the cursor while a (slow, e.g. local) model was generating.
+ */
+export function insertionIsCurrent(before: InsertionSnapshot, after: InsertionSnapshot | undefined): boolean {
+  if (!after) return false
+  return (
+    before.uri === after.uri &&
+    before.version === after.version &&
+    before.line === after.line &&
+    before.character === after.character
+  )
+}

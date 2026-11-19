@@ -22,43 +22,34 @@ function hasFilepath(snippet: AutocompleteSnippet): snippet is AutocompleteSnipp
 
 async function filterSnippetsByAccess(
   snippets: AutocompleteSnippet[],
-  ignoreController?: Promise<FileIgnoreController>,
+  ignoreFor?: (uri: vscode.Uri) => Promise<FileIgnoreController> | undefined,
 ): Promise<AutocompleteSnippet[]> {
-  if (!ignoreController) {
+  if (!ignoreFor) {
     return snippets
   }
 
   try {
-    // Try to get the controller, but don't wait too long
-    const controller = await Promise.race([
-      ignoreController,
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 100)),
-    ])
-
-    if (!controller) {
-      // If promise hasn't resolved yet, assume files are ignored (as per requirement)
-      return snippets.filter((snippet) => {
-        // Only keep snippets without file paths (Diff, Clipboard)
-        return !hasFilepath(snippet) || !snippet.filepath
-      })
-    }
-
-    return snippets.filter((snippet) => {
-      if (hasFilepath(snippet) && snippet.filepath) {
-        const fsPath = uriToFsPath(snippet.filepath)
-        const hasAccess = controller.validateAccess(fsPath)
-        return hasAccess
-      }
-
-      // Keep all other snippet types (Diff, Clipboard) that don't have file paths
-      return true
-    })
+    // Resolve each snippet against the ignore rules of its own workspace root.
+    const checks = await Promise.all(
+      snippets.map(async (snippet) => {
+        const filepath = hasFilepath(snippet) ? snippet.filepath : undefined
+        // Keep snippet types (Diff, Clipboard) that don't have file paths.
+        if (!filepath) return true
+        const uri = filepath.startsWith("file://") ? vscode.Uri.parse(filepath) : vscode.Uri.file(filepath)
+        const controller = await Promise.race([
+          ignoreFor(uri) ?? Promise.resolve(null),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 100)),
+        ])
+        // Unresolved controller or outside-workspace file: deny by default.
+        if (!controller) return false
+        return controller.validateAccess(uriToFsPath(filepath))
+      }),
+    )
+    return snippets.filter((_, i) => checks[i])
   } catch (error) {
     console.error("[AutocompleteContextProvider] Error filtering snippets by access:", error)
     // On error, be conservative and filter out file-based snippets
-    return snippets.filter((snippet) => {
-      return !hasFilepath(snippet) || !snippet.filepath
-    })
+    return snippets.filter((snippet) => !hasFilepath(snippet) || !snippet.filepath)
   }
 }
 
@@ -68,7 +59,7 @@ export async function getProcessedSnippets(
   contextService: ContextRetrievalService,
   modelId: string,
   ide: VsCodeIde,
-  ignoreController?: Promise<FileIgnoreController>,
+  ignoreFor?: (uri: vscode.Uri) => Promise<FileIgnoreController> | undefined,
 ): Promise<{
   filepathUri: string
   helper: any
@@ -102,7 +93,7 @@ export async function getProcessedSnippets(
   const filteredSnippets = getSnippets(helper, snippetPayload)
 
   // Apply access filtering to remove snippets from blocked files
-  const accessibleSnippets = await filterSnippetsByAccess(filteredSnippets, ignoreController)
+  const accessibleSnippets = await filterSnippetsByAccess(filteredSnippets, ignoreFor)
 
   // Convert all snippet filepaths to URIs
   const snippetsWithUris = accessibleSnippets.map((snippet: any) => ({

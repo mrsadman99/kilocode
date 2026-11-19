@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Tilføj credits",
   "kilocode:autocomplete.authError.message":
     "Kilo Code autofuldførelse er sat på pause på grund af et godkendelsesproblem. Mulige årsager: du er ikke logget ind på Kilo, eller din API-nøgle (BYOK) er ugyldig eller mangler. Log ind igen, eller kontroller indstillingerne for udbyderens API-nøgle.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code Autocomplete er sat på pause: den konfigurerede udbyder «{{provider}}» understøttes ikke. Åbn Indstillinger → Modeller, og vælg Kilo Gateway, Mistral eller Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code Autocomplete er sat på pause: autocomplete-modellen eller API-endpointet blev ikke fundet (404). Tjek modelnavnet og endpointet under Indstillinger → Modeller. For lokale modeller skal du sørge for, at modellen er installeret, og at server-URL'en er korrekt.",
 }

@@ -5,6 +5,49 @@ import type { CustomProviderPackage } from "./provider-model"
 const INVALID_PROVIDER_ID = "Invalid provider ID"
 const INVALID_ENV = "Invalid environment variable name"
 const INVALID_BASE_URL = "Base URL must start with http:// or https://"
+const INVALID_PROXY = "Proxy must be an http://, https:// or socks5:// URL"
+
+const PROXY_PROTOCOLS = new Set(["http:", "https:", "socks5:", "socks5h:", "socks4:", "socks4a:"])
+
+export function isProxyURL(value: string): boolean {
+  try {
+    return PROXY_PROTOCOLS.has(new URL(value).protocol)
+  } catch {
+    return false
+  }
+}
+
+/** Build a proxy URL from an address plus optional credentials. Empty address → no proxy. */
+export function composeProxyURL(address: string, user: string, password: string): string | undefined {
+  const trimmed = address.trim()
+  if (!trimmed) return undefined
+  const withScheme = /:\/\//.test(trimmed) ? trimmed : `http://${trimmed}`
+  if (!URL.canParse(withScheme)) return undefined
+  const url = new URL(withScheme)
+  const name = user.trim()
+  const secret = password.trim()
+  if (name) {
+    url.username = name
+    if (secret) url.password = secret
+  }
+  const href = url.toString()
+  return url.pathname === "/" && href.endsWith("/") ? href.slice(0, -1) : href
+}
+
+/** Split a stored proxy URL back into address / user / password form fields. */
+export function parseProxyURL(proxy: string | undefined): { address: string; user: string; password: string } {
+  if (!proxy) return { address: "", user: "", password: "" }
+  try {
+    const url = new URL(proxy)
+    return {
+      address: `${url.protocol}//${url.host}`,
+      user: url.username ? decodeURIComponent(url.username) : "",
+      password: url.password ? decodeURIComponent(url.password) : "",
+    }
+  } catch {
+    return { address: proxy, user: "", password: "" }
+  }
+}
 
 export const ProviderIDSchema = z.string().trim().regex(PROVIDER_ID_PATTERN, INVALID_PROVIDER_ID)
 export const EnvSchema = z
@@ -41,6 +84,7 @@ export const CustomProviderConfigSchema = z
             message: INVALID_BASE_URL,
           }),
         headers: z.record(z.string().trim().min(1), z.string().trim().min(1)).optional(),
+        proxy: z.string().trim().min(1).refine(isProxyURL, { message: INVALID_PROXY }).optional(),
       })
       .strict(),
     models: z
@@ -66,6 +110,7 @@ export type SanitizedProviderConfig = {
   options: {
     baseURL: string
     headers?: Record<string, string>
+    proxy?: string
   }
   models: Record<
     string,
@@ -134,6 +179,7 @@ export function normalizeCustomProviderConfig(
     options: {
       baseURL: config.options.baseURL.trim(),
       ...(headers && Object.keys(headers).length > 0 ? { headers } : {}),
+      ...(config.options.proxy ? { proxy: config.options.proxy } : {}),
     },
     models: Object.fromEntries(
       Object.entries(config.models).map(([id, model]) => [
@@ -221,5 +267,15 @@ export function withCustomProviderDeletions(existing: unknown, next: SanitizedPr
     }
   }
 
-  return { ...next, models: patched } as SanitizedProviderConfig
+  const options = optionsWithProxyDeletion(existing.options, next.options)
+  return { ...next, options, models: patched } as SanitizedProviderConfig
+}
+
+function optionsWithProxyDeletion(existingOptions: unknown, next: SanitizedProviderConfig["options"]) {
+  const options = { ...next } as Omit<SanitizedProviderConfig["options"], "proxy"> & { proxy?: string | null }
+  const old = isRecord(existingOptions) ? existingOptions : {}
+  if (old.proxy !== undefined && next.proxy === undefined) {
+    options.proxy = null
+  }
+  return options
 }

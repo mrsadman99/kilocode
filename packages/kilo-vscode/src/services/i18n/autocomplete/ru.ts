@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Добавить кредиты",
   "kilocode:autocomplete.authError.message":
     "Автодополнение Kilo Code приостановлено из-за проблемы с аутентификацией. Возможные причины: вы не вошли в Kilo или ваш API-ключ (BYOK) недействителен либо отсутствует. Войдите снова или проверьте настройки API-ключа провайдера.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Автодополнение Kilo Code приостановлено: настроенный провайдер «{{provider}}» не поддерживается. Откройте Настройки → Модели и выберите Kilo Gateway, Mistral или Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "Автодополнение Kilo Code приостановлено: модель автодополнения или эндпоинт API не найдены (404). Проверьте имя модели и эндпоинт в Настройках → Модели. Для локальных моделей убедитесь, что модель установлена и URL сервера указан верно.",
 }

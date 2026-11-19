@@ -3,10 +3,13 @@
  * Runs in the extension host — no CLI backend dependency.
  */
 
+import { proxyFetch } from "./proxy-fetch"
+
 type Options = {
   baseURL: string
   apiKey?: string
   headers?: Record<string, string>
+  proxy?: string
 }
 
 type ModelEntry = {
@@ -38,11 +41,15 @@ export async function fetchOpenAIModels(opts: Options): Promise<ModelEntry[]> {
     headers["Authorization"] = `Bearer ${opts.apiKey}`
   }
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-    signal: AbortSignal.timeout(15_000),
-  })
+  const response = await proxyFetch(
+    url,
+    {
+      method: "GET",
+      headers,
+      signal: AbortSignal.timeout(15_000),
+    },
+    opts.proxy,
+  )
 
   if (!response.ok) {
     const text = await response.text().catch(() => "")

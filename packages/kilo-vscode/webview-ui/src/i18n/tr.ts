@@ -473,6 +473,19 @@ export const dict = {
   "provider.custom.field.apiKey.placeholder": "API anahtarı",
   "provider.custom.field.apiKey.description":
     "İsteğe bağlı. Kimlik doğrulamayı başlıklar ile yönetiyorsanız boş bırakın.",
+  "provider.custom.field.proxy.label": "HTTP proxy",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "İsteğe bağlı. Doğrudan bağlanmak için boş bırakın. http://, https:// ve socks5:// destekler.",
+  "provider.custom.field.proxyUser.label": "Proxy kullanıcı adı",
+  "provider.custom.field.proxyUser.placeholder": "İsteğe bağlı",
+  "provider.custom.field.proxyPassword.label": "Proxy parolası",
+  "provider.custom.field.proxyPassword.placeholder": "İsteğe bağlı",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "{{provider}} proxy",
+  "provider.proxy.description":
+    "Bu sağlayıcıya yönelik istekleri bir proxy üzerinden yönlendirin. Doğrudan bağlanmak için boş bırakın.",
+  "provider.proxy.toast.saved.title": "{{provider}} için proxy kaydedildi",
   "provider.custom.models.label": "Modeller",
   "provider.custom.models.id.label": "Kimlik",
   "provider.custom.models.id.placeholder": "model-kimlik",
@@ -511,6 +524,7 @@ export const dict = {
   "provider.custom.error.name.required": "Görünen ad gerekli",
   "provider.custom.error.baseURL.required": "Temel URL gerekli",
   "provider.custom.error.baseURL.format": "http:// veya https:// ile başlamalı",
+  "provider.custom.error.proxy.format": "Proxy bir http://, https:// veya socks5:// URL'si olmalı",
   "provider.custom.error.required": "Gerekli",
   "provider.custom.error.duplicate": "Tekrar",
   "settings.openLocalConfig": "Yerel Config",
@@ -890,6 +904,17 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Sohbet metin alanında otomatik tamamlama önerileri göster",
   "settings.autocomplete.modelsHint":
     "Otomatik tamamlama için kullanılacak modeli seçmek için Modeller ayarlarına bakın.",
+  "settings.autocomplete.local.model.title": "Yerel model",
+  "settings.autocomplete.local.model.description": "Yerel sunucunuzun sunduğu model adı (ör. bir Ollama etiketi)",
+  "settings.autocomplete.local.baseUrl.title": "Yerel sunucu URL'si",
+  "settings.autocomplete.local.baseUrl.description": "Modeli çalıştıran yerel sunucunun temel URL'si",
+  "settings.autocomplete.local.template.title": "FIM şablonu",
+  "settings.autocomplete.local.template.description":
+    "Fill-in-the-middle istem biçimi; 'Otomatik' model adından algılanır",
+  "settings.autocomplete.local.endpoint.title": "API uç noktası",
+  "settings.autocomplete.local.endpoint.description":
+    "'Otomatik' şablon varsayılanını kullanır: Ollama yerel veya OpenAI uyumlu",
+  "settings.autocomplete.local.auto": "Otomatik",
 
   "settings.notifications.sounds": "Sesler",
   "settings.notifications.enable.title": "Sesli bildirimleri etkinleştir",

@@ -25,25 +25,23 @@ export class FimPromptBuilder {
       this.contextProvider.contextService,
       this.contextProvider.modelId,
       this.contextProvider.ide,
-      this.contextProvider.ignoreController,
+      this.contextProvider.ignoreFor,
     )
 
     // Use pruned prefix/suffix from HelperVars (token-limited based on DEFAULT_AUTOCOMPLETE_OPTS)
     const prunedPrefixRaw = helper.prunedPrefix
     const prunedSuffix = helper.prunedSuffix
 
-    let formattedPrefix = prunedPrefixRaw
-    if (prunedSuffix) {
-      const [compiledPrefix] = codestralTemplate.compilePrefixSuffix(
-        prunedPrefixRaw,
-        prunedSuffix,
-        filepathUri,
-        "", // reponame not used in our context
-        snippetsWithUris,
-        workspaceDirs,
-      )
-      formattedPrefix = compiledPrefix
-    }
+    // Always compile: at end-of-file the suffix is empty, but cross-file
+    // snippets must still be included in the prefix.
+    const [formattedPrefix] = codestralTemplate.compilePrefixSuffix(
+      prunedPrefixRaw,
+      prunedSuffix,
+      filepathUri,
+      "", // reponame not used in our context
+      snippetsWithUris,
+      workspaceDirs,
+    )
 
     return {
       formattedPrefix,

@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Dodaj kredyty",
   "kilocode:autocomplete.authError.message":
     "Autouzupełnianie Kilo Code zostało wstrzymane z powodu problemu z uwierzytelnianiem. Możliwe przyczyny: nie zalogowano się do Kilo albo klucz API (BYOK) jest nieprawidłowy lub go brakuje. Zaloguj się ponownie albo sprawdź ustawienia klucza API dostawcy.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Autouzupełnianie Kilo Code jest wstrzymane: skonfigurowany dostawca „{{provider}}” nie jest obsługiwany. Otwórz Ustawienia → Modele i wybierz Kilo Gateway, Mistral lub Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "Autouzupełnianie Kilo Code zostało wstrzymane: nie znaleziono modelu autouzupełniania lub punktu końcowego API (404). Sprawdź nazwę modelu i punkt końcowy w Ustawienia → Modele. W przypadku modeli lokalnych upewnij się, że model jest zainstalowany, a adres URL serwera jest poprawny.",
 }

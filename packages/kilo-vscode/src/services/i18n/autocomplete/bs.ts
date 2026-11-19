@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Dodaj kredite",
   "kilocode:autocomplete.authError.message":
     "Kilo Code automatsko dovršavanje je pauzirano zbog problema s autentifikacijom. Mogući uzroci: niste prijavljeni u Kilo ili je vaš API ključ (BYOK) nevažeći ili nedostaje. Prijavite se ponovo ili provjerite postavke API ključa pružaoca.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code Autocomplete je pauziran: konfigurisani provajder «{{provider}}» nije podržan. Otvorite Postavke → Modeli i odaberite Kilo Gateway, Mistral ili Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code Autocomplete je pauziran: autocomplete model ili API endpoint nije pronađen (404). Provjerite naziv modela i endpoint u Postavke → Modeli. Za lokalne modele provjerite da je model instaliran i da je URL servera ispravan.",
 }

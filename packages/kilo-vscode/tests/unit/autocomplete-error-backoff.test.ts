@@ -64,8 +64,8 @@ describe("classify", () => {
     expect(classify(new Error("Connection timed out"))).toBe("transient")
   })
 
-  it("classifies 404 as transient", () => {
-    expect(classify(new Error("SSE failed: 404 Not Found"))).toBe("transient")
+  it("classifies 404 as fatal (model or endpoint not found)", () => {
+    expect(classify(new Error("SSE failed: 404 Not Found"))).toBe("fatal")
   })
 })
 
@@ -173,6 +173,16 @@ describe("ErrorBackoff", () => {
 
       backoff.success()
       expect(backoff.blocked()).toBe(false)
+    })
+
+    it("allows a fresh probe after reset() following a 404 (e.g. model installed after reload)", () => {
+      backoff.failure(new Error("SSE failed: 404 Not Found"))
+      expect(backoff.blocked()).toBe(true)
+      expect(backoff.getFatalStatus()).toBe(404)
+
+      backoff.reset()
+      expect(backoff.blocked()).toBe(false)
+      expect(backoff.getFatalStatus()).toBeNull()
     })
   })
 

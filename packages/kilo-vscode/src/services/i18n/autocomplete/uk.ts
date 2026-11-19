@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Додати кредити",
   "kilocode:autocomplete.authError.message":
     "Автодоповнення Kilo Code призупинено через проблему автентифікації. Можливі причини: ви не ввійшли в Kilo або ваш API-ключ (BYOK) недійсний чи відсутній. Увійдіть знову або перевірте налаштування API-ключа постачальника.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Автодоповнення Kilo Code призупинено: налаштований провайдер «{{provider}}» не підтримується. Відкрийте Налаштування → Моделі та виберіть Kilo Gateway, Mistral або Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "Автодоповнення Kilo Code призупинено: модель автодоповнення або ендпоінт API не знайдено (404). Перевірте назву моделі та ендпоінт у Налаштуваннях → Моделі. Для локальних моделей переконайтеся, що модель встановлена, а URL сервера вказано правильно.",
 }

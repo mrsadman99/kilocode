@@ -73,6 +73,10 @@ function loadedSettings(message: ExtensionMessage): Record<string, unknown> | un
       "autocomplete.enableChatAutocomplete": message.settings.enableChatAutocomplete,
       "autocomplete.provider": message.settings.provider,
       "autocomplete.model": message.settings.model,
+      "autocomplete.localModel": message.settings.localModel,
+      "autocomplete.localBaseURL": message.settings.localBaseURL,
+      "autocomplete.localTemplate": message.settings.localTemplate,
+      "autocomplete.localEndpoint": message.settings.localEndpoint,
     }
   }
   if (message.type === "indexingSettingsLoaded") {

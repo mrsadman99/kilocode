@@ -165,6 +165,7 @@ import {
   completeProviderOAuth as completeOAuthAction,
   disconnectProvider as disconnectProviderAction,
   saveCustomProvider as saveCustomProviderAction,
+  saveProviderProxy as saveProviderProxyAction,
   resolveStoredKey,
 } from "./provider-actions"
 import type { StoredProviderKey } from "./provider-actions"
@@ -1503,6 +1504,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "completeProviderOAuth":
         case "disconnectProvider":
         case "saveCustomProvider":
+        case "setProviderProxy":
           await this.handleProviderAction(message)
           break
         case "anacondaDesktopStatus":
@@ -2984,12 +2986,25 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     const metadata =
       msg.metadata && typeof msg.metadata === "object" ? (msg.metadata as Record<string, unknown>) : undefined
     const inputs = msg.inputs && typeof msg.inputs === "object" ? (msg.inputs as Record<string, string>) : undefined
-    if (msg.type === "connectProvider" && key) return connectProviderAction(ctx, rid, pid, key, metadata)
-    if (msg.type === "authorizeProviderOAuth") return authorizeOAuthAction(ctx, rid, pid, method, inputs)
-    if (msg.type === "completeProviderOAuth") return completeOAuthAction(ctx, rid, pid, method, code)
+    if (msg.type === "connectProvider" && key) {
+      const proxy = typeof msg.proxy === "string" ? msg.proxy : undefined
+      return connectProviderAction(ctx, rid, pid, key, metadata, proxy, set)
+    }
+    if (msg.type === "authorizeProviderOAuth") {
+      const proxy = typeof msg.proxy === "string" ? msg.proxy : undefined
+      return authorizeOAuthAction(ctx, rid, pid, method, inputs, proxy, set)
+    }
+    if (msg.type === "completeProviderOAuth") {
+      const proxy = typeof msg.proxy === "string" ? msg.proxy : undefined
+      return completeOAuthAction(ctx, rid, pid, method, code, proxy, set)
+    }
     if (msg.type === "disconnectProvider") return disconnectProviderAction(ctx, rid, pid, this.cachedConfigMessage, set)
     if (msg.type === "saveCustomProvider" && config)
       return saveCustomProviderAction(ctx, rid, pid, config, key, keyChanged, this.cachedConfigMessage, set)
+    if (msg.type === "setProviderProxy") {
+      const proxy = typeof msg.proxy === "string" ? msg.proxy : undefined
+      return saveProviderProxyAction(ctx, rid, pid, proxy, set)
+    }
   }
 
   private async handleFetchCustomProviderModels(msg: Record<string, unknown>): Promise<void> {
@@ -2999,8 +3014,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     const key =
       typeof msg.apiKey === "string" ? msg.apiKey : resolveStoredKey(this.storedProviderKeys, msg.providerID, url)
     const headers = msg.headers && typeof msg.headers === "object" ? (msg.headers as Record<string, string>) : undefined
+    const proxy = typeof msg.proxy === "string" && msg.proxy.trim() ? msg.proxy.trim() : undefined
     try {
-      const models = await fetchOpenAIModels({ baseURL: url, apiKey: key, headers })
+      const models = await fetchOpenAIModels({ baseURL: url, apiKey: key, headers, proxy })
       this.postMessage({ type: "customProviderModelsFetched", requestId: rid, models })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to fetch models"

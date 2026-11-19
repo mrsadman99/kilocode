@@ -527,6 +527,19 @@ export const dict = {
   "provider.custom.field.apiKey.placeholder": "API ključ",
   "provider.custom.field.apiKey.description":
     "Opcionalno. Ostavi prazno ako upravljaš autentifikacijom putem zaglavlja.",
+  "provider.custom.field.proxy.label": "HTTP proxy",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Opcionalno. Ostavi prazno za direktno povezivanje. Podržava http://, https:// i socks5://.",
+  "provider.custom.field.proxyUser.label": "Korisničko ime proxyja",
+  "provider.custom.field.proxyUser.placeholder": "Opcionalno",
+  "provider.custom.field.proxyPassword.label": "Lozinka proxyja",
+  "provider.custom.field.proxyPassword.placeholder": "Opcionalno",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "Proxy za {{provider}}",
+  "provider.proxy.description":
+    "Usmjeri zahtjeve prema ovom provajderu kroz proxy. Ostavi prazno za direktno povezivanje.",
+  "provider.proxy.toast.saved.title": "Proxy sačuvan za {{provider}}",
   "provider.custom.models.label": "Modeli",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -565,6 +578,7 @@ export const dict = {
   "provider.custom.error.name.required": "Naziv za prikaz je obavezan",
   "provider.custom.error.baseURL.required": "Osnovni URL je obavezan",
   "provider.custom.error.baseURL.format": "Mora početi sa http:// ili https://",
+  "provider.custom.error.proxy.format": "Proxy mora biti http://, https:// ili socks5:// URL",
   "provider.custom.error.required": "Obavezno",
   "provider.custom.error.duplicate": "Duplikat",
   "settings.openLocalConfig": "Lokalna konfig.",
@@ -901,6 +915,18 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Prikaži prijedloge automatskog dovršavanja u polju chata",
   "settings.autocomplete.modelsHint":
     "Da odaberete koji se model koristi za automatsko dovršavanje, pogledajte postavke Modela.",
+  "settings.autocomplete.local.model.title": "Lokalni model",
+  "settings.autocomplete.local.model.description":
+    "Naziv modela kako ga poslužuje vaš lokalni server (npr. Ollama oznaka)",
+  "settings.autocomplete.local.baseUrl.title": "URL lokalnog servera",
+  "settings.autocomplete.local.baseUrl.description": "Osnovni URL lokalnog servera na kojem model radi",
+  "settings.autocomplete.local.template.title": "FIM šablon",
+  "settings.autocomplete.local.template.description":
+    "Format fill-in-the-middle prompta; „Auto“ se otkriva iz naziva modela",
+  "settings.autocomplete.local.endpoint.title": "API endpoint",
+  "settings.autocomplete.local.endpoint.description":
+    "„Auto“ koristi zadanu vrijednost šablona: Ollama izvorni ili OpenAI kompatibilan",
+  "settings.autocomplete.local.auto": "Auto",
   "settings.notifications.sounds": "Zvukovi",
   "settings.notifications.enable.title": "Omogući zvučne obavijesti",
   "settings.notifications.enable.description":

@@ -99,6 +99,12 @@ export const Info = Schema.Struct({
       Schema.Struct({
         apiKey: Schema.optional(Schema.String),
         baseURL: Schema.optional(Schema.String),
+        // kilocode_change start - per-provider HTTP proxy
+        proxy: Schema.optional(Schema.String).annotate({
+          description:
+            "HTTP(S) proxy URL used for requests to this provider, e.g. http://proxy.example.com:8080. Overrides HTTP_PROXY/HTTPS_PROXY environment variables for this provider.",
+        }),
+        // kilocode_change end
         enterpriseUrl: Schema.optional(Schema.String).annotate({
           description: "GitHub Enterprise URL for copilot authentication",
         }),

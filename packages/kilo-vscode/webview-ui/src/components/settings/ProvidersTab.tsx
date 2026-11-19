@@ -16,6 +16,7 @@ import { useVSCode } from "../../context/vscode"
 import type { Provider } from "../../types/messages"
 import CustomProviderDialog from "./CustomProviderDialog"
 import ProviderConnectDialog from "./ProviderConnectDialog"
+import ProviderProxyDialog from "./ProviderProxyDialog"
 import ProviderSelectDialog from "./ProviderSelectDialog"
 import {
   isPopularProvider,
@@ -114,6 +115,11 @@ const ProvidersTab: Component = () => {
     const cfg = config().provider?.[item.id]
     if (!cfg) return
     dialog.show(() => <CustomProviderDialog existing={{ providerID: item.id, name: item.name, config: cfg }} />)
+  }
+
+  function editProxy(item: Provider) {
+    const options = config().provider?.[item.id]?.options as { proxy?: string } | undefined
+    dialog.show(() => <ProviderProxyDialog providerID={item.id} name={item.name} proxy={options?.proxy} />)
   }
 
   function disconnect(providerID: string, name: string) {
@@ -306,6 +312,11 @@ const ProvidersTab: Component = () => {
                   <Show when={item.id === "anaconda-desktop"}>
                     <Button size="large" variant="ghost" onClick={() => connectProvider(item)}>
                       {language.t("provider.anaconda.action.manage")}
+                    </Button>
+                  </Show>
+                  <Show when={!isCustom(item)}>
+                    <Button size="large" variant="ghost" onClick={() => editProxy(item)}>
+                      {language.t("provider.proxy.action")}
                     </Button>
                   </Show>
                   <Show when={canDisconnect(item)}>
