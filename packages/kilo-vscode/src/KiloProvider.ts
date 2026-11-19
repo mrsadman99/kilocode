@@ -115,6 +115,7 @@ import { mcpRemoval } from "./services/mcp-removal"
 import { marketplaceBundles } from "./services/marketplace/bundles"
 import { retryable, backoff, MAX_RETRIES } from "./util/retry"
 import { hasGit } from "./kilo-provider/git-status"
+import { createGitRefresh } from "./kilo-provider/git-refresh"
 import {
   handleRequestMigrationData,
   handleStartMigration,
@@ -520,6 +521,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   private lastReconciledAt = new Map<string, number>() // Per-session focus-mode reconcile timestamp.
   private pendingSessionRefresh = false // Refresh requested before the client is ready.
   private readonly streams = new SessionStreamScheduler((msg) => this.postMessage(msg))
+  private readonly gitRefresh = createGitRefresh((parts, sid) => void this.refreshGitStatusFromParts(parts, sid))
   private readonly inputs = new ToolInputStream((msg) => this.streams.push(msg))
   private readonly visibleTaskStreams = new VisibleTaskStreams((id, visible) => this.streams.setVisible(id, visible))
   private readonly confirmations = new MessageConfirmation()
@@ -6087,7 +6089,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     event: Extract<ProviderEvent, { type: "message.part.updated" }>,
     sessionID?: string,
   ) {
-    void this.refreshGitStatusFromParts([event.properties.part], sessionID)
+    this.gitRefresh.push([event.properties.part], sessionID)
   }
 
   private async refreshGitStatusFromParts(parts: unknown[], sessionID?: string, recover = false): Promise<boolean> {
@@ -6377,6 +6379,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.visibleTaskStreams.clear()
     this.inputs.dispose()
     this.streams.dispose()
+    this.gitRefresh.dispose()
     this.isWebviewReady = false
     this.webview = null
     // Release any waitForReady() awaiters so their callers don't hang after disposal.
