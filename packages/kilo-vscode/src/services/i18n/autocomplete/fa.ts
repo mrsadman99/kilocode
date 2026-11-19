@@ -24,4 +24,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "افزودن اعتبار",
   "kilocode:autocomplete.authError.message":
     "تکمیل خودکار Kilo Code به دلیل مشکل احراز هویت متوقف شده است. دلایل احتمالی: وارد Kilo نشده‌اید، یا کلید API (BYOK) شما نامعتبر یا وارد نشده است. لطفاً دوباره وارد شوید یا تنظیمات کلید API ارائه‌دهنده خود را بررسی کنید.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "تکمیل خودکار Kilo Code متوقف شده است: ارائه‌دهنده پیکربندی‌شده «{{provider}}» پشتیبانی نمی‌شود. تنظیمات → مدل‌ها را باز کنید و Kilo Gateway، Mistral یا Local (Ollama) را انتخاب کنید.",
+  "kilocode:autocomplete.notFound.message":
+    "تکمیل خودکار Kilo Code متوقف شده است: مدل تکمیل خودکار یا نقطه پایانی API پیدا نشد (404). نام مدل و نقطه پایانی را در تنظیمات → مدل‌ها بررسی کنید. برای مدل‌های محلی، مطمئن شوید مدل نصب شده و نشانی سرور درست است.",
 }

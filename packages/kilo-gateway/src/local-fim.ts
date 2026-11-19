@@ -30,10 +30,15 @@ function event(line: string) {
   if (!line.trim()) return undefined
   const chunk = JSON.parse(line) as {
     response?: string
+    error?: string
     done?: boolean
     prompt_eval_count?: number
     eval_count?: number
   }
+  // Ollama reports runtime failures (e.g. model not found) as an error record
+  // inside an already-open stream. Surface it as a failure instead of caching
+  // an empty completion as a success.
+  if (chunk.error) throw new Error(`FIM local error: ${chunk.error}`)
   const out: { choices: { text: string }[]; usage?: { prompt_tokens: number; completion_tokens: number } } = {
     choices: [{ text: chunk.response ?? "" }],
   }

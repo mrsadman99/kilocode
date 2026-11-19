@@ -25,6 +25,7 @@ export async function generateFim(
 ): Promise<ResponseMetaData> {
   const client = await connectionService.getClientAsync()
   const info = getAutocompleteModelById(modelId)
+  if (!info) throw new Error(`Unknown autocomplete model: ${modelId}`)
   const local = info.providerID === "local" ? localFimOptions(info.modelID) : undefined
   let cost = 0
   let inputTokens = 0

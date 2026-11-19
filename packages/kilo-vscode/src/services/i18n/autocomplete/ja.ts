@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "クレジットを追加",
   "kilocode:autocomplete.authError.message":
     "Kilo Code オートコンプリートは認証の問題により一時停止されました。考えられる原因: Kilo にサインインしていない、または API キー (BYOK) が無効または不足しています。再度サインインするか、プロバイダーの API キー設定を確認してください。",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code 自動補完は一時停止中です：設定されたプロバイダー「{{provider}}」はサポートされていません。設定 → モデルを開き、Kilo Gateway、Mistral、または Local (Ollama) を選択してください。",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code 自動補完は一時停止されました：自動補完モデルまたは API エンドポイントが見つかりません（404）。設定 → モデルでモデル名とエンドポイントを確認してください。ローカルモデルの場合は、モデルがインストールされ、サーバー URL が正しいことを確認してください。",
 }

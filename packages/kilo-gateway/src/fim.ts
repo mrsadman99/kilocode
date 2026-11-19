@@ -37,14 +37,20 @@ function localTarget(model?: string, opts?: LocalFimOptions): FimTarget {
   return { provider: "local", model: model?.trim() || DEFAULT_LOCAL_MODEL, url: `${base}/${path}`, endpoint }
 }
 
-export function resolveFimTarget(provider?: string, model?: string, opts?: LocalFimOptions): FimTarget {
-  if (provider === "local") return localTarget(model, opts)
-  if (!provider || provider === "kilo") return kiloTarget(model)
+/**
+ * Resolve the upstream FIM target. Returns `undefined` for an explicit but
+ * unsupported provider so the request is rejected rather than silently sent
+ * to the cloud default with the user's code.
+ */
+export function resolveFimTarget(provider?: string, model?: string, opts?: LocalFimOptions): FimTarget | undefined {
+  const pid = provider?.trim()
+  if (pid === "local") return localTarget(model, opts)
+  if (!pid || pid === "kilo") return kiloTarget(model)
 
-  const info = getAutocompleteModel(provider, model)
+  const info = getAutocompleteModel(pid, model)
+  if (!info) return undefined
   if (info.directProvider === "mistral") {
     return { provider: "mistral", model: info.requestModel }
   }
-  // An unknown direct provider, such as a retired one, falls back to the default Gateway model.
   return kiloTarget(info.requestModel)
 }

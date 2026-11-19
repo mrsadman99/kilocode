@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "新增額度",
   "kilocode:autocomplete.authError.message":
     "Kilo Code 自動完成因驗證問題已暫停。可能原因：你尚未登入 Kilo，或你的 API 金鑰（BYOK）無效或遺失。請重新登入或檢查提供者 API 金鑰設定。",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code 自動完成已暫停：設定的供應商「{{provider}}」不受支援。開啟設定 → 模型，選擇 Kilo Gateway、Mistral 或 Local (Ollama)。",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code 自動完成已暫停：找不到自動完成模型或 API 端點（404）。請在設定 → 模型中檢查模型名稱和端點。對於本機模型，請確保模型已安裝且伺服器 URL 正確。",
 }

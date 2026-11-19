@@ -17,12 +17,14 @@ describe("FIM target resolution", () => {
     })
   })
 
-  test("falls back to the default Gateway model for retired direct providers", () => {
-    expect(resolveFimTarget("inception", "mercury-edit-2")).toEqual({
-      provider: "kilo",
-      model: "mistralai/codestral-2508",
-      url: "https://ai-gateway.kilo.ai/api/v1/fim/completions",
-    })
+  test("keeps an unset Mistral model on Mistral, not the cloud default", () => {
+    expect(resolveFimTarget("mistral")).toEqual({ provider: "mistral", model: "codestral-2508" })
+    expect(resolveFimTarget("mistral", "unknown-model")).toBeUndefined()
+  })
+
+  test("rejects explicit unsupported providers instead of routing to the cloud default", () => {
+    expect(resolveFimTarget("inception", "mercury-edit-2")).toBeUndefined()
+    expect(resolveFimTarget("ollama", "qwen2.5-coder:7b")).toBeUndefined()
   })
 
   test("preserves gateway model pass-through behavior", () => {

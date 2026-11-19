@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Credits toevoegen",
   "kilocode:autocomplete.authError.message":
     "Kilo Code Autocomplete is gepauzeerd vanwege een authenticatieprobleem. Mogelijke oorzaken: je bent niet aangemeld bij Kilo, of je API-sleutel (BYOK) is ongeldig of ontbreekt. Meld je opnieuw aan of controleer de API-sleutelinstellingen van je provider.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code Autocomplete is gepauzeerd: de geconfigureerde provider «{{provider}}» wordt niet ondersteund. Open Instellingen → Modellen en kies Kilo Gateway, Mistral of Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code Autocomplete is gepauzeerd: het autocomplete-model of API-eindpunt is niet gevonden (404). Controleer de modelnaam en het eindpunt bij Instellingen → Modellen. Zorg er bij lokale modellen voor dat het model is geïnstalleerd en de server-URL correct is.",
 }

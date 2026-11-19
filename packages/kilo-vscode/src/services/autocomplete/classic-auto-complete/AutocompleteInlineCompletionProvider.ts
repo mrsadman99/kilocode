@@ -130,7 +130,12 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   /** The pending request associated with the current debounce timer (if any) */
   private debouncedPendingRequest: PendingRequest | null = null
   private isFirstCall: boolean = true
-  private ignoreController: Promise<FileIgnoreController>
+  /** Ignore controllers keyed by workspace root, refreshed when ignore files change. */
+  private ignores = new Map<string, Promise<FileIgnoreController>>()
+  private ignoreWatcher: vscode.FileSystemWatcher
+  private foldersListener: vscode.Disposable
+  /** Identifies the active autocomplete configuration (model + local settings). */
+  private configKey = ""
   /** Abort controllers for in-flight FIM requests, scoped by file/notebook context. */
   private fimAbortControllers = new Map<string, AbortController>()
   private acceptedCommand: vscode.Disposable | null = null
@@ -153,7 +158,6 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     connectionService: KiloConnectionService,
     costTrackingCallback: CostTrackingCallback,
     getSettings: () => AutocompleteServiceSettings | null,
-    workspacePath: string,
     telemetry: AutocompleteTelemetry | null = null,
     onFatalError?: (status: number | null) => void,
   ) {
@@ -162,12 +166,22 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     this.costTrackingCallback = costTrackingCallback
     this.getSettings = getSettings
     this.onFatalError = onFatalError ?? null
+    this.configKey = modelId
 
-    this.ignoreController = (async () => {
-      const ignoreController = new FileIgnoreController(workspacePath)
-      await ignoreController.initialize()
-      return ignoreController
-    })()
+    // Resolve ignore rules per workspace root and refresh them when the ignore
+    // files change, so edits to .kilocodeignore/.gitignore take effect without a
+    // restart and every workspace folder is honored (not just the first one).
+    this.ignoreWatcher = vscode.workspace.createFileSystemWatcher("**/{.kilocodeignore,.gitignore}")
+    const invalidate = () => {
+      this.ignores.clear()
+      // Cancel queued/in-flight requests and drop cached suggestions: a file
+      // excluded while a request was pending must not still be sent.
+      this.resetRequests()
+    }
+    this.ignoreWatcher.onDidChange(invalidate)
+    this.ignoreWatcher.onDidCreate(invalidate)
+    this.ignoreWatcher.onDidDelete(invalidate)
+    this.foldersListener = vscode.workspace.onDidChangeWorkspaceFolders(invalidate)
 
     const ide = new VsCodeIde(context)
     this.contextService = new ContextRetrievalService(ide)
@@ -175,7 +189,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       ide,
       contextService: this.contextService,
       modelId,
-      ignoreController: this.ignoreController,
+      ignoreFor: (uri) => this.ignoreFor(uri),
     }
     this.fimPromptBuilder = new FimPromptBuilder(this.contextProvider)
 
@@ -248,9 +262,77 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
    * Update the autocomplete model ID. The context provider (shared with the
    * FIM prompt builder) is mutated in place so downstream consumers pick up
    * the new value on the next request.
+   *
+   * `configKey` identifies the full configuration (model + local settings).
+   * When it changes, cached suggestions, in-flight requests, latency samples,
+   * and error backoff from the previous configuration are discarded so a new
+   * model is never served stale results or blocked by a previous model's errors.
    */
-  public setModel(modelId: string): void {
+  public setModel(modelId: string, configKey = modelId): void {
+    if (this.contextProvider.modelId === modelId && this.configKey === configKey) return
     this.contextProvider.modelId = modelId
+    this.configKey = configKey
+    this.latencyHistory.length = 0
+    this.debounceDelayMs = INITIAL_DEBOUNCE_DELAY_MS
+    this.resetRequests()
+    this.backoff.reset()
+    this.fatalNotified = false
+  }
+
+  /**
+   * Drop cached suggestions and cancel queued/in-flight requests. Used when the
+   * configuration or ignore rules change, so stale results are never served and
+   * a pending request does not send code that is no longer allowed.
+   */
+  private resetRequests(): void {
+    this.suggestionsHistory.length = 0
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer)
+      this.debounceTimer = null
+    }
+    this.settleDebouncedPendingRequest()
+    this.pendingRequests.length = 0
+    this.isFirstCall = true
+    for (const controller of this.fimAbortControllers.values()) controller.abort()
+    this.fimAbortControllers.clear()
+  }
+
+  /** Resolve the ignore controller for the workspace root owning `uri`. */
+  private ignoreFor(uri: vscode.Uri): Promise<FileIgnoreController> | undefined {
+    const root = vscode.workspace.getWorkspaceFolder(uri)?.uri.fsPath
+    if (!root) return undefined
+    const cached = this.ignores.get(root)
+    if (cached) return cached
+    const created = (async () => {
+      const controller = new FileIgnoreController(root)
+      await controller.initialize()
+      return controller
+    })()
+    this.ignores.set(root, created)
+    return created
+  }
+
+  /**
+   * Whether ignore rules exclude this document from autocomplete. Untitled
+   * documents are always allowed; files outside every workspace folder, files
+   * matching .kilocodeignore/.gitignore, and unresolved checks are denied.
+   */
+  private async excluded(document: vscode.TextDocument): Promise<boolean> {
+    if (document.isUntitled) return false
+    try {
+      const ignore = this.ignoreFor(notebookUri(document.uri) ?? document.uri)
+      if (!ignore) return true
+      // Try to get the controller with a short timeout
+      const controller = await Promise.race([
+        ignore,
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 50)),
+      ])
+      if (!controller) return true
+      return !accessible(controller, document)
+    } catch {
+      // On error, assume file is ignored
+      return true
+    }
   }
 
   private processSuggestion(
@@ -282,9 +364,10 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     return { text: "", scope, prefix, suffix }
   }
 
-  private async disposeIgnoreController(): Promise<void> {
-    const ignoreController = await this.ignoreController.catch(() => null)
-    ignoreController?.dispose()
+  private async disposeIgnoreControllers(): Promise<void> {
+    const controllers = await Promise.all([...this.ignores.values()].map((p) => p.catch(() => null)))
+    for (const controller of controllers) controller?.dispose()
+    this.ignores.clear()
   }
 
   /**
@@ -324,12 +407,14 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       controller.abort()
     }
     this.fimAbortControllers.clear()
+    this.ignoreWatcher.dispose()
+    this.foldersListener.dispose()
     this.telemetry?.dispose()
     this.contextService?.dispose()
     this.contextService = null
     this.recentlyVisitedRangesService.dispose()
     this.recentlyEditedTracker.dispose()
-    void this.disposeIgnoreController()
+    void this.disposeIgnoreControllers()
     if (this.acceptedCommand) {
       this.acceptedCommand.dispose()
       this.acceptedCommand = null
@@ -365,7 +450,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     const telemetryContext: AutocompleteContext = {
       languageId: document.languageId,
       modelId: this.contextProvider.modelId,
-      provider: getAutocompleteModelById(this.contextProvider.modelId).provider,
+      provider: getAutocompleteModelById(this.contextProvider.modelId)?.provider ?? "unknown",
     }
 
     this.telemetry?.captureSuggestionRequested(telemetryContext)
@@ -397,32 +482,16 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       return []
     }
 
+    const scope = autocompleteScope(document)
+    // Cancel the active request for this file when VS Code cancels this call
+    // (e.g. the user typed again), so a superseded stream is not cached.
+    const cancel = _token.onCancellationRequested(() => this.fimAbortControllers.get(scope)?.abort())
     try {
       // Check if file is ignored (for manual trigger via codeSuggestion)
-      // Skip ignore check for untitled documents
-      if (!document.isUntitled) {
-        try {
-          // Try to get the controller with a short timeout
-          const controller = await Promise.race([
-            this.ignoreController,
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 50)),
-          ])
-
-          if (!controller) {
-            // If promise hasn't resolved yet, assume file is ignored
-            return []
-          }
-
-          if (!accessible(controller, document)) {
-            return []
-          }
-        } catch {
-          // On error, assume file is ignored
-          return []
-        }
+      if (await this.excluded(document)) {
+        return []
       }
 
-      const scope = autocompleteScope(document)
       const { prefix, suffix } = extractPrefixSuffix(document, position)
 
       // Check cache first - allow mid-word lookups from cache
@@ -450,9 +519,9 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         return []
       }
 
-      const { prompt, prefix: promptPrefix, suffix: promptSuffix } = await this.getPrompt(document, position)
-
-      await this.debouncedFetchAndCacheSuggestion(scope, prompt, promptPrefix, promptSuffix, document.languageId)
+      // The expensive context build happens inside the debounced fetch, not on
+      // every keystroke.
+      await this.debouncedFetchAndCacheSuggestion(scope, prefix, suffix, document, position)
 
       const cachedResult = applyFirstLineOnly(
         findMatchingSuggestion(scope, prefix, suffix, this.suggestionsHistory),
@@ -475,6 +544,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       // only big catch at the top of the call-chain, if anything goes wrong at a lower level
       // do not catch, just let the error cascade
       return []
+    } finally {
+      cancel.dispose()
     }
   }
 
@@ -505,10 +576,10 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
    */
   private debouncedFetchAndCacheSuggestion(
     scope: string,
-    prompt: AutocompletePrompt,
     prefix: string,
     suffix: string,
-    languageId: string,
+    document: vscode.TextDocument,
+    position: vscode.Position,
   ): Promise<void> {
     // Check if any existing pending request covers this one
     const coveringRequest = findCoveringPendingRequest(scope, prefix, suffix, this.pendingRequests)
@@ -521,7 +592,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     // but still track it as a pending request so subsequent calls can reuse it
     if (this.isFirstCall && this.debounceTimer === null) {
       this.isFirstCall = false
-      const promise = this.fetchAndCacheSuggestion(scope, prompt, prefix, suffix, languageId)
+      const promise = this.fetchAndCacheSuggestion(scope, document, position)
       const leading: PendingRequest = { scope, prefix, suffix, promise }
       promise.finally(() => this.removePendingRequest(leading))
       this.pendingRequests.push(leading)
@@ -552,7 +623,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         this.debouncedPendingRequest = null
         this.isFirstCall = true // Reset for next sequence
         try {
-          await this.fetchAndCacheSuggestion(scope, prompt, prefix, suffix, languageId)
+          await this.fetchAndCacheSuggestion(scope, document, position)
         } finally {
           this.removePendingRequest(pendingRequest)
           resolve()
@@ -574,10 +645,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
 
   public async fetchAndCacheSuggestion(
     scope: string,
-    prompt: AutocompletePrompt,
-    prefix: string,
-    suffix: string,
-    languageId: string,
+    document: vscode.TextDocument,
+    position: vscode.Position,
   ): Promise<void> {
     // Defense-in-depth: credentials may become invalid between the provider gate and the actual
     // debounced execution. In that case, do not attempt an LLM call at all.
@@ -591,15 +660,25 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     this.fimAbortControllers.set(scope, controller)
 
     const startTime = performance.now()
+    const key = this.configKey
+    const languageId = document.languageId
 
     // Build telemetry context for this request
     const telemetryContext: AutocompleteContext = {
       languageId,
       modelId: this.contextProvider.modelId,
-      provider: getAutocompleteModelById(this.contextProvider.modelId).provider,
+      provider: getAutocompleteModelById(this.contextProvider.modelId)?.provider ?? "unknown",
     }
 
     try {
+      // Build the (expensive) FIM context only when the request actually runs,
+      // after the debounce — not on every keystroke.
+      const { prompt, prefix, suffix } = await this.getPrompt(document, position)
+
+      // Ignore rules may have changed while the context was being built; never
+      // send code for a file that has since been excluded.
+      if (await this.excluded(document)) return
+
       // Curry processSuggestion with request context
       const curriedProcessSuggestion = (text: string) =>
         this.processSuggestion(text, scope, prefix, suffix, telemetryContext, languageId)
@@ -611,6 +690,13 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         curriedProcessSuggestion,
         controller.signal,
       )
+
+      // Discard aborted, superseded, or stale-configuration results entirely.
+      // An aborted stream can end normally (reader.cancel) with partial text;
+      // it must not be cached as a success or reset the error backoff.
+      if (controller.signal.aborted || this.fimAbortControllers.get(scope) !== controller || key !== this.configKey) {
+        return
+      }
 
       const latencyMs = performance.now() - startTime
 
@@ -624,10 +710,10 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         telemetryContext,
       )
 
+      this.costTrackingCallback(result.cost, result.inputTokens, result.outputTokens)
+
       // Record latency for adaptive debounce delay
       this.recordLatency(latencyMs)
-
-      this.costTrackingCallback(result.cost, result.inputTokens, result.outputTokens)
 
       // Successful response — reset any backoff / circuit breaker state
       this.backoff.success()

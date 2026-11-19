@@ -80,6 +80,7 @@ export class ChatTextAreaAutocomplete {
     const provider = cfg.get<string>("provider")
     const model = provider === "local" ? cfg.get<string>("localModel") : cfg.get<string>("model")
     const entry = getAutocompleteModel(provider, model)
+    if (!entry) return { suggestion: "" }
     const startTime = Date.now()
 
     // Build context for telemetry

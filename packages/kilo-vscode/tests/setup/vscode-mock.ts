@@ -14,6 +14,14 @@ const kind = (value: string): { value: string; append: (part: string) => ReturnT
 
 const noop = () => {}
 
+/** Registered file-system watcher handlers, so tests can simulate ignore-file edits. */
+const watchers: Array<Record<string, (uri?: unknown) => void>> = []
+
+/** Fire the change event of every registered file-system watcher. */
+export function fireFileWatchers() {
+  for (const w of watchers) w.change?.()
+}
+
 const mockUri = {
   parse: (value: string) => ({ scheme: "https", authority: "", path: value, query: "", fragment: "", fsPath: value }),
   file: (path: string) => ({ scheme: "file", authority: "", path, query: "", fragment: "", fsPath: path }),
@@ -57,6 +65,21 @@ const mockVscode = {
     onDidCloseTextDocument: () => ({ dispose: noop }),
     onDidChangeConfiguration: () => ({ dispose: noop }),
     onDidChangeWorkspaceFolders: () => ({ dispose: noop }),
+    getWorkspaceFolder: (uri: { fsPath?: string }) => {
+      const value = uri?.fsPath ?? ""
+      return value === "/repo" || value.startsWith("/repo/")
+        ? { uri: { fsPath: "/repo" }, name: "repo", index: 0 }
+        : undefined
+    },
+    createFileSystemWatcher: () => {
+      const handlers: Record<string, (uri?: unknown) => void> = {}
+      watchers.push(handlers)
+      const on = (name: string) => (cb: (uri?: unknown) => void) => {
+        handlers[name] = cb
+        return { dispose: noop }
+      }
+      return { onDidChange: on("change"), onDidCreate: on("create"), onDidDelete: on("delete"), dispose: noop }
+    },
     openTextDocument: async (input: { content?: string; language?: string }) => ({
       getText: () => input.content ?? "",
       languageId: input.language ?? "plaintext",
@@ -80,6 +103,21 @@ const mockVscode = {
     },
   },
   StatusBarAlignment: { Left: 1, Right: 2 },
+  CancellationTokenSource: class {
+    private cb?: () => void
+    token = {
+      isCancellationRequested: false,
+      onCancellationRequested: (cb: () => void) => {
+        this.cb = cb
+        return { dispose: noop }
+      },
+    }
+    cancel() {
+      this.token.isCancellationRequested = true
+      this.cb?.()
+    }
+    dispose() {}
+  },
   ThemeColor: class {
     constructor(public id: string) {}
   },

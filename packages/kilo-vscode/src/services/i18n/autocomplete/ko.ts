@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "크레딧 추가",
   "kilocode:autocomplete.authError.message":
     "Kilo Code 자동 완성이 인증 문제로 일시 중지되었습니다. 가능한 원인: Kilo에 로그인하지 않았거나 API 키(BYOK)가 유효하지 않거나 누락되었습니다. 다시 로그인하거나 제공자 API 키 설정을 확인하세요.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code 자동완성이 일시 중지되었습니다: 구성된 제공자 «{{provider}}»는 지원되지 않습니다. 설정 → 모델을 열고 Kilo Gateway, Mistral 또는 Local (Ollama)을 선택하세요.",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code 자동완성이 일시 중지되었습니다: 자동완성 모델 또는 API 엔드포인트를 찾을 수 없습니다(404). 설정 → 모델에서 모델 이름과 엔드포인트를 확인하세요. 로컬 모델의 경우 모델이 설치되어 있고 서버 URL이 올바른지 확인하세요.",
 }

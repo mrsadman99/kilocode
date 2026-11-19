@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "เพิ่มเครดิต",
   "kilocode:autocomplete.authError.message":
     "การเติมข้อความอัตโนมัติของ Kilo Code ถูกพักไว้เนื่องจากปัญหาการยืนยันตัวตน สาเหตุที่เป็นไปได้: คุณไม่ได้ลงชื่อเข้าใช้ Kilo หรือคีย์ API (BYOK) ของคุณไม่ถูกต้องหรือหายไป โปรดลงชื่อเข้าใช้อีกครั้งหรือตรวจสอบการตั้งค่าคีย์ API ของผู้ให้บริการ",
+  "kilocode:autocomplete.invalidProvider.message":
+    "การเติมข้อความอัตโนมัติของ Kilo Code หยุดชั่วคราว: ผู้ให้บริการที่กำหนดค่า «{{provider}}» ไม่รองรับ เปิด การตั้งค่า → โมเดล แล้วเลือก Kilo Gateway, Mistral หรือ Local (Ollama)",
+  "kilocode:autocomplete.notFound.message":
+    "การเติมข้อความอัตโนมัติของ Kilo Code หยุดชั่วคราว: ไม่พบโมเดลเติมข้อความอัตโนมัติหรือจุดปลาย API (404) ตรวจสอบชื่อโมเดลและจุดปลายใน การตั้งค่า → โมเดล สำหรับโมเดลในเครื่อง ตรวจสอบว่าติดตั้งโมเดลแล้วและ URL ของเซิร์ฟเวอร์ถูกต้อง",
 }

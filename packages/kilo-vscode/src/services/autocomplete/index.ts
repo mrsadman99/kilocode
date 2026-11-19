@@ -20,7 +20,7 @@ export const registerAutocompleteProvider = async (
   // Register AutocompleteServiceManager Commands
   context.subscriptions.push(
     vscode.commands.registerCommand("kilo-code.new.autocomplete.reload", async () => {
-      await autocompleteManager.load()
+      await autocompleteManager.reload()
     }),
   )
   context.subscriptions.push(

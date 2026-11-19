@@ -20,4 +20,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Adicionar créditos",
   "kilocode:autocomplete.authError.message":
     "O Autocompletar do Kilo Code foi pausado devido a um problema de autenticação. Possíveis causas: você não está conectado ao Kilo, ou sua chave de API (BYOK) é inválida ou está ausente. Entre novamente ou verifique as configurações da chave de API do provedor.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "O autocomplete do Kilo Code está pausado: o provedor configurado «{{provider}}» não é suportado. Abra Configurações → Modelos e escolha Kilo Gateway, Mistral ou Local (Ollama).",
+  "kilocode:autocomplete.notFound.message":
+    "O autocomplete do Kilo Code foi pausado: o modelo de autocomplete ou o endpoint da API não foi encontrado (404). Verifique o nome do modelo e o endpoint em Configurações → Modelos. Para modelos locais, certifique-se de que o modelo esteja instalado e a URL do servidor esteja correta.",
 }

@@ -85,25 +85,54 @@ function localModel(model?: string): AutocompleteModelDef {
   }
 }
 
-export function getAutocompleteModel(provider?: string, model?: string): AutocompleteModelDef {
-  // When provider is unset, always default to Kilo Gateway. Direct-provider
-  // use must be opted into explicitly via the provider setting — never inferred
-  // from a model name, since the same plain model id can exist on multiple
-  // providers and we don't want to silently route legacy settings to BYOK.
-  const pid = provider ?? "kilo"
-  if (pid === "local") return localModel(model)
-  for (const m of models) {
-    if (m.providerID === pid && m.modelID === model) return m
+/** The Gateway accepts arbitrary FIM model ids, so custom choices are preserved. */
+function gatewayModel(model: string): AutocompleteModelDef {
+  return {
+    id: `kilo/${model}`,
+    modelID: model,
+    label: model,
+    providerID: "kilo",
+    provider: "Kilo Gateway",
+    requestModel: model,
+    temperature: 0.2,
   }
-  return DEFAULT_AUTOCOMPLETE_MODEL
 }
 
-export function getAutocompleteModelById(id: string): AutocompleteModelDef {
-  if (id.startsWith("local/")) return localModel(id.slice("local/".length))
-  for (const m of models) {
-    if (m.id === id) return m
+/**
+ * Resolve the configured autocomplete model. The result always stays within
+ * the explicitly chosen provider: an unsupported provider, or a model that
+ * does not belong to a direct BYOK provider, resolves to `undefined` so the
+ * caller surfaces a configuration error instead of routing the user's code to
+ * a different service. Only an unset provider resolves to the cloud default.
+ */
+export function getAutocompleteModel(provider?: string, model?: string): AutocompleteModelDef | undefined {
+  const pid = provider?.trim()
+  if (!pid) return DEFAULT_AUTOCOMPLETE_MODEL
+  if (pid === "local") return localModel(model)
+  const owned = models.filter((m) => m.providerID === pid)
+  if (owned.length === 0) return undefined
+  const name = model?.trim()
+  const found = name ? owned.find((m) => m.modelID === name) : undefined
+  if (found) return found
+  if (pid === "kilo") {
+    // The Gateway accepts arbitrary FIM model ids; preserve the user's choice
+    // rather than silently substituting a different model.
+    return name ? gatewayModel(name) : DEFAULT_AUTOCOMPLETE_MODEL
   }
-  return DEFAULT_AUTOCOMPLETE_MODEL
+  // Direct BYOK providers only support their whitelisted models. An unset model
+  // resolves to that provider's own default; an unknown model is rejected.
+  return name ? undefined : owned[0]
+}
+
+export function getAutocompleteModelById(id: string): AutocompleteModelDef | undefined {
+  if (id.startsWith("local/")) return localModel(id.slice("local/".length))
+  const found = models.find((m) => m.id === id)
+  if (found) return found
+  if (id.startsWith("kilo/")) {
+    const name = id.slice("kilo/".length)
+    if (name) return gatewayModel(name)
+  }
+  return undefined
 }
 
 export function validAutocompleteProvider(value: unknown) {

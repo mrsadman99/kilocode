@@ -26,10 +26,34 @@ describe("DEFAULT_AUTOCOMPLETE_MODEL", () => {
   })
 })
 
-describe("retired autocomplete models", () => {
-  test("fall back to the default model", () => {
-    expect(getAutocompleteModel("kilo", "inception/mercury-next-edit")).toBe(DEFAULT_AUTOCOMPLETE_MODEL)
-    expect(getAutocompleteModel("inception", "mercury-edit-2")).toBe(DEFAULT_AUTOCOMPLETE_MODEL)
+describe("provider-scoped model resolution", () => {
+  test("keeps an unknown Kilo Gateway model within the gateway", () => {
+    const info = getAutocompleteModel("kilo", "inception/mercury-next-edit")
+    expect(info?.providerID).toBe("kilo")
+    expect(info?.modelID).toBe("inception/mercury-next-edit")
+    expect(getAutocompleteModelById("kilo/custom/fim-model")?.modelID).toBe("custom/fim-model")
+  })
+
+  test("never substitutes a different provider for an explicit choice", () => {
+    // Unknown model under a direct BYOK provider is rejected, not routed to kilo.
+    expect(getAutocompleteModel("mistral", "опечатка")).toBeUndefined()
+    expect(getAutocompleteModel("mistral", "mistralai/codestral-2508")).toBeUndefined()
+    // Unset model under mistral resolves to mistral's own default, not kilo.
+    const mistral = getAutocompleteModel("mistral")
+    expect(mistral?.providerID).toBe("mistral")
+    expect(mistral?.modelID).toBe("codestral-2508")
+  })
+
+  test("explicit unsupported provider resolves to undefined instead of the cloud default", () => {
+    expect(getAutocompleteModel("inception", "mercury-edit-2")).toBeUndefined()
+    expect(getAutocompleteModel("ollama", "qwen2.5-coder:7b")).toBeUndefined()
+    expect(getAutocompleteModelById("inception/mercury-edit-2")).toBeUndefined()
+  })
+
+  test("unset provider still resolves to the default", () => {
+    expect(getAutocompleteModel()).toBe(DEFAULT_AUTOCOMPLETE_MODEL)
+    expect(getAutocompleteModel(undefined, "anything")).toBe(DEFAULT_AUTOCOMPLETE_MODEL)
+    expect(getAutocompleteModel("kilo")).toBe(DEFAULT_AUTOCOMPLETE_MODEL)
   })
 
   test("are not valid provider or model values", () => {

@@ -5,6 +5,7 @@ import { TelemetryProxy, TelemetryEventName } from "../telemetry"
 import { AutocompleteStatusBar } from "./AutocompleteStatusBar"
 import { AutocompleteCodeActionProvider } from "./AutocompleteCodeActionProvider"
 import { AutocompleteInlineCompletionProvider } from "./classic-auto-complete/AutocompleteInlineCompletionProvider"
+import { insertionIsCurrent } from "./classic-auto-complete/inline-utils"
 import { AutocompleteTelemetry } from "./classic-auto-complete/AutocompleteTelemetry"
 import type { KiloConnectionService } from "../cli-backend"
 import { hasValidCredentials } from "./fim"
@@ -22,22 +23,40 @@ export interface AutocompleteServiceSettings {
   enableChatAutocomplete?: boolean
   provider?: string
   model?: string
+  localModel?: string
+  localBaseURL?: string
+  localTemplate?: string
+  localEndpoint?: string
   snoozeUntil?: number
 }
 
 function readSettings(): AutocompleteServiceSettings {
   const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
   const provider = config.get<string>("provider")
-  const model = provider === "local" ? config.get<string>("localModel") : config.get<string>("model")
-  const info = getAutocompleteModel(provider, model)
   return {
     enableAutoTrigger: config.get<boolean>("enableAutoTrigger") ?? true,
     enableSmartInlineTaskKeybinding: config.get<boolean>("enableSmartInlineTaskKeybinding") ?? true,
     enableChatAutocomplete: config.get<boolean>("enableChatAutocomplete") ?? true,
-    provider: info.providerID,
-    model: info.modelID,
+    provider,
+    model: provider === "local" ? config.get<string>("localModel") : config.get<string>("model"),
+    localModel: config.get<string>("localModel"),
+    localBaseURL: config.get<string>("localBaseURL"),
+    localTemplate: config.get<string>("localTemplate"),
+    localEndpoint: config.get<string>("localEndpoint"),
     snoozeUntil: config.get<number>("snoozeUntil"),
   }
+}
+
+/** Identifies the full autocomplete configuration for cache/backoff isolation. */
+function configKey(settings: AutocompleteServiceSettings | null): string {
+  return JSON.stringify([
+    settings?.provider ?? "",
+    settings?.model ?? "",
+    settings?.localModel ?? "",
+    settings?.localBaseURL ?? "",
+    settings?.localTemplate ?? "",
+    settings?.localEndpoint ?? "",
+  ])
 }
 
 async function writeSettings(patch: Partial<AutocompleteServiceSettings>): Promise<void> {
@@ -55,6 +74,7 @@ export class AutocompleteServiceManager {
   private settings: AutocompleteServiceSettings | null = null
 
   private taskId: string | null = null
+  private invalidNotified = false
 
   // Status bar integration
   private statusBar: AutocompleteStatusBar | null = null
@@ -83,8 +103,6 @@ export class AutocompleteServiceManager {
     this.connectionService = connectionService
     AutocompleteServiceManager._instance = this
 
-    const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? ""
-
     // Register the providers
     this.codeActionProvider = new AutocompleteCodeActionProvider()
     this.inlineCompletionProvider = new AutocompleteInlineCompletionProvider(
@@ -93,7 +111,6 @@ export class AutocompleteServiceManager {
       connectionService,
       this.updateCostTracking.bind(this),
       () => this.settings,
-      workspacePath,
       new AutocompleteTelemetry(),
       (status) => this.handleFatalAutocompleteError(status),
     )
@@ -134,7 +151,21 @@ export class AutocompleteServiceManager {
   public async load() {
     this.settings = readSettings()
 
-    this.inlineCompletionProvider.setModel(getAutocompleteModel(this.settings.provider, this.settings.model).id)
+    const info = getAutocompleteModel(this.settings.provider, this.settings.model)
+    if (info) {
+      this.invalidNotified = false
+      this.inlineCompletionProvider.setModel(info.id, configKey(this.settings))
+    } else {
+      // Explicit but unsupported provider: do not fall back to the cloud
+      // default (that would send the user's code to an unintended provider).
+      this.inlineCompletionProvider.setModel("", configKey(this.settings))
+      if (!this.invalidNotified) {
+        this.invalidNotified = true
+        vscode.window.showWarningMessage(
+          t("kilocode:autocomplete.invalidProvider.message", { provider: this.settings.provider ?? "" }),
+        )
+      }
+    }
 
     await this.updateGlobalContext()
     this.updateStatusBar()
@@ -143,12 +174,23 @@ export class AutocompleteServiceManager {
   }
 
   /**
+   * Explicit reload (command). Clears any error backoff so a previously fatal
+   * condition — e.g. a local model that was not installed yet (404) — gets a
+   * fresh probe without restarting VS Code, then re-reads settings.
+   */
+  public async reload() {
+    this.inlineCompletionProvider.resetBackoff()
+    await this.load()
+  }
+
+  /**
    * Ensure the inline completion provider registration matches the current settings.
    * Only disposes/re-registers when the desired state actually changes, avoiding
    * unnecessary churn that can break VS Code's provider tracking during startup races.
    */
   private async ensureInlineCompletionProviderRegistration() {
-    const shouldBeRegistered = (this.settings?.enableAutoTrigger ?? false) && !this.isSnoozed()
+    const valid = !!getAutocompleteModel(this.settings?.provider, this.settings?.model)
+    const shouldBeRegistered = valid && (this.settings?.enableAutoTrigger ?? false) && !this.isSnoozed()
     const isRegistered = this.inlineCompletionProviderDisposable !== null
     if (shouldBeRegistered === isRegistered) return
 
@@ -245,6 +287,12 @@ export class AutocompleteServiceManager {
 
     // Call the inline completion provider directly with manual trigger context
     const position = editor.selection.active
+    const before = {
+      uri: document.uri.toString(),
+      version: document.version,
+      line: position.line,
+      character: position.character,
+    }
     const context: vscode.InlineCompletionContext = {
       triggerKind: vscode.InlineCompletionTriggerKind.Invoke,
       selectedCompletionInfo: undefined,
@@ -258,6 +306,20 @@ export class AutocompleteServiceManager {
       tokenSource.token,
     )
     tokenSource.dispose()
+
+    // The user may have typed or moved the cursor while the model was
+    // generating (especially slow local models). Never insert stale text at
+    // outdated coordinates.
+    const active = vscode.window.activeTextEditor
+    const after = active
+      ? {
+          uri: active.document.uri.toString(),
+          version: active.document.version,
+          line: active.selection.active.line,
+          character: active.selection.active.character,
+        }
+      : undefined
+    if (!insertionIsCurrent(before, after)) return
 
     // If we got completions, directly insert the first one
     if (completions && (Array.isArray(completions) ? completions.length > 0 : completions.items.length > 0)) {
@@ -296,16 +358,19 @@ export class AutocompleteServiceManager {
 
   private getCurrentModelName(): string {
     const info = getAutocompleteModel(this.settings?.provider, this.settings?.model)
-    return info.label
+    return info?.label ?? "not set"
   }
 
   private getCurrentProviderName(): string {
     const info = getAutocompleteModel(this.settings?.provider, this.settings?.model)
-    return info.provider
+    return info?.provider ?? "not set"
   }
 
   private hasNoUsableProvider(): boolean {
-    return !hasValidCredentials(this.connectionService)
+    return (
+      !hasValidCredentials(this.connectionService) ||
+      !getAutocompleteModel(this.settings?.provider, this.settings?.model)
+    )
   }
 
   /**
@@ -313,6 +378,11 @@ export class AutocompleteServiceManager {
    * Shows a one-time notification to the user so they know autocomplete is paused.
    */
   private handleFatalAutocompleteError(status: number | null): void {
+    if (status === 404) {
+      vscode.window.showWarningMessage(t("kilocode:autocomplete.notFound.message"))
+      return
+    }
+
     const msg =
       status === 402
         ? t("kilocode:autocomplete.creditsExhausted.message")

@@ -15,6 +15,7 @@ export function getAutocompleteSelection(provider?: string, modelID?: string) {
   if (provider === "local") return { providerID: "local", modelID: "local" }
   if (!provider && !modelID) return null
   const model = getAutocompleteModel(provider, modelID)
+  if (!model) return null
   return { providerID: model.providerID, modelID: model.modelID }
 }
 

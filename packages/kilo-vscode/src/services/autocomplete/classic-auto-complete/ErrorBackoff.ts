@@ -2,7 +2,7 @@
  * Circuit breaker and exponential backoff for autocomplete request errors.
  *
  * Classifies errors into:
- * - **fatal**: 401, 402, 403 — stops all requests until explicitly reset
+ * - **fatal**: 401, 402, 403, 404 — stops all requests until explicitly reset
  * - **retriable**: 429, 5xx, network errors — exponential backoff with cap
  * - **transient**: abort, unknown — no special handling
  *
@@ -47,7 +47,9 @@ export function extractStatus(error: unknown): number | null {
 export function classify(error: unknown): ErrorKind {
   const status = extractStatus(error)
   if (status === null) return "transient"
-  if (status === 401 || status === 402 || status === 403) return "fatal"
+  // 404 = model or endpoint not found: a configuration error, not a transient
+  // outage. Stop retrying so a wrong local model tag does not flood the server.
+  if (status === 401 || status === 402 || status === 403 || status === 404) return "fatal"
   if (status === 429 || status >= 500) return "retriable"
   return "transient"
 }

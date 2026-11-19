@@ -215,5 +215,6 @@ export interface AutocompleteContextProvider {
   contextService: ContextRetrievalService
   ide: VsCodeIde
   modelId: string
-  ignoreController?: Promise<FileIgnoreController>
+  /** Resolve the ignore controller for the workspace root owning a URI. */
+  ignoreFor?: (uri: vscode.Uri) => Promise<FileIgnoreController> | undefined
 }

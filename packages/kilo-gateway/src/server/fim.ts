@@ -79,6 +79,7 @@ export function createFimHandler(Auth: Auth) {
   return async (c: any) => {
     const { prefix, suffix, provider, model, maxTokens, temperature, baseURL, endpoint, stop } = c.req.valid("json")
     const target = resolveFimTarget(provider, model, { baseURL, endpoint })
+    if (!target) return c.json({ error: `Unsupported autocomplete provider: ${provider}` }, 400)
     const fimMaxTokens = maxTokens ?? 256
     const fimTemperature = temperature ?? 0.2
     const signal = AbortSignal.any([c.req.raw.signal, AbortSignal.timeout(FIM_TIMEOUT_MS)])

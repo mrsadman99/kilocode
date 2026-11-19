@@ -21,4 +21,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Kredi ekle",
   "kilocode:autocomplete.authError.message":
     "Kilo Code otomatik tamamlama bir kimlik doğrulama sorunu nedeniyle duraklatıldı. Olası nedenler: Kilo'da oturum açmadınız veya API anahtarınız (BYOK) geçersiz ya da eksik. Lütfen tekrar oturum açın veya sağlayıcı API anahtarı ayarlarınızı kontrol edin.",
+  "kilocode:autocomplete.invalidProvider.message":
+    "Kilo Code Autocomplete duraklatıldı: yapılandırılan sağlayıcı «{{provider}}» desteklenmiyor. Ayarlar → Modeller bölümünü açın ve Kilo Gateway, Mistral veya Local (Ollama) seçeneğini belirleyin.",
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code Autocomplete duraklatıldı: autocomplete modeli veya API uç noktası bulunamadı (404). Ayarlar → Modeller bölümünde model adını ve uç noktayı kontrol edin. Yerel modeller için modelin kurulu olduğundan ve sunucu URL'sinin doğru olduğundan emin olun.",
 }

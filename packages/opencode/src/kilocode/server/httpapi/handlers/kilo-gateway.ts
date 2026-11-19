@@ -115,6 +115,7 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
         baseURL: ctx.payload.baseURL,
         endpoint: ctx.payload.endpoint,
       })
+      if (!target) return yield* Effect.fail(new HttpApiError.BadRequest({}))
       if (target.provider === "local") {
         const url = yield* Effect.try({ try: () => new URL(target.url), catch: () => new HttpApiError.BadRequest({}) })
         if (url.protocol !== "http:" && url.protocol !== "https:")

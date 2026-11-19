@@ -23,4 +23,8 @@ export const dict = {
   "kilocode:autocomplete.creditsExhausted.addCredits": "Add Credits",
   "kilocode:autocomplete.authError.message":
     "Kilo Code Autocomplete has been paused due to an authentication issue. Possible causes: you are not signed in to Kilo, or your API key (BYOK) is invalid or missing. Please sign in again or check your provider API key settings.",
+  "kilocode:autocomplete.invalidProvider.message":
+    'Kilo Code Autocomplete is paused: the configured provider "{{provider}}" is not supported. Open Settings → Models and choose Kilo Gateway, Mistral, or Local (Ollama).',
+  "kilocode:autocomplete.notFound.message":
+    "Kilo Code Autocomplete has been paused: the autocomplete model or API endpoint was not found (404). Check the model name and endpoint in Settings → Models. For local models, make sure the model is installed and the server URL is correct.",
 }

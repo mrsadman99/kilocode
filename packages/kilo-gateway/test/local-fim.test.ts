@@ -87,6 +87,11 @@ describe("ollamaSse", () => {
       'data: {"choices":[{"text":""}],"usage":{"prompt_tokens":0,"completion_tokens":2}}\n\n',
     ])
   })
+
+  test("throws on an Ollama error record instead of yielding an empty completion", async () => {
+    const body = stream(['{"error":"model \'nope\' not found"}\n'])
+    expect(collect(ollamaSse(body))).rejects.toThrow("FIM local error: model 'nope' not found")
+  })
 })
 
 describe("requestLocalFim", () => {
