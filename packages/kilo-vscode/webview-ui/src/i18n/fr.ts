@@ -530,6 +530,19 @@ export const dict = {
   "provider.custom.field.apiKey.placeholder": "Clé API",
   "provider.custom.field.apiKey.description":
     "Optionnel. Laissez vide si vous gérez l'authentification via les en-têtes.",
+  "provider.custom.field.proxy.label": "Proxy HTTP",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Optionnel. Laissez vide pour une connexion directe. Prend en charge http://, https:// et socks5://.",
+  "provider.custom.field.proxyUser.label": "Nom d'utilisateur du proxy",
+  "provider.custom.field.proxyUser.placeholder": "Optionnel",
+  "provider.custom.field.proxyPassword.label": "Mot de passe du proxy",
+  "provider.custom.field.proxyPassword.placeholder": "Optionnel",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "Proxy pour {{provider}}",
+  "provider.proxy.description":
+    "Acheminer les requêtes vers ce fournisseur via un proxy. Laissez vide pour une connexion directe.",
+  "provider.proxy.toast.saved.title": "Proxy enregistré pour {{provider}}",
   "provider.custom.models.label": "Modèles",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -568,6 +581,7 @@ export const dict = {
   "provider.custom.error.name.required": "Le nom d'affichage est requis",
   "provider.custom.error.baseURL.required": "L'URL de base est requise",
   "provider.custom.error.baseURL.format": "Doit commencer par http:// ou https://",
+  "provider.custom.error.proxy.format": "Le proxy doit être une URL http://, https:// ou socks5://",
   "provider.custom.error.required": "Requis",
   "provider.custom.error.duplicate": "Doublon",
   "settings.openLocalConfig": "Config locale",

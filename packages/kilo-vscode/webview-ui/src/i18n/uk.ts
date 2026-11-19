@@ -477,6 +477,19 @@ export const dict = {
   "provider.custom.field.apiKey.placeholder": "API-ключ",
   "provider.custom.field.apiKey.description":
     "Необов'язково. Залиште порожнім, якщо автентифікація керується заголовками.",
+  "provider.custom.field.proxy.label": "HTTP-проксі",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Необов'язково. Залиште порожнім для прямого підключення. Підтримуються http://, https:// та socks5://.",
+  "provider.custom.field.proxyUser.label": "Ім'я користувача проксі",
+  "provider.custom.field.proxyUser.placeholder": "Необов'язково",
+  "provider.custom.field.proxyPassword.label": "Пароль проксі",
+  "provider.custom.field.proxyPassword.placeholder": "Необов'язково",
+  "provider.proxy.action": "Проксі",
+  "provider.proxy.title": "Проксі для {{provider}}",
+  "provider.proxy.description":
+    "Спрямовувати запити до цього провайдера через проксі. Залиште порожнім для прямого підключення.",
+  "provider.proxy.toast.saved.title": "Проксі збережено для {{provider}}",
   "provider.custom.models.label": "Моделі",
   "provider.custom.models.id.label": "Ідентифікатор",
   "provider.custom.models.id.placeholder": "ідентифікатор-моделі",
@@ -514,6 +527,7 @@ export const dict = {
   "provider.custom.error.name.required": "Відображувана назва обов'язкова",
   "provider.custom.error.baseURL.required": "Базовий URL обов'язковий",
   "provider.custom.error.baseURL.format": "Має починатися з http:// або https://",
+  "provider.custom.error.proxy.format": "Проксі має бути URL виду http://, https:// або socks5://",
   "provider.custom.error.required": "Обов'язкове поле",
   "provider.custom.error.duplicate": "Дублікат",
   "settings.openLocalConfig": "Локальний конфіг",

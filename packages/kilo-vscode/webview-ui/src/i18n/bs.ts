@@ -527,6 +527,19 @@ export const dict = {
   "provider.custom.field.apiKey.placeholder": "API ključ",
   "provider.custom.field.apiKey.description":
     "Opcionalno. Ostavi prazno ako upravljaš autentifikacijom putem zaglavlja.",
+  "provider.custom.field.proxy.label": "HTTP proxy",
+  "provider.custom.field.proxy.placeholder": "http://proxy.example.com:8080",
+  "provider.custom.field.proxy.description":
+    "Opcionalno. Ostavi prazno za direktno povezivanje. Podržava http://, https:// i socks5://.",
+  "provider.custom.field.proxyUser.label": "Korisničko ime proxyja",
+  "provider.custom.field.proxyUser.placeholder": "Opcionalno",
+  "provider.custom.field.proxyPassword.label": "Lozinka proxyja",
+  "provider.custom.field.proxyPassword.placeholder": "Opcionalno",
+  "provider.proxy.action": "Proxy",
+  "provider.proxy.title": "Proxy za {{provider}}",
+  "provider.proxy.description":
+    "Usmjeri zahtjeve prema ovom provajderu kroz proxy. Ostavi prazno za direktno povezivanje.",
+  "provider.proxy.toast.saved.title": "Proxy sačuvan za {{provider}}",
   "provider.custom.models.label": "Modeli",
   "provider.custom.models.id.label": "ID",
   "provider.custom.models.id.placeholder": "model-id",
@@ -565,6 +578,7 @@ export const dict = {
   "provider.custom.error.name.required": "Naziv za prikaz je obavezan",
   "provider.custom.error.baseURL.required": "Osnovni URL je obavezan",
   "provider.custom.error.baseURL.format": "Mora početi sa http:// ili https://",
+  "provider.custom.error.proxy.format": "Proxy mora biti http://, https:// ili socks5:// URL",
   "provider.custom.error.required": "Obavezno",
   "provider.custom.error.duplicate": "Duplikat",
   "settings.openLocalConfig": "Lokalna konfig.",
