@@ -47,6 +47,7 @@ const active = new Set([
   "docs-sync.yml",
   "generate.yml",
   "kilo-auto-close.yml",
+  "mrsadman-release.yml",
   "nix-eval.yml",
   "nix-hashes.yml",
   "outdated-kilo-deps.yml",
