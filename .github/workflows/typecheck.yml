@@ -23,7 +23,7 @@ jobs:
       - name: Detect typecheck changes
         if: github.event_name != 'workflow_dispatch'
         id: filter
-        uses: Kilo-Org/paths-filter@668c092af3649c4b664c54e4b704aa46782f6f7c # v3
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3 # kilocode_change
         with:
           predicate-quantifier: every
           filters: |
