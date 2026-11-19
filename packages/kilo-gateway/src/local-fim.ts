@@ -68,8 +68,13 @@ export async function* ollamaSse(body: ReadableStream<Uint8Array>) {
   if (tail) yield tail
 }
 
-export async function requestLocalFim(target: LocalTarget, payload: LocalFimPayload, signal: AbortSignal) {
-  const response = await fetch(target.url, {
+export async function requestLocalFim(
+  target: LocalTarget,
+  payload: LocalFimPayload,
+  signal: AbortSignal,
+  send: (url: string, init: RequestInit) => Promise<Response> = fetch,
+) {
+  const response = await send(target.url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     signal,

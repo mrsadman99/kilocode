@@ -902,6 +902,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "نام مدل آن‌گونه که سرور محلی ارائه می‌دهد (مثلاً برچسب Ollama)",
   "settings.autocomplete.local.baseUrl.title": "نشانی سرور محلی",
   "settings.autocomplete.local.baseUrl.description": "نشانی پایه سرور محلی که مدل را اجرا می‌کند",
+  "settings.autocomplete.local.proxy.title": "پروکسی",
+  "settings.autocomplete.local.proxy.description":
+    "پروکسی HTTP/SOCKS اختیاری برای دسترسی به سرور محلی؛ برای اتصال مستقیم خالی بگذارید",
   "settings.autocomplete.local.template.title": "الگوی FIM",
   "settings.autocomplete.local.template.description":
     "قالب اعلان fill-in-the-middle؛ «خودکار» از نام مدل تشخیص داده می‌شود",

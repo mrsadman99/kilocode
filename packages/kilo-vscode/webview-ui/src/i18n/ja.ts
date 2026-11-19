@@ -914,6 +914,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "ローカルサーバーが提供するモデル名（例: Ollama のタグ）",
   "settings.autocomplete.local.baseUrl.title": "ローカルサーバー URL",
   "settings.autocomplete.local.baseUrl.description": "モデルを実行するローカルサーバーのベース URL",
+  "settings.autocomplete.local.proxy.title": "プロキシ",
+  "settings.autocomplete.local.proxy.description":
+    "ローカルサーバーへの接続に使う任意の HTTP/SOCKS プロキシ。空欄の場合は直接接続します",
   "settings.autocomplete.local.template.title": "FIM テンプレート",
   "settings.autocomplete.local.template.description":
     "Fill-in-the-middle プロンプト形式。「自動」はモデル名から判別します",

@@ -53,6 +53,7 @@ import {
   wrapFirstByte,
 } from "@/kilocode/provider/provider"
 import * as ModelsRefresh from "@/kilocode/provider/models-refresh"
+import * as ApiLog from "@/kilocode/api-log" // kilocode_change - outbound LLM request log
 import { bedrockAuth, providerKey, vertexAuth, vertexCredentials, vertexOptions } from "@/kilocode/provider/cloud-auth"
 // kilocode_change end
 import { ProviderError } from "./error"
@@ -1914,6 +1915,7 @@ const layer = Layer.effect(
         options["fetch"] = async (input: any, init?: BunFetchRequestInit) => {
           const fetchFn = customFetch ?? fetch
           const opts = init ?? {}
+          const started = Date.now() // kilocode_change - API request log timing
           const chunkAbortCtl = typeof chunkTimeout === "number" && chunkTimeout > 0 ? new AbortController() : undefined
           const timeout = buildTimeoutSignal(options) // kilocode_change - use cancellable timeout for connection phase
           // kilocode_change start - extend the same deadline to the first response byte
@@ -1950,6 +1952,7 @@ const layer = Layer.effect(
             ).finally(() => headerTimeoutCtl?.clear())
             // kilocode_change end
             timeout.clear()
+            void ApiLog.llm({ model, request: input, init: opts, proxy, started, response: res }) // kilocode_change - API request log
             // kilocode_change start - hand the remaining deadline to the first-byte guard
             const remaining = deadline !== undefined ? deadline - Date.now() : undefined
             const live =
@@ -1959,6 +1962,7 @@ const layer = Layer.effect(
             // kilocode_change end
           } catch (err) {
             timeout.clear()
+            void ApiLog.llm({ model, request: input, init: opts, proxy, started, error: err }) // kilocode_change - API request log
             throw err
           }
           // kilocode_change end

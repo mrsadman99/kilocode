@@ -892,6 +892,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "Model name as served by your local server (e.g. an Ollama tag)",
   "settings.autocomplete.local.baseUrl.title": "Local server URL",
   "settings.autocomplete.local.baseUrl.description": "Base URL of the local server running the model",
+  "settings.autocomplete.local.proxy.title": "Proxy",
+  "settings.autocomplete.local.proxy.description":
+    "Optional HTTP/SOCKS proxy for reaching the local server; leave empty to connect directly",
   "settings.autocomplete.local.template.title": "FIM template",
   "settings.autocomplete.local.template.description":
     "Fill-in-the-middle prompt format; Auto detects it from the model name",

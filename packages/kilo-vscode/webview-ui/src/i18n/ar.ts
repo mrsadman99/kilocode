@@ -895,6 +895,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "اسم النموذج كما يقدمه الخادم المحلي (مثل وسم Ollama)",
   "settings.autocomplete.local.baseUrl.title": "عنوان URL للخادم المحلي",
   "settings.autocomplete.local.baseUrl.description": "عنوان URL الأساسي للخادم المحلي الذي يشغّل النموذج",
+  "settings.autocomplete.local.proxy.title": "الوكيل",
+  "settings.autocomplete.local.proxy.description":
+    "وكيل HTTP/SOCKS اختياري للوصول إلى الخادم المحلي؛ اتركه فارغًا للاتصال المباشر",
   "settings.autocomplete.local.template.title": "قالب FIM",
   "settings.autocomplete.local.template.description": "تنسيق موجّه fill-in-the-middle؛ «تلقائي» يُستنتج من اسم النموذج",
   "settings.autocomplete.local.endpoint.title": "نقطة نهاية API",

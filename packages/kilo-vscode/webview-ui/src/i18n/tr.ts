@@ -908,6 +908,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "Yerel sunucunuzun sunduğu model adı (ör. bir Ollama etiketi)",
   "settings.autocomplete.local.baseUrl.title": "Yerel sunucu URL'si",
   "settings.autocomplete.local.baseUrl.description": "Modeli çalıştıran yerel sunucunun temel URL'si",
+  "settings.autocomplete.local.proxy.title": "Proxy",
+  "settings.autocomplete.local.proxy.description":
+    "Yerel sunucuya erişmek için isteğe bağlı HTTP/SOCKS proxy'si; doğrudan bağlanmak için boş bırakın",
   "settings.autocomplete.local.template.title": "FIM şablonu",
   "settings.autocomplete.local.template.description":
     "Fill-in-the-middle istem biçimi; 'Otomatik' model adından algılanır",

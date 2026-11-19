@@ -16,6 +16,7 @@ import { BrowserTabProvider } from "./browser-tab/BrowserTabProvider"
 import { formatBrowserFeedback } from "./shared/browser-feedback"
 import { EXTENSION_DISPLAY_NAME } from "./constants"
 import { KiloConnectionService } from "./services/cli-backend"
+import { registerApiLog } from "./services/api-log"
 import { retention } from "./services/task-cleanup/retention"
 import { registerAutocompleteProvider } from "./services/autocomplete"
 import { ensureBackendForAutocomplete } from "./services/autocomplete/ensure-backend"
@@ -93,6 +94,9 @@ export async function activate(context: vscode.ExtensionContext) {
     () => browserBroker.env(),
     (dir): Promise<void> => browserAutomationService.ready(dir),
   )
+
+  // "kilo API" output channel: LLM / autocomplete API requests from the backend
+  context.subscriptions.push(registerApiLog(connectionService))
 
   // One MCP OAuth sign-in service for the whole extension (sidebar, Kilo tabs, Settings, Marketplace).
   // Initialize it eagerly so its MCP OAuth URL subscriptions and `onUrl`

@@ -142,6 +142,10 @@ const ModelsTab: Component = () => {
     const v = settings()["autocomplete.localBaseURL"]
     return typeof v === "string" ? v : ""
   }
+  const localProxy = () => {
+    const v = settings()["autocomplete.localProxy"]
+    return typeof v === "string" ? v : ""
+  }
   const localTemplate = () => {
     const v = settings()["autocomplete.localTemplate"]
     return typeof v === "string" ? v : "auto"
@@ -275,6 +279,16 @@ const ModelsTab: Component = () => {
               value={localBaseURL()}
               placeholder="http://127.0.0.1:11434"
               onChange={(value: string) => updateSetting("autocomplete.localBaseURL", value.trim() || null)}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.local.proxy.title")}
+            description={language.t("settings.autocomplete.local.proxy.description")}
+          >
+            <TextField
+              value={localProxy()}
+              placeholder="http://127.0.0.1:8080"
+              onChange={(value: string) => updateSetting("autocomplete.localProxy", value.trim() || null)}
             />
           </SettingsRow>
           <SettingsRow

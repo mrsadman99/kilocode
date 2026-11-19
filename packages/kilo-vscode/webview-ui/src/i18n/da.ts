@@ -919,6 +919,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "Modelnavn som serveret af din lokale server (f.eks. et Ollama-tag)",
   "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
   "settings.autocomplete.local.baseUrl.description": "Basis-URL for den lokale server, der kører modellen",
+  "settings.autocomplete.local.proxy.title": "Proxy",
+  "settings.autocomplete.local.proxy.description":
+    "Valgfri HTTP/SOCKS-proxy til den lokale server; lad være tom for direkte forbindelse",
   "settings.autocomplete.local.template.title": "FIM-skabelon",
   "settings.autocomplete.local.template.description": "Fill-in-the-middle-promptformat; 'Auto' udledes af modelnavnet",
   "settings.autocomplete.local.endpoint.title": "API-endpoint",

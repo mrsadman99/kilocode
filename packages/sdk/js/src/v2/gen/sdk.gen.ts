@@ -7308,6 +7308,7 @@ export class Kilo extends HeyApiClient {
       baseURL?: string
       endpoint?: "completions" | "generate"
       stop?: Array<string>
+      proxy?: string
     },
     options?: Options<never, ThrowOnError, KiloFimResponse>,
   ) {
@@ -7327,6 +7328,7 @@ export class Kilo extends HeyApiClient {
             { in: "body", key: "baseURL" },
             { in: "body", key: "endpoint" },
             { in: "body", key: "stop" },
+            { in: "body", key: "proxy" },
           ],
         },
       ],

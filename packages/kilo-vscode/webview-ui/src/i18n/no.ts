@@ -882,6 +882,9 @@ export const dict = {
     "Modellnavn slik den lokale serveren tilbyr det (f.eks. en Ollama-tagg)",
   "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
   "settings.autocomplete.local.baseUrl.description": "Grunn-URL til den lokale serveren som kjører modellen",
+  "settings.autocomplete.local.proxy.title": "Proxy",
+  "settings.autocomplete.local.proxy.description":
+    "Valgfri HTTP/SOCKS-proxy for å nå den lokale serveren; la stå tom for direkte tilkobling",
   "settings.autocomplete.local.template.title": "FIM-mal",
   "settings.autocomplete.local.template.description":
     "Fill-in-the-middle-promptformat; «Auto» utledes fra modellnavnet",

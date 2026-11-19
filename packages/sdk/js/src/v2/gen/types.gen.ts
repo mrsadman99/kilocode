@@ -112,6 +112,7 @@ export type Event =
   | EventBackgroundProcessUpdated
   | EventBackgroundProcessDeleted
   | EventSandboxStatusChanged
+  | EventKiloApi
   | EventSuggestionShown
   | EventSuggestionAccepted
   | EventSuggestionDismissed
@@ -309,6 +310,21 @@ export type BackgroundProcessInfo = {
     updated: number
     ended?: number
   }
+}
+
+export type KiloApiRequest = {
+  kind: "llm" | "autocomplete"
+  provider: string
+  model: string
+  apiModel?: string
+  method: string
+  url: string
+  status?: number
+  error?: string
+  detail?: string
+  thinking?: string
+  proxy?: string
+  ms?: number
 }
 
 export type SuggestionRequest = {
@@ -1164,6 +1180,7 @@ export type GlobalEvent = {
     | EventBackgroundProcessUpdated
     | EventBackgroundProcessDeleted
     | EventSandboxStatusChanged
+    | EventKiloApi
     | EventSuggestionShown
     | EventSuggestionAccepted
     | EventSuggestionDismissed
@@ -5900,6 +5917,12 @@ export type EventSandboxStatusChanged = {
     reason?: string
     version: number
   }
+}
+
+export type EventKiloApi = {
+  id: string
+  type: "kilo.api"
+  properties: KiloApiRequest
 }
 
 export type EventSuggestionShown = {
@@ -17295,6 +17318,7 @@ export type KiloFimData = {
     baseURL?: string
     endpoint?: "completions" | "generate"
     stop?: Array<string>
+    proxy?: string
   }
   path?: never
   query?: {

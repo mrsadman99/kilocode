@@ -908,6 +908,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "로컬 서버에서 제공하는 모델 이름 (예: Ollama 태그)",
   "settings.autocomplete.local.baseUrl.title": "로컬 서버 URL",
   "settings.autocomplete.local.baseUrl.description": "모델을 실행하는 로컬 서버의 기본 URL",
+  "settings.autocomplete.local.proxy.title": "프록시",
+  "settings.autocomplete.local.proxy.description":
+    "로컬 서버에 연결할 선택적 HTTP/SOCKS 프록시입니다. 비워 두면 직접 연결합니다",
   "settings.autocomplete.local.template.title": "FIM 템플릿",
   "settings.autocomplete.local.template.description":
     "Fill-in-the-middle 프롬프트 형식; '자동'은 모델 이름에서 감지합니다",

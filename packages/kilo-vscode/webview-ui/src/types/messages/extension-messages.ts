@@ -596,6 +596,7 @@ export interface AutocompleteSettingsLoadedMessage {
     /** Local provider settings; `null` means "no explicit setting — use the default." */
     localModel: string | null
     localBaseURL: string | null
+    localProxy: string | null
     localTemplate: string | null
     localEndpoint: string | null
   }

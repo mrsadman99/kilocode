@@ -11,6 +11,7 @@ import { fimTemplates, inferFimTemplate } from "./continuedev/core/autocomplete/
 export interface LocalFimOptions {
   baseURL: string
   endpoint: LocalFimEndpoint
+  proxy: string
   stop: string[]
   wrap: (prefix: string, suffix: string) => string
 }
@@ -19,6 +20,7 @@ export interface LocalFimOptions {
 export function localFimOptions(model: string): LocalFimOptions {
   const cfg = vscode.workspace.getConfiguration("kilo-code.new.autocomplete")
   const baseURL = cfg.get<string>("localBaseURL")?.trim() || DEFAULT_LOCAL_BASE_URL
+  const proxy = cfg.get<string>("localProxy")?.trim() ?? ""
   const picked = cfg.get<string>("localTemplate")
   const id: FimTemplateID = picked && validFimTemplate(picked) ? (picked as FimTemplateID) : inferFimTemplate(model)
   const template = fimTemplates[id]
@@ -28,6 +30,7 @@ export function localFimOptions(model: string): LocalFimOptions {
   return {
     baseURL,
     endpoint: resolved,
+    proxy,
     stop: template.completionOptions?.stop ?? [],
     wrap: (prefix, suffix) => template.template(prefix, suffix),
   }

@@ -14044,6 +14044,9 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "proxy": {
+                    "type": "string"
                   }
                 },
                 "required": ["prefix", "suffix"],
@@ -31144,6 +31147,9 @@
             "$ref": "#/components/schemas/EventSandboxStatusChanged"
           },
           {
+            "$ref": "#/components/schemas/EventKiloApi"
+          },
+          {
             "$ref": "#/components/schemas/EventSuggestionShown"
           },
           {
@@ -31755,6 +31761,50 @@
           }
         },
         "required": ["id", "sessionID", "command", "cwd", "ports", "status", "lifetime", "ready", "output", "time"],
+        "additionalProperties": false
+      },
+      "KiloApiRequest": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["llm", "autocomplete"]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "apiModel": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "thinking": {
+            "type": "string"
+          },
+          "proxy": {
+            "type": "string"
+          },
+          "ms": {
+            "type": "integer"
+          }
+        },
+        "required": ["kind", "provider", "model", "method", "url"],
         "additionalProperties": false
       },
       "SuggestionRequest": {
@@ -34288,6 +34338,9 @@
               },
               {
                 "$ref": "#/components/schemas/EventSandboxStatusChanged"
+              },
+              {
+                "$ref": "#/components/schemas/EventKiloApi"
               },
               {
                 "$ref": "#/components/schemas/EventSuggestionShown"
@@ -49293,6 +49346,23 @@
             },
             "required": ["sessionID", "directory", "enabled", "available", "version"],
             "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "properties"],
+        "additionalProperties": false
+      },
+      "EventKiloApi": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["kilo.api"]
+          },
+          "properties": {
+            "$ref": "#/components/schemas/KiloApiRequest"
           }
         },
         "required": ["id", "type", "properties"],

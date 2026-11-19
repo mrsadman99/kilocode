@@ -6,6 +6,7 @@ import { BusEvent } from "@/bus/bus-event" // kilocode_change - include legacy K
 import "@opencode-ai/core/account"
 import "@/server/event"
 import "@/kilocode/indexing-event" // kilocode_change - register indexing.status before HttpApi event schemas
+import "@/kilocode/api-log" // kilocode_change - register kilo.api before HttpApi event schemas
 import { Schema } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiError, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi" // kilocode_change - HttpApiSchema for the bodyless upgrade payload
 import semver from "semver"

@@ -152,6 +152,8 @@ export class ServerManager {
           KILO_PARENT_PID: String(process.pid),
           KILO_CLIENT: "vscode",
           KILO_ENABLE_QUESTION_TOOL: "true",
+          // Surface outbound LLM / autocomplete API requests in the "kilo API" output channel.
+          KILO_API_LOG: "1",
           KILOCODE_FEATURE: "vscode-extension",
           ...indexingEnv,
           KILO_TELEMETRY_LEVEL: vscode.env.isTelemetryEnabled ? "all" : "off",

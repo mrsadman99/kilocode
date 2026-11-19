@@ -920,6 +920,9 @@ export const dict = {
     "Naziv modela kako ga poslužuje vaš lokalni server (npr. Ollama oznaka)",
   "settings.autocomplete.local.baseUrl.title": "URL lokalnog servera",
   "settings.autocomplete.local.baseUrl.description": "Osnovni URL lokalnog servera na kojem model radi",
+  "settings.autocomplete.local.proxy.title": "Proxy",
+  "settings.autocomplete.local.proxy.description":
+    "Opcionalni HTTP/SOCKS proxy za pristup lokalnom serveru; ostavite prazno za direktnu vezu",
   "settings.autocomplete.local.template.title": "FIM šablon",
   "settings.autocomplete.local.template.description":
     "Format fill-in-the-middle prompta; „Auto“ se otkriva iz naziva modela",

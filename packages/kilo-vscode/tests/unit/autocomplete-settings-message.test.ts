@@ -59,6 +59,13 @@ describe("buildAutocompleteSettingsMessage", () => {
     expect(msg.settings.provider).toBeNull()
     expect(msg.settings.model).toBe("codestral-2508")
   })
+
+  it("passes the local proxy setting through and defaults to null", () => {
+    expect(buildAutocompleteSettingsMessage().settings.localProxy).toBeNull()
+
+    state.set("localProxy", "http://127.0.0.1:8080")
+    expect(buildAutocompleteSettingsMessage().settings.localProxy).toBe("http://127.0.0.1:8080")
+  })
 })
 
 describe("validAutocompleteSetting", () => {
@@ -81,5 +88,14 @@ describe("validAutocompleteSetting", () => {
 
   it("rejects non-boolean toggle updates", () => {
     expect(validAutocompleteSetting("enableAutoTrigger", "true")).toBe(false)
+  })
+
+  it("accepts string or cleared local proxy values and rejects other types", () => {
+    expect(validAutocompleteSetting("localProxy", "http://127.0.0.1:8080")).toBe(true)
+    expect(validAutocompleteSetting("localProxy", "socks5://127.0.0.1:1080")).toBe(true)
+    expect(validAutocompleteSetting("localProxy", "")).toBe(true)
+    expect(validAutocompleteSetting("localProxy", null)).toBe(true)
+    expect(validAutocompleteSetting("localProxy", undefined)).toBe(true)
+    expect(validAutocompleteSetting("localProxy", 8080)).toBe(false)
   })
 })

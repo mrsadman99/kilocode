@@ -909,6 +909,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "Ім'я моделі на вашому локальному сервері (наприклад, тег Ollama)",
   "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
   "settings.autocomplete.local.baseUrl.description": "Базовий URL локального сервера, на якому запущено модель",
+  "settings.autocomplete.local.proxy.title": "Проксі",
+  "settings.autocomplete.local.proxy.description":
+    "Необов'язковий HTTP/SOCKS-проксі для доступу до локального сервера; залиште порожнім для прямого підключення",
   "settings.autocomplete.local.template.title": "Шаблон FIM",
   "settings.autocomplete.local.template.description":
     "Формат fill-in-the-middle промпту; «Авто» визначається за назвою моделі",

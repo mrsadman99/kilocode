@@ -101,6 +101,7 @@ const KEY_TAB_OVERRIDES: Record<string, string> = {
   "settings.autocomplete.model.title": "models",
   "settings.autocomplete.local.model.title": "models",
   "settings.autocomplete.local.baseUrl.title": "models",
+  "settings.autocomplete.local.proxy.title": "models",
   "settings.autocomplete.local.template.title": "models",
   "settings.autocomplete.local.endpoint.title": "models",
 }

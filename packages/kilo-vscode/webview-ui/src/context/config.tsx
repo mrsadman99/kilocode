@@ -75,6 +75,7 @@ function loadedSettings(message: ExtensionMessage): Record<string, unknown> | un
       "autocomplete.model": message.settings.model,
       "autocomplete.localModel": message.settings.localModel,
       "autocomplete.localBaseURL": message.settings.localBaseURL,
+      "autocomplete.localProxy": message.settings.localProxy,
       "autocomplete.localTemplate": message.settings.localTemplate,
       "autocomplete.localEndpoint": message.settings.localEndpoint,
     }

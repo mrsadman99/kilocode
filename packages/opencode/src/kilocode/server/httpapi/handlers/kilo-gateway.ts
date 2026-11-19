@@ -31,6 +31,9 @@ import { ClaudeMigration } from "@/kilocode/config/claude-migration"
 import { Auth } from "@/auth"
 import { Config } from "@/config/config"
 import { organization as catalogOrganization } from "@/kilocode/provider/catalog"
+import { providerProxy } from "@/kilocode/provider/provider"
+import { proxiedFetch, type FetchFn } from "@/kilocode/provider/proxy"
+import * as ApiLog from "@/kilocode/api-log"
 import { EventV2Bridge } from "@/event-v2-bridge"
 import { Storage } from "@/storage/storage"
 import { Instance } from "@/kilocode/instance"
@@ -39,6 +42,7 @@ import { ModelCache } from "@/provider/model-cache"
 import { InstanceHttpApi } from "@/server/routes/instance/httpapi/api"
 import { AudioTranscriptionsBody, CloudSessionImportError, FimBody } from "../groups/kilo-gateway"
 import { requestLocalFim } from "@kilocode/kilo-gateway/local-fim"
+import { loopback } from "@/kilocode/server/loopback"
 
 const FIM_TIMEOUT_MS = 30_000
 const log = Log.create({ service: "kilo-gateway" })
@@ -50,6 +54,11 @@ function jsonError(error: string, status: number) {
 function logError(route: string, err: unknown) {
   log.error("unhandled error", { route, err })
 }
+
+// Loopback FIM must stay direct even when HTTP(S)_PROXY is set globally.
+const direct: FetchFn = (input, init) =>
+  // @ts-ignore proxy:false bypasses env proxies in Bun but is absent from bun-types
+  fetch(input, { ...init, proxy: false })
 
 export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo", (handlers) =>
   Effect.gen(function* () {
@@ -133,6 +142,11 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
       if (target.provider === "kilo" && !info?.auth) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
       if (target.provider !== "local" && !token) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
 
+      const requested = target.provider === "local" ? ctx.payload.proxy?.trim() : undefined
+      const cfg = requested ? undefined : yield* config.get()
+      const proxy = requested || providerProxy(cfg?.provider?.[target.provider]?.options ?? {})
+      const send = proxiedFetch(proxy)
+
       const request = yield* HttpServerRequest.HttpServerRequest
       const signal =
         request.source instanceof Request
@@ -140,29 +154,39 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
           : AbortSignal.timeout(FIM_TIMEOUT_MS)
       const response = yield* Effect.promise(async () => {
         try {
-          if (target.provider === "local") return await requestLocalFim(target, ctx.payload, signal)
+          if (target.provider === "local") {
+            const bypass = !proxy && loopback(target.url)
+            const transport = bypass ? direct : send
+            return await ApiLog.trace(
+              { provider: target.provider, model: target.model, url: target.url, proxy, direct: bypass },
+              () => requestLocalFim(target, ctx.payload, signal, transport),
+            )
+          }
           const run = async (url: string): Promise<Response> => {
-            console.info(`[FIM] request provider=${target.provider} model=${target.model} url=${url}`)
-            return fetch(url, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                ...(target.provider === "kilo"
-                  ? buildKiloHeaders(undefined, { kilocodeOrganizationId: info?.organizationId })
-                  : {}),
-                ...(target.provider === "kilo" ? { [HEADER_FEATURE]: "autocomplete" } : {}),
-              },
-              signal,
-              body: JSON.stringify({
-                model: target.model,
-                prompt: ctx.payload.prefix,
-                suffix: ctx.payload.suffix,
-                max_tokens: ctx.payload.maxTokens ?? 256,
-                temperature: ctx.payload.temperature ?? 0.2,
-                stream: true,
+            const label = proxy ? (URL.parse(proxy)?.host ?? "custom") : "env"
+            console.info(`[FIM] request provider=${target.provider} model=${target.model} url=${url} proxy=${label}`)
+            return ApiLog.trace({ provider: target.provider, model: target.model, url, proxy }, () =>
+              send(url, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                  ...(target.provider === "kilo"
+                    ? buildKiloHeaders(undefined, { kilocodeOrganizationId: info?.organizationId })
+                    : {}),
+                  ...(target.provider === "kilo" ? { [HEADER_FEATURE]: "autocomplete" } : {}),
+                },
+                signal,
+                body: JSON.stringify({
+                  model: target.model,
+                  prompt: ctx.payload.prefix,
+                  suffix: ctx.payload.suffix,
+                  max_tokens: ctx.payload.maxTokens ?? 256,
+                  temperature: ctx.payload.temperature ?? 0.2,
+                  stream: true,
+                }),
               }),
-            })
+            )
           }
           if (target.provider === "mistral") return requestMistralFim(run)
           return run(target.url)

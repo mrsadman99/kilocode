@@ -879,6 +879,8 @@ export const dict = {
   "settings.autocomplete.local.model.description": "本地服务器提供的模型名称（例如 Ollama 标签）",
   "settings.autocomplete.local.baseUrl.title": "本地服务器 URL",
   "settings.autocomplete.local.baseUrl.description": "运行模型的本地服务器的基础 URL",
+  "settings.autocomplete.local.proxy.title": "代理",
+  "settings.autocomplete.local.proxy.description": "用于访问本地服务器的可选 HTTP/SOCKS 代理；留空则直接连接",
   "settings.autocomplete.local.template.title": "FIM 模板",
   "settings.autocomplete.local.template.description": "Fill-in-the-middle 提示格式；“自动”根据模型名称识别",
   "settings.autocomplete.local.endpoint.title": "API 端点",

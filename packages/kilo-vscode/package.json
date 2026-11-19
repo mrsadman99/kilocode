@@ -1047,6 +1047,11 @@
           "default": "http://127.0.0.1:11434",
           "description": "Base URL of the local server used for autocomplete when the provider is 'local'."
         },
+        "kilo-code.new.autocomplete.localProxy": {
+          "type": "string",
+          "default": "",
+          "description": "Optional HTTP/SOCKS proxy URL used to reach the local autocomplete server (e.g. http://127.0.0.1:8080 or socks5://127.0.0.1:1080). Leave empty to connect directly."
+        },
         "kilo-code.new.autocomplete.localTemplate": {
           "type": "string",
           "enum": [

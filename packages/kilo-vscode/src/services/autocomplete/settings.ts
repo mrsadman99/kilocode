@@ -36,6 +36,7 @@ export function buildAutocompleteSettingsMessage() {
       model: config.get<string>("model") ?? null,
       localModel: config.get<string>("localModel") ?? null,
       localBaseURL: config.get<string>("localBaseURL") ?? null,
+      localProxy: config.get<string>("localProxy") ?? null,
       localTemplate: config.get<string>("localTemplate") ?? null,
       localEndpoint: config.get<string>("localEndpoint") ?? null,
     },
@@ -53,7 +54,7 @@ export function watchAutocompleteConfig(post: Post): vscode.Disposable {
 
 function validLocalSetting(key: string, value: unknown) {
   if (value === null || value === undefined) return true
-  if (key === "localModel" || key === "localBaseURL") return typeof value === "string"
+  if (key === "localModel" || key === "localBaseURL" || key === "localProxy") return typeof value === "string"
   if (key === "localTemplate") return value === "auto" || validFimTemplate(value)
   if (key === "localEndpoint") return value === "auto" || validLocalFimEndpoint(value)
   return false

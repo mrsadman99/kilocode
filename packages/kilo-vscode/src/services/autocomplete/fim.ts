@@ -46,7 +46,9 @@ export async function generateFim(
       model: info.modelID,
       maxTokens: FIM_MAX_TOKENS,
       temperature: info.temperature,
-      ...(local ? { baseURL: local.baseURL, endpoint: local.endpoint, stop: local.stop } : {}),
+      ...(local
+        ? { baseURL: local.baseURL, endpoint: local.endpoint, stop: local.stop, proxy: local.proxy || undefined }
+        : {}),
     },
     {
       signal,

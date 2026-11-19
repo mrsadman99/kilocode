@@ -134,6 +134,8 @@ export const FimBody = Schema.Struct({
   endpoint: Schema.optional(Schema.Union([Schema.Literal("completions"), Schema.Literal("generate")])),
   /** Local provider only: stop sequences for the assembled FIM prompt. */
   stop: Schema.optional(Schema.Array(Schema.String)),
+  /** Local provider only: HTTP/SOCKS proxy URL used to reach the local server. */
+  proxy: Schema.optional(Schema.String),
 })
 
 export const AudioTranscriptionsBody = Schema.Struct({

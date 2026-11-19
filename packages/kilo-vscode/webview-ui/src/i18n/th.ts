@@ -903,6 +903,9 @@ export const dict = {
   "settings.autocomplete.local.model.description": "ชื่อโมเดลตามที่เซิร์ฟเวอร์ในเครื่องให้บริการ (เช่น แท็ก Ollama)",
   "settings.autocomplete.local.baseUrl.title": "URL ของเซิร์ฟเวอร์ในเครื่อง",
   "settings.autocomplete.local.baseUrl.description": "URL หลักของเซิร์ฟเวอร์ในเครื่องที่รันโมเดล",
+  "settings.autocomplete.local.proxy.title": "พร็อกซี",
+  "settings.autocomplete.local.proxy.description":
+    "พร็อกซี HTTP/SOCKS เสริมสำหรับเชื่อมต่อเซิร์ฟเวอร์ในเครื่อง เว้นว่างไว้เพื่อเชื่อมต่อโดยตรง",
   "settings.autocomplete.local.template.title": "เทมเพลต FIM",
   "settings.autocomplete.local.template.description":
     "รูปแบบพรอมต์ fill-in-the-middle; 'อัตโนมัติ' ตรวจจับจากชื่อโมเดล",
