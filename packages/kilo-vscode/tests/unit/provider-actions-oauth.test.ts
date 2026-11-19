@@ -95,7 +95,9 @@ describe("completeProviderOAuth with proxy", () => {
     const { calls, ctx } = createCompleteCtx()
     await completeProviderOAuth(ctx as never, "req", "openai", 0, undefined, "http://127.0.0.1:8080")
     expect(calls.callback).toEqual([{ providerID: "openai", method: 0, code: undefined, directory: "/tmp" }])
-    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } }])
+    expect(calls.config).toEqual([
+      { config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } },
+    ])
     expect(calls.posts.at(-1)).toEqual({ type: "providerConnected", requestId: "req", providerID: "openai" })
   })
 
@@ -157,7 +159,9 @@ describe("authorizeProviderOAuth with proxy", () => {
   it("persists the proxy before starting OAuth so the token exchange can use it", async () => {
     const { calls, ctx } = createAuthorizeCtx()
     await authorizeProviderOAuth(ctx as never, "req", "openai", 0, undefined, "http://127.0.0.1:8080")
-    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } }])
+    expect(calls.config).toEqual([
+      { config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } },
+    ])
     expect(calls.seq.indexOf("config")).toBeLessThan(calls.seq.indexOf("authorize"))
     expect(calls.posts.at(-1)).toMatchObject({ type: "providerOAuthReady", providerID: "openai" })
   })

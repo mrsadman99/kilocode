@@ -84,12 +84,7 @@ export const CustomProviderConfigSchema = z
             message: INVALID_BASE_URL,
           }),
         headers: z.record(z.string().trim().min(1), z.string().trim().min(1)).optional(),
-        proxy: z
-          .string()
-          .trim()
-          .min(1)
-          .refine(isProxyURL, { message: INVALID_PROXY })
-          .optional(),
+        proxy: z.string().trim().min(1).refine(isProxyURL, { message: INVALID_PROXY }).optional(),
       })
       .strict(),
     models: z

@@ -826,7 +826,9 @@ describe("saveProviderProxy", () => {
   it("writes options.proxy for a standard provider and confirms", async () => {
     const { ctx, calls, setCachedConfig } = createCtx()
     await saveProviderProxy(ctx, "req", "openai", "http://127.0.0.1:8080", setCachedConfig)
-    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } }])
+    expect(calls.config).toEqual([
+      { config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } },
+    ])
     expect(calls.posts.at(-1)).toEqual({ type: "providerProxySaved", requestId: "req", providerID: "openai" })
   })
 
@@ -849,7 +851,9 @@ describe("connectProvider with proxy", () => {
   it("applies the proxy to config before storing the key", async () => {
     const { ctx, calls, setCachedConfig } = createCtx()
     await connectProvider(ctx, "req", "openai", "sk-test", undefined, "http://127.0.0.1:8080", setCachedConfig)
-    expect(calls.config).toEqual([{ config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } }])
+    expect(calls.config).toEqual([
+      { config: { provider: { openai: { options: { proxy: "http://127.0.0.1:8080" } } } } },
+    ])
     expect(calls.set).toEqual([{ providerID: "openai", auth: { type: "api", key: "sk-test" } }])
     expect(calls.posts.at(-1)).toEqual({ type: "providerConnected", requestId: "req", providerID: "openai" })
   })

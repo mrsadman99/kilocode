@@ -176,22 +176,14 @@ describe("proxyFetch", () => {
 
   it("routes through an http proxy", async () => {
     const before = state.httpHits
-    const res = await proxyFetch(
-      `${state.target!.url.origin}/models`,
-      {},
-      `http://127.0.0.1:${state.http!.port}`,
-    )
+    const res = await proxyFetch(`${state.target!.url.origin}/models`, {}, `http://127.0.0.1:${state.http!.port}`)
     expect(res.status).toBe(200)
     expect(state.httpHits).toBeGreaterThan(before)
   })
 
   it("routes through a socks5 proxy", async () => {
     const before = state.socksHits
-    const res = await proxyFetch(
-      `${state.target!.url.origin}/models`,
-      {},
-      `socks5://127.0.0.1:${state.socks!.port}`,
-    )
+    const res = await proxyFetch(`${state.target!.url.origin}/models`, {}, `socks5://127.0.0.1:${state.socks!.port}`)
     expect(res.status).toBe(200)
     expect(state.socksHits).toBeGreaterThan(before)
   })

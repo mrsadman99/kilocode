@@ -237,7 +237,9 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
   const [fetchPackage, setFetchPackage] = createSignal(form.npm)
   const [fetchURL, setFetchURL] = createSignal(form.baseURL)
   const [fetchKey, setFetchKey] = createSignal("")
-  const [fetchProxy, setFetchProxy] = createSignal(composeProxyURL(form.proxy, form.proxyUser, form.proxyPassword) ?? "")
+  const [fetchProxy, setFetchProxy] = createSignal(
+    composeProxyURL(form.proxy, form.proxyUser, form.proxyPassword) ?? "",
+  )
   const syncFetchProxy = () => setFetchProxy(composeProxyURL(form.proxy, form.proxyUser, form.proxyPassword) ?? "")
   let fetchVersion = 0
 
