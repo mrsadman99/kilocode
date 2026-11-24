@@ -1028,12 +1028,14 @@
           "enum": [
             "kilo",
             "mistral",
-            "local"
+            "local",
+            "custom"
           ],
           "enumDescriptions": [
             "Use autocomplete models through Kilo Gateway",
             "Use autocomplete models through your connected Mistral provider API key",
-            "Use a local FIM model (Ollama, llama.cpp, LM Studio) via a local server"
+            "Use a local FIM model (Ollama, llama.cpp, LM Studio) via a local server",
+            "Use any OpenAI-compatible FIM endpoint (/completions with prompt+suffix), e.g. DeepSeek, vLLM, Together"
           ],
           "description": "Provider to use for inline autocomplete suggestions. If unset, Kilo Gateway is used."
         },
@@ -1083,6 +1085,58 @@
           ],
           "default": "auto",
           "description": "Local server API endpoint used for autocomplete when the provider is 'local'."
+        },
+        "kilo-code.new.autocomplete.customModel": {
+          "type": "string",
+          "default": "",
+          "description": "Model name for autocomplete on the custom OpenAI-compatible FIM endpoint (e.g. deepseek-chat). Used when the autocomplete provider is 'custom'."
+        },
+        "kilo-code.new.autocomplete.customBaseURL": {
+          "type": "string",
+          "default": "",
+          "description": "Base URL of the custom OpenAI-compatible FIM API (e.g. https://api.deepseek.com/beta). Requests are sent to {baseURL}/completions with prompt+suffix."
+        },
+        "kilo-code.new.autocomplete.customApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the custom autocomplete endpoint, sent as a Bearer token. Leave empty to send requests without an Authorization header."
+        },
+        "kilo-code.new.autocomplete.customProxy": {
+          "type": "string",
+          "default": "",
+          "description": "Optional HTTP/SOCKS proxy URL used to reach the custom autocomplete endpoint (e.g. http://127.0.0.1:8080 or socks5://127.0.0.1:1080). Leave empty to use the global proxy settings."
+        },
+        "kilo-code.new.autocomplete.customFormat": {
+          "type": "string",
+          "enum": [
+            "openai",
+            "completions",
+            "generate"
+          ],
+          "enumDescriptions": [
+            "OpenAI FIM: POST {baseURL}/completions with native prompt+suffix (e.g. DeepSeek beta API)",
+            "OpenAI-compatible /v1/completions with a client-side FIM template (llama.cpp, LM Studio, vLLM, Ollama)",
+            "Ollama-native /api/generate with a client-side FIM template"
+          ],
+          "default": "openai",
+          "description": "API format of the custom autocomplete endpoint. Templated formats wrap the prompt with FIM tokens client-side; the API key is only sent with the OpenAI FIM format."
+        },
+        "kilo-code.new.autocomplete.customTemplate": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "starcoder",
+            "qwen",
+            "codellama"
+          ],
+          "enumDescriptions": [
+            "Infer the FIM template from the model name",
+            "StarCoder FIM tokens (<fim_prefix>/<fim_suffix>/<fim_middle>)",
+            "Qwen / Qwen2.5-Coder FIM tokens (<|fim_prefix|>/<|fim_suffix|>/<|fim_middle|>)",
+            "CodeLlama FIM tokens (<PRE>/<SUF>/<MID>)"
+          ],
+          "default": "auto",
+          "description": "Fill-in-the-middle prompt template used by the templated custom formats (completions/generate)."
         },
         "kilo-code.new.autocomplete.enableAutoTrigger": {
           "type": "boolean",

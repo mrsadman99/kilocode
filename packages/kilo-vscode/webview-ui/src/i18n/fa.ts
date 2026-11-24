@@ -898,20 +898,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "فعال‌سازی تکمیل خودکار متن چت",
   "settings.autocomplete.chatAutocomplete.description": "نمایش پیشنهادات تکمیل خودکار در کادر متنی چت",
   "settings.autocomplete.modelsHint": "برای انتخاب مدل مورد استفاده در تکمیل خودکار، به تنظیمات مدل‌ها مراجعه کنید.",
-  "settings.autocomplete.local.model.title": "مدل محلی",
-  "settings.autocomplete.local.model.description": "نام مدل آن‌گونه که سرور محلی ارائه می‌دهد (مثلاً برچسب Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "نشانی سرور محلی",
-  "settings.autocomplete.local.baseUrl.description": "نشانی پایه سرور محلی که مدل را اجرا می‌کند",
-  "settings.autocomplete.local.proxy.title": "پروکسی",
-  "settings.autocomplete.local.proxy.description":
-    "پروکسی HTTP/SOCKS اختیاری برای دسترسی به سرور محلی؛ برای اتصال مستقیم خالی بگذارید",
-  "settings.autocomplete.local.template.title": "الگوی FIM",
-  "settings.autocomplete.local.template.description":
-    "قالب اعلان fill-in-the-middle؛ «خودکار» از نام مدل تشخیص داده می‌شود",
-  "settings.autocomplete.local.endpoint.title": "نقطه پایانی API",
-  "settings.autocomplete.local.endpoint.description":
-    "«خودکار» از پیش‌فرض الگو استفاده می‌کند: بومی Ollama یا سازگار با OpenAI",
-  "settings.autocomplete.local.auto": "خودکار",
+  "settings.autocomplete.custom.format.title": "قالب API",
+  "settings.autocomplete.custom.format.description":
+    "نحوه انتظار نقطه پایانی برای درخواست‌های FIM: prompt+suffix بومی یا الگوی سمت کلاینت از طریق /v1/completions یا Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "الگوی FIM",
+  "settings.autocomplete.custom.template.description":
+    "الگوی پرامپت برای قالب‌های الگودار؛ Auto آن را از نام مدل تشخیص می‌دهد",
+  "settings.autocomplete.custom.auto": "خودکار",
+  "settings.autocomplete.custom.model.title": "مدل",
+  "settings.autocomplete.custom.model.description": "نام مدل در نقطه پایانی سفارشی (مثلاً deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "نشانی پایه",
+  "settings.autocomplete.custom.baseUrl.description":
+    "پایه API سازگار با OpenAI؛ درخواست‌ها با prompt+suffix به {baseURL}/completions ارسال می‌شوند",
+  "settings.autocomplete.custom.apiKey.title": "کلید API",
+  "settings.autocomplete.custom.apiKey.description":
+    "به‌صورت توکن Bearer ارسال می‌شود؛ برای فراخوانی بدون احراز هویت خالی بگذارید",
+  "settings.autocomplete.custom.apiKey.placeholder": "خالی = بدون احراز هویت",
+  "settings.autocomplete.custom.proxy.title": "پروکسی",
+  "settings.autocomplete.custom.proxy.description":
+    "پروکسی HTTP/SOCKS اختیاری برای دسترسی به نقطه پایانی؛ خالی از پروکسی سراسری استفاده می‌کند",
 
   "settings.notifications.sounds": "صداها",
   "settings.notifications.enable.title": "فعال‌سازی اعلان‌های صوتی",

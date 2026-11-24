@@ -873,20 +873,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Włącz autouzupełnianie czatu",
   "settings.autocomplete.chatAutocomplete.description": "Pokaż sugestie autouzupełniania w polu czatu",
   "settings.autocomplete.modelsHint": "Aby wybrać model używany do autouzupełniania, zobacz Ustawienia modeli.",
-  "settings.autocomplete.local.model.title": "Model lokalny",
-  "settings.autocomplete.local.model.description": "Nazwa modelu udostępnianego przez lokalny serwer (np. tag Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL lokalnego serwera",
-  "settings.autocomplete.local.baseUrl.description": "Bazowy URL lokalnego serwera, na którym działa model",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Opcjonalny proxy HTTP/SOCKS do łączenia się z lokalnym serwerem; pozostaw puste, aby łączyć się bezpośrednio",
-  "settings.autocomplete.local.template.title": "Szablon FIM",
-  "settings.autocomplete.local.template.description":
-    "Format promptu fill-in-the-middle; „Auto” jest wykrywany z nazwy modelu",
-  "settings.autocomplete.local.endpoint.title": "Punkt końcowy API",
-  "settings.autocomplete.local.endpoint.description":
-    "„Auto” używa domyślnego dla szablonu: natywnego Ollama lub zgodnego z OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "Format API",
+  "settings.autocomplete.custom.format.description":
+    "Jak endpoint oczekuje żądań FIM: natywne prompt+suffix lub szablon po stronie klienta przez /v1/completions albo Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "Szablon FIM",
+  "settings.autocomplete.custom.template.description":
+    "Szablon promptu dla formatów szablonowych; Auto wykrywa go po nazwie modelu",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Nazwa modelu w niestandardowym endpoincie (np. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Bazowy URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Baza API kompatybilnego z OpenAI; żądania trafiają do {baseURL}/completions z prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Klucz API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Wysyłany jako token Bearer; pozostaw puste, aby wywoływać bez uwierzytelniania",
+  "settings.autocomplete.custom.apiKey.placeholder": "Puste = bez uwierzytelniania",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Opcjonalny proxy HTTP/SOCKS do łączenia się z endpointem; puste używa globalnego proxy",
   "settings.notifications.sounds": "Dźwięki",
   "settings.notifications.enable.title": "Włącz powiadomienia dźwiękowe",
   "settings.notifications.enable.description":

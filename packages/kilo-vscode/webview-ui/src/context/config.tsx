@@ -78,6 +78,12 @@ function loadedSettings(message: ExtensionMessage): Record<string, unknown> | un
       "autocomplete.localProxy": message.settings.localProxy,
       "autocomplete.localTemplate": message.settings.localTemplate,
       "autocomplete.localEndpoint": message.settings.localEndpoint,
+      "autocomplete.customModel": message.settings.customModel,
+      "autocomplete.customBaseURL": message.settings.customBaseURL,
+      "autocomplete.customApiKey": message.settings.customApiKey,
+      "autocomplete.customProxy": message.settings.customProxy,
+      "autocomplete.customFormat": message.settings.customFormat,
+      "autocomplete.customTemplate": message.settings.customTemplate,
     }
   }
   if (message.type === "indexingSettingsLoaded") {

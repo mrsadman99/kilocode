@@ -915,21 +915,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Prikaži prijedloge automatskog dovršavanja u polju chata",
   "settings.autocomplete.modelsHint":
     "Da odaberete koji se model koristi za automatsko dovršavanje, pogledajte postavke Modela.",
-  "settings.autocomplete.local.model.title": "Lokalni model",
-  "settings.autocomplete.local.model.description":
-    "Naziv modela kako ga poslužuje vaš lokalni server (npr. Ollama oznaka)",
-  "settings.autocomplete.local.baseUrl.title": "URL lokalnog servera",
-  "settings.autocomplete.local.baseUrl.description": "Osnovni URL lokalnog servera na kojem model radi",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Opcionalni HTTP/SOCKS proxy za pristup lokalnom serveru; ostavite prazno za direktnu vezu",
-  "settings.autocomplete.local.template.title": "FIM šablon",
-  "settings.autocomplete.local.template.description":
-    "Format fill-in-the-middle prompta; „Auto“ se otkriva iz naziva modela",
-  "settings.autocomplete.local.endpoint.title": "API endpoint",
-  "settings.autocomplete.local.endpoint.description":
-    "„Auto“ koristi zadanu vrijednost šablona: Ollama izvorni ili OpenAI kompatibilan",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "Format API-ja",
+  "settings.autocomplete.custom.format.description":
+    "Kako endpoint očekuje FIM zahtjeve: native prompt+suffix ili šablon na strani klijenta putem /v1/completions ili Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "FIM šablon",
+  "settings.autocomplete.custom.template.description":
+    "Šablon prompta za šablonske formate; Auto ga otkriva iz naziva modela",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Naziv modela na prilagođenom endpointu (npr. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Bazni URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Baza OpenAI-kompatibilnog API-ja; zahtjevi idu na {baseURL}/completions sa prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API ključ",
+  "settings.autocomplete.custom.apiKey.description":
+    "Šalje se kao Bearer token; ostavite prazno za pozive bez autentifikacije",
+  "settings.autocomplete.custom.apiKey.placeholder": "Prazno = bez autentifikacije",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Opcionalni HTTP/SOCKS proxy za pristup endpointu; prazno koristi globalni proxy",
   "settings.notifications.sounds": "Zvukovi",
   "settings.notifications.enable.title": "Omogući zvučne obavijesti",
   "settings.notifications.enable.description":

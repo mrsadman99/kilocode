@@ -599,6 +599,13 @@ export interface AutocompleteSettingsLoadedMessage {
     localProxy: string | null
     localTemplate: string | null
     localEndpoint: string | null
+    /** Custom OpenAI-compatible FIM provider settings; `null` means unset. */
+    customModel: string | null
+    customBaseURL: string | null
+    customApiKey: string | null
+    customProxy: string | null
+    customFormat: string | null
+    customTemplate: string | null
   }
 }
 

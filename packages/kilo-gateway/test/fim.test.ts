@@ -78,3 +78,51 @@ describe("local FIM target resolution", () => {
     expect(resolveFimTarget("local").model).toBe("qwen2.5-coder:7b")
   })
 })
+
+describe("custom FIM target resolution", () => {
+  test("posts to {baseURL}/completions and strips trailing slashes", () => {
+    expect(resolveFimTarget("custom", "deepseek-chat", { baseURL: "https://api.deepseek.com/beta/" })).toEqual({
+      provider: "custom",
+      model: "deepseek-chat",
+      url: "https://api.deepseek.com/beta/completions",
+    })
+  })
+
+  test("trims the model and keeps an optional Bearer key", () => {
+    expect(
+      resolveFimTarget("custom", "  deepseek-chat  ", { baseURL: "http://localhost:8000/v1", apiKey: "  sk-test  " }),
+    ).toEqual({
+      provider: "custom",
+      model: "deepseek-chat",
+      url: "http://localhost:8000/v1/completions",
+      apiKey: "sk-test",
+    })
+  })
+
+  test("omits the key when empty so requests go without Authorization", () => {
+    const target = resolveFimTarget("custom", "m", { baseURL: "http://localhost:8000", apiKey: "   " })
+    expect(target).toEqual({ provider: "custom", model: "m", url: "http://localhost:8000/completions" })
+  })
+
+  test("requires a base URL", () => {
+    expect(resolveFimTarget("custom", "deepseek-chat")).toBeUndefined()
+    expect(resolveFimTarget("custom", "deepseek-chat", { baseURL: "  " })).toBeUndefined()
+  })
+
+  test("templated formats reuse the local server protocol", () => {
+    expect(resolveFimTarget("custom", "qwen2.5-coder:7b", { endpoint: "generate" })).toEqual({
+      provider: "local",
+      model: "qwen2.5-coder:7b",
+      url: "http://127.0.0.1:11434/api/generate",
+      endpoint: "generate",
+    })
+    expect(
+      resolveFimTarget("custom", "starcoder2:7b", { baseURL: "http://192.168.1.10:8080/", endpoint: "completions" }),
+    ).toEqual({
+      provider: "local",
+      model: "starcoder2:7b",
+      url: "http://192.168.1.10:8080/v1/completions",
+      endpoint: "completions",
+    })
+  })
+})

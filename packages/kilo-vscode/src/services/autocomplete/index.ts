@@ -2,6 +2,7 @@ import * as vscode from "vscode"
 import { AutocompleteServiceManager } from "./AutocompleteServiceManager"
 import { ensureBackendForAutocomplete } from "./ensure-backend"
 import { migrateDefaultAutocompleteSettings } from "./migrate-default"
+import { migrateLocalAutocompleteProvider } from "./migrate-local"
 import type { KiloConnectionService } from "../cli-backend"
 
 export const registerAutocompleteProvider = async (
@@ -13,6 +14,7 @@ export const registerAutocompleteProvider = async (
   // constructor synchronously kicks off readSettings() via load(), which would
   // otherwise race with the migration.
   await migrateDefaultAutocompleteSettings(context)
+  await migrateLocalAutocompleteProvider(context)
 
   const autocompleteManager = new AutocompleteServiceManager(context, connectionService)
   context.subscriptions.push(autocompleteManager)

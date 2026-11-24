@@ -17319,6 +17319,7 @@ export type KiloFimData = {
     endpoint?: "completions" | "generate"
     stop?: Array<string>
     proxy?: string
+    apiKey?: string
   }
   path?: never
   query?: {

@@ -899,20 +899,24 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "เปิดใช้งานเติมอัตโนมัติแชท",
   "settings.autocomplete.chatAutocomplete.description": "แสดงข้อเสนอแนะเติมอัตโนมัติในช่องแชท",
   "settings.autocomplete.modelsHint": "เลือกโมเดลที่ใช้สำหรับการเติมอัตโนมัติได้ที่การตั้งค่าโมเดล",
-  "settings.autocomplete.local.model.title": "โมเดลในเครื่อง",
-  "settings.autocomplete.local.model.description": "ชื่อโมเดลตามที่เซิร์ฟเวอร์ในเครื่องให้บริการ (เช่น แท็ก Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL ของเซิร์ฟเวอร์ในเครื่อง",
-  "settings.autocomplete.local.baseUrl.description": "URL หลักของเซิร์ฟเวอร์ในเครื่องที่รันโมเดล",
-  "settings.autocomplete.local.proxy.title": "พร็อกซี",
-  "settings.autocomplete.local.proxy.description":
-    "พร็อกซี HTTP/SOCKS เสริมสำหรับเชื่อมต่อเซิร์ฟเวอร์ในเครื่อง เว้นว่างไว้เพื่อเชื่อมต่อโดยตรง",
-  "settings.autocomplete.local.template.title": "เทมเพลต FIM",
-  "settings.autocomplete.local.template.description":
-    "รูปแบบพรอมต์ fill-in-the-middle; 'อัตโนมัติ' ตรวจจับจากชื่อโมเดล",
-  "settings.autocomplete.local.endpoint.title": "จุดปลาย API",
-  "settings.autocomplete.local.endpoint.description":
-    "'อัตโนมัติ' ใช้ค่าเริ่มต้นของเทมเพลต: Ollama ดั้งเดิมหรือเข้ากันได้กับ OpenAI",
-  "settings.autocomplete.local.auto": "อัตโนมัติ",
+  "settings.autocomplete.custom.format.title": "รูปแบบ API",
+  "settings.autocomplete.custom.format.description":
+    "วิธีที่ปลายทางคาดหวังคำขอ FIM: prompt+suffix แบบเนทีฟหรือเทมเพลตฝั่งไคลเอ็นต์ผ่าน /v1/completions หรือ Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "เทมเพลต FIM",
+  "settings.autocomplete.custom.template.description": "เทมเพลตพรอมต์สำหรับรูปแบบเทมเพลต Auto ตรวจจับจากชื่อโมเดล",
+  "settings.autocomplete.custom.auto": "อัตโนมัติ",
+  "settings.autocomplete.custom.model.title": "โมเดล",
+  "settings.autocomplete.custom.model.description": "ชื่อโมเดลบนปลายทางที่กำหนดเอง (เช่น deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL พื้นฐาน",
+  "settings.autocomplete.custom.baseUrl.description":
+    "ฐาน API ที่เข้ากันได้กับ OpenAI คำขอจะถูกส่งไปยัง {baseURL}/completions พร้อม prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "คีย์ API",
+  "settings.autocomplete.custom.apiKey.description":
+    "ส่งเป็นโทเคน Bearer เว้นว่างไว้เพื่อเรียกใช้โดยไม่มีการยืนยันตัวตน",
+  "settings.autocomplete.custom.apiKey.placeholder": "ว่าง = ไม่ยืนยันตัวตน",
+  "settings.autocomplete.custom.proxy.title": "พร็อกซี",
+  "settings.autocomplete.custom.proxy.description":
+    "พร็อกซี HTTP/SOCKS เสริมสำหรับเข้าถึงปลายทาง เว้นว่างไว้เพื่อใช้พร็อกซีส่วนกลาง",
   "settings.notifications.sounds": "เสียง",
   "settings.notifications.enable.title": "เปิดใช้การแจ้งเตือนด้วยเสียง",
   "settings.notifications.enable.description":

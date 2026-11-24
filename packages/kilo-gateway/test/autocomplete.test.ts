@@ -103,3 +103,29 @@ describe("local autocomplete models", () => {
     expect(validLocalFimEndpoint("auto")).toBe(false)
   })
 })
+
+describe("custom autocomplete models", () => {
+  test("synthesizes a def for any user-defined model", () => {
+    const info = getAutocompleteModel("custom", "deepseek-chat")
+    expect(info.providerID).toBe("custom")
+    expect(info.modelID).toBe("deepseek-chat")
+    expect(info.requestModel).toBe("deepseek-chat")
+    expect(info.id).toBe("custom/deepseek-chat")
+  })
+
+  test("keeps an empty model empty instead of substituting a default", () => {
+    expect(getAutocompleteModel("custom").modelID).toBe("")
+    expect(getAutocompleteModel("custom", "  ").modelID).toBe("")
+  })
+
+  test("resolves custom defs by combined id", () => {
+    const info = getAutocompleteModelById("custom/deepseek-chat")
+    expect(info.providerID).toBe("custom")
+    expect(info.modelID).toBe("deepseek-chat")
+  })
+
+  test("custom is a valid provider but not a whitelisted model", () => {
+    expect(validAutocompleteProvider("custom")).toBe(true)
+    expect(validAutocompleteModel("deepseek-chat")).toBe(false)
+  })
+})

@@ -904,19 +904,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "채팅 텍스트 영역 자동완성 활성화",
   "settings.autocomplete.chatAutocomplete.description": "채팅 텍스트 영역에서 자동완성 제안 표시",
   "settings.autocomplete.modelsHint": "자동 완성에 사용되는 모델을 선택하려면 모델 설정을 참조하세요.",
-  "settings.autocomplete.local.model.title": "로컬 모델",
-  "settings.autocomplete.local.model.description": "로컬 서버에서 제공하는 모델 이름 (예: Ollama 태그)",
-  "settings.autocomplete.local.baseUrl.title": "로컬 서버 URL",
-  "settings.autocomplete.local.baseUrl.description": "모델을 실행하는 로컬 서버의 기본 URL",
-  "settings.autocomplete.local.proxy.title": "프록시",
-  "settings.autocomplete.local.proxy.description":
-    "로컬 서버에 연결할 선택적 HTTP/SOCKS 프록시입니다. 비워 두면 직접 연결합니다",
-  "settings.autocomplete.local.template.title": "FIM 템플릿",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle 프롬프트 형식; '자동'은 모델 이름에서 감지합니다",
-  "settings.autocomplete.local.endpoint.title": "API 엔드포인트",
-  "settings.autocomplete.local.endpoint.description": "'자동'은 템플릿 기본값을 사용: Ollama 네이티브 또는 OpenAI 호환",
-  "settings.autocomplete.local.auto": "자동",
+  "settings.autocomplete.custom.format.title": "API 형식",
+  "settings.autocomplete.custom.format.description":
+    "엔드포인트가 FIM 요청을 받는 방식: 네이티브 prompt+suffix 또는 /v1/completions나 Ollama /api/generate의 클라이언트 측 템플릿",
+  "settings.autocomplete.custom.template.title": "FIM 템플릿",
+  "settings.autocomplete.custom.template.description": "템플릿 형식용 프롬프트 템플릿; Auto는 모델 이름에서 감지합니다",
+  "settings.autocomplete.custom.auto": "자동",
+  "settings.autocomplete.custom.model.title": "모델",
+  "settings.autocomplete.custom.model.description": "사용자 지정 엔드포인트의 모델 이름 (예: deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "기본 URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI 호환 API 베이스; 요청은 prompt+suffix와 함께 {baseURL}/completions로 전송됩니다",
+  "settings.autocomplete.custom.apiKey.title": "API 키",
+  "settings.autocomplete.custom.apiKey.description": "Bearer 토큰으로 전송됩니다. 비워 두면 인증 없이 호출합니다",
+  "settings.autocomplete.custom.apiKey.placeholder": "비움 = 인증 없음",
+  "settings.autocomplete.custom.proxy.title": "프록시",
+  "settings.autocomplete.custom.proxy.description":
+    "엔드포인트 연결에 사용할 선택적 HTTP/SOCKS 프록시; 비워 두면 전역 프록시 사용",
   "settings.notifications.sounds": "소리",
   "settings.notifications.enable.title": "소리 알림 활성화",
   "settings.notifications.enable.description":

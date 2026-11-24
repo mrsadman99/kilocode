@@ -910,20 +910,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "チャットの自動補完を有効にする",
   "settings.autocomplete.chatAutocomplete.description": "チャットテキストエリアに自動補完の提案を表示",
   "settings.autocomplete.modelsHint": "オートコンプリートに使用するモデルを選択するには、モデル設定をご覧ください。",
-  "settings.autocomplete.local.model.title": "ローカルモデル",
-  "settings.autocomplete.local.model.description": "ローカルサーバーが提供するモデル名（例: Ollama のタグ）",
-  "settings.autocomplete.local.baseUrl.title": "ローカルサーバー URL",
-  "settings.autocomplete.local.baseUrl.description": "モデルを実行するローカルサーバーのベース URL",
-  "settings.autocomplete.local.proxy.title": "プロキシ",
-  "settings.autocomplete.local.proxy.description":
-    "ローカルサーバーへの接続に使う任意の HTTP/SOCKS プロキシ。空欄の場合は直接接続します",
-  "settings.autocomplete.local.template.title": "FIM テンプレート",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle プロンプト形式。「自動」はモデル名から判別します",
-  "settings.autocomplete.local.endpoint.title": "API エンドポイント",
-  "settings.autocomplete.local.endpoint.description":
-    "「自動」はテンプレートの既定値を使用: Ollama ネイティブまたは OpenAI 互換",
-  "settings.autocomplete.local.auto": "自動",
+  "settings.autocomplete.custom.format.title": "API 形式",
+  "settings.autocomplete.custom.format.description":
+    "エンドポイントが FIM リクエストをどのように受け取るか: ネイティブの prompt+suffix、または /v1/completions もしくは Ollama /api/generate 上のクライアント側テンプレート",
+  "settings.autocomplete.custom.template.title": "FIM テンプレート",
+  "settings.autocomplete.custom.template.description":
+    "テンプレート形式用のプロンプトテンプレート。Auto はモデル名から検出します",
+  "settings.autocomplete.custom.auto": "自動",
+  "settings.autocomplete.custom.model.title": "モデル",
+  "settings.autocomplete.custom.model.description": "カスタムエンドポイント上のモデル名（例: deepseek-chat）",
+  "settings.autocomplete.custom.baseUrl.title": "ベース URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI 互換 API のベース。リクエストは prompt+suffix を付けて {baseURL}/completions に送信されます",
+  "settings.autocomplete.custom.apiKey.title": "API キー",
+  "settings.autocomplete.custom.apiKey.description":
+    "Bearer トークンとして送信されます。空欄の場合は認証なしで呼び出します",
+  "settings.autocomplete.custom.apiKey.placeholder": "空欄 = 認証なし",
+  "settings.autocomplete.custom.proxy.title": "プロキシ",
+  "settings.autocomplete.custom.proxy.description":
+    "エンドポイントへの接続に使う任意の HTTP/SOCKS プロキシ。空欄の場合はグローバルプロキシを使用",
   "settings.notifications.sounds": "サウンド",
   "settings.notifications.enable.title": "サウンド通知を有効にする",
   "settings.notifications.enable.description":

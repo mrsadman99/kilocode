@@ -1,9 +1,54 @@
 import { ResponseMetaData } from "./types"
 import type { KiloConnectionService } from "../cli-backend"
-import { getAutocompleteModelById } from "../../shared/autocomplete-models"
+import type { AutocompleteModelDef, FimTemplateID } from "@kilocode/kilo-gateway/autocomplete"
+import { getAutocompleteModelById, validFimTemplate } from "../../shared/autocomplete-models"
 import { localFimOptions } from "./local-fim"
+import { customFimOptions } from "./custom-fim"
+import { fimTemplates, inferFimTemplate } from "./continuedev/core/autocomplete/templating/AutocompleteTemplate"
 
 const FIM_MAX_TOKENS = 256
+
+/** Assemble the provider-specific FIM request fields (prompt wrapping, endpoint options). */
+function fimPrompt(info: AutocompleteModelDef, prefix: string, suffix: string) {
+  if (info.providerID === "local") {
+    const local = localFimOptions(info.modelID)
+    return {
+      prefix: local.wrap(prefix, suffix),
+      suffix: "",
+      baseURL: local.baseURL,
+      endpoint: local.endpoint,
+      stop: local.stop,
+      proxy: local.proxy || undefined,
+    }
+  }
+  if (info.providerID === "custom") {
+    const custom = customFimOptions()
+    if (custom.format === "openai") {
+      if (!custom.baseURL) throw new Error("Custom autocomplete base URL is not configured")
+      if (!info.modelID) throw new Error("Custom autocomplete model is not configured")
+      return {
+        prefix,
+        suffix,
+        baseURL: custom.baseURL,
+        apiKey: custom.apiKey || undefined,
+        proxy: custom.proxy || undefined,
+      }
+    }
+    const id: FimTemplateID = validFimTemplate(custom.template)
+      ? (custom.template as FimTemplateID)
+      : inferFimTemplate(info.modelID)
+    const template = fimTemplates[id]
+    return {
+      prefix: template.template(prefix, suffix),
+      suffix: "",
+      baseURL: custom.baseURL || undefined,
+      endpoint: custom.format,
+      stop: template.completionOptions?.stop ?? [],
+      proxy: custom.proxy || undefined,
+    }
+  }
+  return { prefix, suffix }
+}
 
 /**
  * Generate a FIM (Fill-in-the-Middle) completion via the CLI backend.
@@ -26,7 +71,7 @@ export async function generateFim(
   const client = await connectionService.getClientAsync()
   const info = getAutocompleteModelById(modelId)
   if (!info) throw new Error(`Unknown autocomplete model: ${modelId}`)
-  const local = info.providerID === "local" ? localFimOptions(info.modelID) : undefined
+  const prompt = fimPrompt(info, prefix, suffix)
   let cost = 0
   let inputTokens = 0
   let outputTokens = 0
@@ -40,15 +85,11 @@ export async function generateFim(
 
   const { stream } = await client.kilo.fim(
     {
-      prefix: local ? local.wrap(prefix, suffix) : prefix,
-      suffix: local ? "" : suffix,
+      ...prompt,
       provider: info.providerID,
       model: info.modelID,
       maxTokens: FIM_MAX_TOKENS,
       temperature: info.temperature,
-      ...(local
-        ? { baseURL: local.baseURL, endpoint: local.endpoint, stop: local.stop, proxy: local.proxy || undefined }
-        : {}),
     },
     {
       signal,

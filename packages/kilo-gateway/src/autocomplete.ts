@@ -1,5 +1,5 @@
-export type AutocompleteProviderID = "kilo" | "mistral" | "local"
-export type DirectAutocompleteProviderID = Exclude<AutocompleteProviderID, "kilo" | "local">
+export type AutocompleteProviderID = "kilo" | "mistral" | "local" | "custom"
+export type DirectAutocompleteProviderID = Exclude<AutocompleteProviderID, "kilo" | "local" | "custom">
 
 /** FIM prompt templates for local models, assembled client-side. */
 export type FimTemplateID = "starcoder" | "qwen" | "codellama"
@@ -12,6 +12,7 @@ export const LOCAL_FIM_ENDPOINTS: readonly LocalFimEndpoint[] = ["completions", 
 export const DEFAULT_LOCAL_MODEL = "qwen2.5-coder:7b"
 export const DEFAULT_LOCAL_BASE_URL = "http://127.0.0.1:11434"
 export const LOCAL_PROVIDER_LABEL = "Local (Ollama)"
+export const CUSTOM_PROVIDER_LABEL = "Custom (OpenAI-compatible)"
 
 export interface AutocompleteModelDef {
   /** Stable combined value for internal comparisons. */
@@ -98,6 +99,20 @@ function gatewayModel(model: string): AutocompleteModelDef {
   }
 }
 
+/** Custom OpenAI-compatible FIM endpoints accept arbitrary user-defined models. */
+function customModel(model?: string): AutocompleteModelDef {
+  const name = model?.trim() ?? ""
+  return {
+    id: `custom/${name}`,
+    modelID: name,
+    label: name,
+    providerID: "custom",
+    provider: CUSTOM_PROVIDER_LABEL,
+    requestModel: name,
+    temperature: 0.2,
+  }
+}
+
 /**
  * Resolve the configured autocomplete model. The result always stays within
  * the explicitly chosen provider: an unsupported provider, or a model that
@@ -109,6 +124,7 @@ export function getAutocompleteModel(provider?: string, model?: string): Autocom
   const pid = provider?.trim()
   if (!pid) return DEFAULT_AUTOCOMPLETE_MODEL
   if (pid === "local") return localModel(model)
+  if (pid === "custom") return customModel(model)
   const owned = models.filter((m) => m.providerID === pid)
   if (owned.length === 0) return undefined
   const name = model?.trim()
@@ -126,6 +142,7 @@ export function getAutocompleteModel(provider?: string, model?: string): Autocom
 
 export function getAutocompleteModelById(id: string): AutocompleteModelDef | undefined {
   if (id.startsWith("local/")) return localModel(id.slice("local/".length))
+  if (id.startsWith("custom/")) return customModel(id.slice("custom/".length))
   const found = models.find((m) => m.id === id)
   if (found) return found
   if (id.startsWith("kilo/")) {
@@ -137,7 +154,7 @@ export function getAutocompleteModelById(id: string): AutocompleteModelDef | und
 
 export function validAutocompleteProvider(value: unknown) {
   if (typeof value !== "string") return false
-  if (value === "local") return true
+  if (value === "local" || value === "custom") return true
   return models.some((m) => m.providerID === value)
 }
 

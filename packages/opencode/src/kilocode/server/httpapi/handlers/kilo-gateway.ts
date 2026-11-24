@@ -42,6 +42,7 @@ import { ModelCache } from "@/provider/model-cache"
 import { InstanceHttpApi } from "@/server/routes/instance/httpapi/api"
 import { AudioTranscriptionsBody, CloudSessionImportError, FimBody } from "../groups/kilo-gateway"
 import { requestLocalFim } from "@kilocode/kilo-gateway/local-fim"
+import { requestCustomFim } from "@kilocode/kilo-gateway/custom-fim"
 import { loopback } from "@/kilocode/server/loopback"
 
 const FIM_TIMEOUT_MS = 30_000
@@ -123,9 +124,11 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
       const target = resolveFimTarget(ctx.payload.provider, ctx.payload.model, {
         baseURL: ctx.payload.baseURL,
         endpoint: ctx.payload.endpoint,
+        apiKey: ctx.payload.apiKey,
       })
       if (!target) return yield* Effect.fail(new HttpApiError.BadRequest({}))
-      if (target.provider === "local") {
+      if (target.provider === "custom" && !target.model) return yield* Effect.fail(new HttpApiError.BadRequest({}))
+      if (target.provider === "local" || target.provider === "custom") {
         const url = yield* Effect.try({ try: () => new URL(target.url), catch: () => new HttpApiError.BadRequest({}) })
         if (url.protocol !== "http:" && url.protocol !== "https:")
           return yield* Effect.fail(new HttpApiError.BadRequest({}))
@@ -133,16 +136,18 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
       const info = target.provider === "kilo" ? yield* proxyAuth() : undefined
       const token = yield* Effect.gen(function* () {
         if (target.provider === "kilo") return info?.token
-        if (target.provider === "local") return undefined
+        if (target.provider === "local" || target.provider === "custom") return undefined
         const item = yield* auth.get(target.provider).pipe(Effect.mapError(() => new HttpApiError.Unauthorized({})))
         if (item?.type === "api") return item.key
         return DIRECT_FIM_ENV[target.provider].map((key) => process.env[key]).find(Boolean)
       })
 
       if (target.provider === "kilo" && !info?.auth) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
-      if (target.provider !== "local" && !token) return yield* Effect.fail(new HttpApiError.Unauthorized({}))
+      if (target.provider !== "local" && target.provider !== "custom" && !token)
+        return yield* Effect.fail(new HttpApiError.Unauthorized({}))
 
-      const requested = target.provider === "local" ? ctx.payload.proxy?.trim() : undefined
+      const requested =
+        target.provider === "local" || target.provider === "custom" ? ctx.payload.proxy?.trim() : undefined
       const cfg = requested ? undefined : yield* config.get()
       const proxy = requested || providerProxy(cfg?.provider?.[target.provider]?.options ?? {})
       const send = proxiedFetch(proxy)
@@ -160,6 +165,14 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
             return await ApiLog.trace(
               { provider: target.provider, model: target.model, url: target.url, proxy, direct: bypass },
               () => requestLocalFim(target, ctx.payload, signal, transport),
+            )
+          }
+          if (target.provider === "custom") {
+            const bypass = !proxy && loopback(target.url)
+            const transport = bypass ? direct : send
+            return await ApiLog.trace(
+              { provider: target.provider, model: target.model, url: target.url, proxy, direct: bypass },
+              () => requestCustomFim(target, ctx.payload, signal, transport),
             )
           }
           const run = async (url: string): Promise<Response> => {

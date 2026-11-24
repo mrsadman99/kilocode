@@ -888,20 +888,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Enable chat textarea autocomplete",
   "settings.autocomplete.chatAutocomplete.description": "Show autocomplete suggestions in the chat textarea",
   "settings.autocomplete.modelsHint": "To choose which model is used for autocompletions, see the Models settings.",
-  "settings.autocomplete.local.model.title": "Local model",
-  "settings.autocomplete.local.model.description": "Model name as served by your local server (e.g. an Ollama tag)",
-  "settings.autocomplete.local.baseUrl.title": "Local server URL",
-  "settings.autocomplete.local.baseUrl.description": "Base URL of the local server running the model",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Optional HTTP/SOCKS proxy for reaching the local server; leave empty to connect directly",
-  "settings.autocomplete.local.template.title": "FIM template",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle prompt format; Auto detects it from the model name",
-  "settings.autocomplete.local.endpoint.title": "API endpoint",
-  "settings.autocomplete.local.endpoint.description":
-    "Auto uses the template default: Ollama native or OpenAI-compatible",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "API format",
+  "settings.autocomplete.custom.format.description":
+    "How the endpoint expects FIM requests: native prompt+suffix, or a client-side template over /v1/completions or Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "FIM template",
+  "settings.autocomplete.custom.template.description":
+    "Prompt template for the templated formats; Auto detects it from the model name",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Model name on the custom endpoint (e.g. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Base URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI-compatible API base; requests go to {baseURL}/completions with prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API key",
+  "settings.autocomplete.custom.apiKey.description":
+    "Sent as a Bearer token; leave empty to call the endpoint without authentication",
+  "settings.autocomplete.custom.apiKey.placeholder": "Leave empty for no auth",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Optional HTTP/SOCKS proxy for reaching the endpoint; empty uses the global proxy",
 
   "settings.notifications.sounds": "Sounds",
   "settings.notifications.enable.title": "Enable Sound Notifications",

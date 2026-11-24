@@ -923,21 +923,24 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Mostrar sugestões de autocompletar no campo de chat",
   "settings.autocomplete.modelsHint":
     "Para escolher qual modelo é usado para autocompletar, veja as configurações de Modelos.",
-  "settings.autocomplete.local.model.title": "Modelo local",
-  "settings.autocomplete.local.model.description":
-    "Nome do modelo conforme servido pelo seu servidor local (ex.: uma tag do Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL do servidor local",
-  "settings.autocomplete.local.baseUrl.description": "URL base do servidor local que executa o modelo",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Proxy HTTP/SOCKS diret evit tizhout ar servijer lec'hel; lezel goullo evit kevreañ eeun",
-  "settings.autocomplete.local.template.title": "Modelo FIM",
-  "settings.autocomplete.local.template.description":
-    "Formato de prompt fill-in-the-middle; «Auto» é detectado pelo nome do modelo",
-  "settings.autocomplete.local.endpoint.title": "Endpoint da API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Auto» usa o padrão do modelo: nativo do Ollama ou compatível com OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "Furmad API",
+  "settings.autocomplete.custom.format.description":
+    "Penaos e c'hortoz an dibenn rekedoù FIM: prompt+suffix genidik pe patrom a-gostez ar kliant dre /v1/completions pe Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "Patrom FIM",
+  "settings.autocomplete.custom.template.description":
+    "Patrom ar prompt evit ar furmadoù patrom; Auto a zizolo anezhañ diwar anv ar model",
+  "settings.autocomplete.custom.auto": "Emgefre",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Anv ar model war an dibenn personelaet (da sk. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL diazez",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Diazez API kenglotus gant OpenAI; kaset e vez ar rekedoù da {baseURL}/completions gant prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Alc'hwez API",
+  "settings.autocomplete.custom.apiKey.description": "Kaset evel token Bearer; lezel goullo evit gervel hep dilesa",
+  "settings.autocomplete.custom.apiKey.placeholder": "Goullo = hep dilesa",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Proxy HTTP/SOCKS diret evit tizhout an dibenn; goullo a implij ar proxy hollek",
   "settings.notifications.sounds": "Sons",
   "settings.notifications.enable.title": "Ativar notificações sonoras",
   "settings.notifications.enable.description":

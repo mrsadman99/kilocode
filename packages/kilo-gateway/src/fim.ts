@@ -18,10 +18,13 @@ export type FimTarget =
   | { provider: "kilo"; model: string; url: string }
   | { provider: "mistral"; model: string }
   | { provider: "local"; model: string; url: string; endpoint: LocalFimEndpoint }
+  | { provider: "custom"; model: string; url: string; apiKey?: string }
 
-export interface LocalFimOptions {
+export interface FimOptions {
   baseURL?: string
   endpoint?: LocalFimEndpoint
+  /** Custom provider only: Bearer key; omitted/empty means no Authorization header. */
+  apiKey?: string
 }
 
 const KILO_FIM_URL = resolveKiloGatewayUrl("fim/completions")
@@ -30,11 +33,19 @@ function kiloTarget(model?: string): FimTarget {
   return { provider: "kilo", model: model ?? DEFAULT_AUTOCOMPLETE_MODEL.requestModel, url: KILO_FIM_URL }
 }
 
-function localTarget(model?: string, opts?: LocalFimOptions): FimTarget {
+function localTarget(model?: string, opts?: FimOptions): FimTarget {
   const base = (opts?.baseURL?.trim() || DEFAULT_LOCAL_BASE_URL).replace(/\/+$/, "")
   const endpoint = opts?.endpoint ?? "generate"
   const path = endpoint === "generate" ? "api/generate" : "v1/completions"
   return { provider: "local", model: model?.trim() || DEFAULT_LOCAL_MODEL, url: `${base}/${path}`, endpoint }
+}
+
+/** OpenAI-compatible FIM: POST {baseURL}/completions with native prompt+suffix. */
+function customTarget(model?: string, opts?: FimOptions): FimTarget | undefined {
+  const base = opts?.baseURL?.trim().replace(/\/+$/, "")
+  if (!base) return undefined
+  const apiKey = opts?.apiKey?.trim()
+  return { provider: "custom", model: model?.trim() ?? "", url: `${base}/completions`, ...(apiKey ? { apiKey } : {}) }
 }
 
 /**
@@ -42,9 +53,16 @@ function localTarget(model?: string, opts?: LocalFimOptions): FimTarget {
  * unsupported provider so the request is rejected rather than silently sent
  * to the cloud default with the user's code.
  */
-export function resolveFimTarget(provider?: string, model?: string, opts?: LocalFimOptions): FimTarget | undefined {
+export function resolveFimTarget(provider?: string, model?: string, opts?: FimOptions): FimTarget | undefined {
   const pid = provider?.trim()
   if (pid === "local") return localTarget(model, opts)
+  if (pid === "custom") {
+    // Templated custom formats reuse the local server protocol (client-side FIM
+    // wrapping, /v1/completions or /api/generate); only the native OpenAI FIM
+    // format posts prompt+suffix to {baseURL}/completions.
+    if (opts?.endpoint) return localTarget(model, opts)
+    return customTarget(model, opts)
+  }
   if (!pid || pid === "kilo") return kiloTarget(model)
 
   const info = getAutocompleteModel(pid, model)

@@ -123,10 +123,10 @@ const ModelsTab: Component = () => {
       updateSetting("autocomplete.model", null)
       return
     }
-    if (providerID === "local") {
-      // The local model name lives in its own free-form setting, not the
+    if (providerID === "custom") {
+      // The custom model name lives in its own free-form setting, not the
       // whitelisted `model` enum.
-      updateSetting("autocomplete.provider", "local")
+      updateSetting("autocomplete.provider", "custom")
       updateSetting("autocomplete.model", null)
       return
     }
@@ -134,36 +134,40 @@ const ModelsTab: Component = () => {
     updateSetting("autocomplete.model", modelID)
   }
 
-  const localModel = () => {
-    const v = settings()["autocomplete.localModel"]
+  const customModel = () => {
+    const v = settings()["autocomplete.customModel"]
     return typeof v === "string" ? v : ""
   }
-  const localBaseURL = () => {
-    const v = settings()["autocomplete.localBaseURL"]
+  const customBaseURL = () => {
+    const v = settings()["autocomplete.customBaseURL"]
     return typeof v === "string" ? v : ""
   }
-  const localProxy = () => {
-    const v = settings()["autocomplete.localProxy"]
+  const customApiKey = () => {
+    const v = settings()["autocomplete.customApiKey"]
     return typeof v === "string" ? v : ""
   }
-  const localTemplate = () => {
-    const v = settings()["autocomplete.localTemplate"]
+  const customProxy = () => {
+    const v = settings()["autocomplete.customProxy"]
+    return typeof v === "string" ? v : ""
+  }
+  const customFormat = () => {
+    const v = settings()["autocomplete.customFormat"]
+    return v === "completions" || v === "generate" ? v : "openai"
+  }
+  const customTemplate = () => {
+    const v = settings()["autocomplete.customTemplate"]
     return typeof v === "string" ? v : "auto"
   }
-  const localEndpoint = () => {
-    const v = settings()["autocomplete.localEndpoint"]
-    return typeof v === "string" ? v : "auto"
-  }
+  const formatOptions = [
+    { value: "openai", label: "OpenAI FIM (prompt+suffix)" },
+    { value: "completions", label: "/v1/completions (templated)" },
+    { value: "generate", label: "/api/generate (Ollama)" },
+  ]
   const templateOptions = [
-    { value: "auto", label: language.t("settings.autocomplete.local.auto") },
+    { value: "auto", label: language.t("settings.autocomplete.custom.auto") },
     { value: "starcoder", label: "StarCoder" },
     { value: "qwen", label: "Qwen" },
     { value: "codellama", label: "CodeLlama" },
-  ]
-  const endpointOptions = [
-    { value: "auto", label: language.t("settings.autocomplete.local.auto") },
-    { value: "completions", label: "/v1/completions (OpenAI-compatible)" },
-    { value: "generate", label: "/api/generate (Ollama)" },
   ]
 
   return (
@@ -260,73 +264,87 @@ const ModelsTab: Component = () => {
             description={language.t("settings.autocomplete.model.description")}
           />
         </SettingsRow>
-        <Show when={autocompleteProvider() === "local"}>
+        <Show when={autocompleteProvider() === "custom" || autocompleteProvider() === "local"}>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.model.title")}
-            description={language.t("settings.autocomplete.local.model.description")}
+            title={language.t("settings.autocomplete.custom.model.title")}
+            description={language.t("settings.autocomplete.custom.model.description")}
           >
             <TextField
-              value={localModel()}
-              placeholder="qwen2.5-coder:7b"
-              onChange={(value: string) => updateSetting("autocomplete.localModel", value.trim() || null)}
+              value={customModel()}
+              placeholder="deepseek-chat"
+              onChange={(value: string) => updateSetting("autocomplete.customModel", value.trim() || null)}
             />
           </SettingsRow>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.baseUrl.title")}
-            description={language.t("settings.autocomplete.local.baseUrl.description")}
+            title={language.t("settings.autocomplete.custom.baseUrl.title")}
+            description={language.t("settings.autocomplete.custom.baseUrl.description")}
           >
             <TextField
-              value={localBaseURL()}
-              placeholder="http://127.0.0.1:11434"
-              onChange={(value: string) => updateSetting("autocomplete.localBaseURL", value.trim() || null)}
+              value={customBaseURL()}
+              placeholder="https://api.deepseek.com/beta"
+              onChange={(value: string) => updateSetting("autocomplete.customBaseURL", value.trim() || null)}
             />
           </SettingsRow>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.proxy.title")}
-            description={language.t("settings.autocomplete.local.proxy.description")}
+            title={language.t("settings.autocomplete.custom.apiKey.title")}
+            description={language.t("settings.autocomplete.custom.apiKey.description")}
           >
             <TextField
-              value={localProxy()}
+              type="password"
+              autocomplete="off"
+              value={customApiKey()}
+              placeholder={language.t("settings.autocomplete.custom.apiKey.placeholder")}
+              onChange={(value: string) => updateSetting("autocomplete.customApiKey", value.trim() || null)}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.custom.proxy.title")}
+            description={language.t("settings.autocomplete.custom.proxy.description")}
+          >
+            <TextField
+              value={customProxy()}
               placeholder="http://127.0.0.1:8080"
-              onChange={(value: string) => updateSetting("autocomplete.localProxy", value.trim() || null)}
+              onChange={(value: string) => updateSetting("autocomplete.customProxy", value.trim() || null)}
             />
           </SettingsRow>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.template.title")}
-            description={language.t("settings.autocomplete.local.template.description")}
+            title={language.t("settings.autocomplete.custom.format.title")}
+            description={language.t("settings.autocomplete.custom.format.description")}
           >
             <Select
-              options={templateOptions}
-              current={templateOptions.find((item) => item.value === localTemplate())}
+              options={formatOptions}
+              current={formatOptions.find((item) => item.value === customFormat())}
               value={(item) => item.value}
               label={(item) => item.label}
-              onSelect={(item) => updateSetting("autocomplete.localTemplate", item?.value ?? "auto")}
+              onSelect={(item) => updateSetting("autocomplete.customFormat", item?.value ?? "openai")}
               variant="secondary"
               size="small"
               triggerVariant="settings"
               triggerProps={{
-                "aria-label": `${language.t("settings.autocomplete.local.template.title")}: ${localTemplate()}`,
+                "aria-label": `${language.t("settings.autocomplete.custom.format.title")}: ${customFormat()}`,
               }}
             />
           </SettingsRow>
-          <SettingsRow
-            title={language.t("settings.autocomplete.local.endpoint.title")}
-            description={language.t("settings.autocomplete.local.endpoint.description")}
-          >
-            <Select
-              options={endpointOptions}
-              current={endpointOptions.find((item) => item.value === localEndpoint())}
-              value={(item) => item.value}
-              label={(item) => item.label}
-              onSelect={(item) => updateSetting("autocomplete.localEndpoint", item?.value ?? "auto")}
-              variant="secondary"
-              size="small"
-              triggerVariant="settings"
-              triggerProps={{
-                "aria-label": `${language.t("settings.autocomplete.local.endpoint.title")}: ${localEndpoint()}`,
-              }}
-            />
-          </SettingsRow>
+          <Show when={customFormat() !== "openai"}>
+            <SettingsRow
+              title={language.t("settings.autocomplete.custom.template.title")}
+              description={language.t("settings.autocomplete.custom.template.description")}
+            >
+              <Select
+                options={templateOptions}
+                current={templateOptions.find((item) => item.value === customTemplate())}
+                value={(item) => item.value}
+                label={(item) => item.label}
+                onSelect={(item) => updateSetting("autocomplete.customTemplate", item?.value ?? "auto")}
+                variant="secondary"
+                size="small"
+                triggerVariant="settings"
+                triggerProps={{
+                  "aria-label": `${language.t("settings.autocomplete.custom.template.title")}: ${customTemplate()}`,
+                }}
+              />
+            </SettingsRow>
+          </Show>
         </Show>
         <SettingsRow
           title={language.t("settings.models.speechToTextBaseUrl.title")}

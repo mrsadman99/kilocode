@@ -905,20 +905,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Увімкнути автодоповнення в полі чату",
   "settings.autocomplete.chatAutocomplete.description": "Показувати підказки автодоповнення в полі введення чату",
   "settings.autocomplete.modelsHint": "Щоб вибрати модель для автодоповнення, див. Налаштування моделей.",
-  "settings.autocomplete.local.model.title": "Локальна модель",
-  "settings.autocomplete.local.model.description": "Ім'я моделі на вашому локальному сервері (наприклад, тег Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
-  "settings.autocomplete.local.baseUrl.description": "Базовий URL локального сервера, на якому запущено модель",
-  "settings.autocomplete.local.proxy.title": "Проксі",
-  "settings.autocomplete.local.proxy.description":
-    "Необов'язковий HTTP/SOCKS-проксі для доступу до локального сервера; залиште порожнім для прямого підключення",
-  "settings.autocomplete.local.template.title": "Шаблон FIM",
-  "settings.autocomplete.local.template.description":
-    "Формат fill-in-the-middle промпту; «Авто» визначається за назвою моделі",
-  "settings.autocomplete.local.endpoint.title": "Ендпоінт API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Авто» використовує типове значення шаблону: Ollama або OpenAI-сумісний",
-  "settings.autocomplete.local.auto": "Авто",
+  "settings.autocomplete.custom.format.title": "Формат API",
+  "settings.autocomplete.custom.format.description":
+    "Як ендпойнт очікує FIM-запити: нативні prompt+suffix або клієнтський шаблон через /v1/completions чи Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "FIM-шаблон",
+  "settings.autocomplete.custom.template.description":
+    "Шаблон промпту для шаблонних форматів; Auto визначається за назвою моделі",
+  "settings.autocomplete.custom.auto": "Авто",
+  "settings.autocomplete.custom.model.title": "Модель",
+  "settings.autocomplete.custom.model.description": "Назва моделі на власному ендпойнті (напр. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Базовий URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "База OpenAI-сумісного API; запити надсилаються на {baseURL}/completions з prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Ключ API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Надсилається як Bearer-токен; залиште порожнім для виклику без автентифікації",
+  "settings.autocomplete.custom.apiKey.placeholder": "Порожньо = без автентифікації",
+  "settings.autocomplete.custom.proxy.title": "Проксі",
+  "settings.autocomplete.custom.proxy.description":
+    "Необов'язковий HTTP/SOCKS-проксі для доступу до ендпойнта; порожньо — використовується глобальний проксі",
 
   "settings.notifications.sounds": "Звуки",
   "settings.notifications.enable.title": "Увімкнути звукові сповіщення",

@@ -1391,21 +1391,25 @@ export const dict = {
   // Autocomplete hint
   "settings.autocomplete.modelsHint":
     "Per scegliere quale modello usare per l'autocompletamento, vedi le impostazioni Modelli.",
-  "settings.autocomplete.local.model.title": "Modello locale",
-  "settings.autocomplete.local.model.description":
-    "Nome del modello come fornito dal server locale (es. un tag Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL del server locale",
-  "settings.autocomplete.local.baseUrl.description": "URL base del server locale che esegue il modello",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Proxy HTTP/SOCKS facoltativo per raggiungere il server locale; lasciare vuoto per connettersi direttamente",
-  "settings.autocomplete.local.template.title": "Template FIM",
-  "settings.autocomplete.local.template.description":
-    "Formato del prompt fill-in-the-middle; «Auto» viene rilevato dal nome del modello",
-  "settings.autocomplete.local.endpoint.title": "Endpoint API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Auto» usa il valore predefinito del template: nativo Ollama o compatibile OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "Formato API",
+  "settings.autocomplete.custom.format.description":
+    "Come l'endpoint si aspetta le richieste FIM: prompt+suffix nativi o template lato client tramite /v1/completions o Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "Template FIM",
+  "settings.autocomplete.custom.template.description":
+    "Template del prompt per i format con template; Auto lo rileva dal nome del modello",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Modello",
+  "settings.autocomplete.custom.model.description": "Nome del modello sull'endpoint personalizzato (es. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL base",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Base API compatibile OpenAI; le richieste vanno a {baseURL}/completions con prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Chiave API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Inviata come token Bearer; lasciare vuoto per chiamare senza autenticazione",
+  "settings.autocomplete.custom.apiKey.placeholder": "Vuoto = senza autenticazione",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Proxy HTTP/SOCKS facoltativo per raggiungere l'endpoint; vuoto usa il proxy globale",
 
   // Indexing
   "settings.indexing.globalEnable.title": "Abilita globalmente",

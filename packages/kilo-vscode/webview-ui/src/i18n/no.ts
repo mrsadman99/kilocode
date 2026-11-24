@@ -877,21 +877,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofullføringsforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For å velge hvilken modell som brukes til autofullføring, se Modellinnstillinger.",
-  "settings.autocomplete.local.model.title": "Lokal modell",
-  "settings.autocomplete.local.model.description":
-    "Modellnavn slik den lokale serveren tilbyr det (f.eks. en Ollama-tagg)",
-  "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
-  "settings.autocomplete.local.baseUrl.description": "Grunn-URL til den lokale serveren som kjører modellen",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Valgfri HTTP/SOCKS-proxy for å nå den lokale serveren; la stå tom for direkte tilkobling",
-  "settings.autocomplete.local.template.title": "FIM-mal",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle-promptformat; «Auto» utledes fra modellnavnet",
-  "settings.autocomplete.local.endpoint.title": "API-endepunkt",
-  "settings.autocomplete.local.endpoint.description":
-    "«Auto» bruker malens standard: Ollama-nativ eller OpenAI-kompatibel",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "API-format",
+  "settings.autocomplete.custom.format.description":
+    "Hvordan endepunktet forventer FIM-forespørsler: native prompt+suffix eller en klientside mal via /v1/completions eller Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "FIM-mal",
+  "settings.autocomplete.custom.template.description": "Promptmal for malformatene; Auto oppdager den fra modellnavnet",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Modell",
+  "settings.autocomplete.custom.model.description":
+    "Modellnavn på det egendefinerte endepunktet (f.eks. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Basis-URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI-kompatibel API-base; forespørsler går til {baseURL}/completions med prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API-nøkkel",
+  "settings.autocomplete.custom.apiKey.description":
+    "Sendes som Bearer-token; la stå tom for å kalle uten autentisering",
+  "settings.autocomplete.custom.apiKey.placeholder": "Tom = uten autentisering",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Valgfri HTTP/SOCKS-proxy for å nå endepunktet; tom bruker global proxy",
   "settings.notifications.sounds": "Lyder",
   "settings.notifications.enable.title": "Aktiver lydvarsler",
   "settings.notifications.enable.description":

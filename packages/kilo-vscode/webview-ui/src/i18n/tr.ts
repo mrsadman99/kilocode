@@ -904,20 +904,25 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Sohbet metin alanında otomatik tamamlama önerileri göster",
   "settings.autocomplete.modelsHint":
     "Otomatik tamamlama için kullanılacak modeli seçmek için Modeller ayarlarına bakın.",
-  "settings.autocomplete.local.model.title": "Yerel model",
-  "settings.autocomplete.local.model.description": "Yerel sunucunuzun sunduğu model adı (ör. bir Ollama etiketi)",
-  "settings.autocomplete.local.baseUrl.title": "Yerel sunucu URL'si",
-  "settings.autocomplete.local.baseUrl.description": "Modeli çalıştıran yerel sunucunun temel URL'si",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Yerel sunucuya erişmek için isteğe bağlı HTTP/SOCKS proxy'si; doğrudan bağlanmak için boş bırakın",
-  "settings.autocomplete.local.template.title": "FIM şablonu",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle istem biçimi; 'Otomatik' model adından algılanır",
-  "settings.autocomplete.local.endpoint.title": "API uç noktası",
-  "settings.autocomplete.local.endpoint.description":
-    "'Otomatik' şablon varsayılanını kullanır: Ollama yerel veya OpenAI uyumlu",
-  "settings.autocomplete.local.auto": "Otomatik",
+  "settings.autocomplete.custom.format.title": "API biçimi",
+  "settings.autocomplete.custom.format.description":
+    "Uç noktanın FIM isteklerini nasıl beklediği: yerel prompt+suffix veya /v1/completions ya da Ollama /api/generate üzerinden istemci tarafı şablon",
+  "settings.autocomplete.custom.template.title": "FIM şablonu",
+  "settings.autocomplete.custom.template.description":
+    "Şablonlu biçimler için istem şablonu; Auto onu model adından algılar",
+  "settings.autocomplete.custom.auto": "Otomatik",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Özel uç noktadaki model adı (örn. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Temel URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI uyumlu API tabanı; istekler prompt+suffix ile {baseURL}/completions adresine gönderilir",
+  "settings.autocomplete.custom.apiKey.title": "API anahtarı",
+  "settings.autocomplete.custom.apiKey.description":
+    "Bearer belirteci olarak gönderilir; kimlik doğrulamasız çağırmak için boş bırakın",
+  "settings.autocomplete.custom.apiKey.placeholder": "Boş = kimlik doğrulamasız",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Uç noktaya erişmek için isteğe bağlı HTTP/SOCKS proxy'si; boş bırakılırsa genel proxy kullanılır",
 
   "settings.notifications.sounds": "Sesler",
   "settings.notifications.enable.title": "Sesli bildirimleri etkinleştir",

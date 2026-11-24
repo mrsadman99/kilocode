@@ -14047,6 +14047,9 @@
                   },
                   "proxy": {
                     "type": "string"
+                  },
+                  "apiKey": {
+                    "type": "string"
                   }
                 },
                 "required": ["prefix", "suffix"],

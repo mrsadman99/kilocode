@@ -912,20 +912,26 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Включить автодополнение чата",
   "settings.autocomplete.chatAutocomplete.description": "Показывать предложения автодополнения в поле чата",
   "settings.autocomplete.modelsHint": "Чтобы выбрать модель для автодополнения, см. настройки Моделей.",
-  "settings.autocomplete.local.model.title": "Локальная модель",
-  "settings.autocomplete.local.model.description": "Имя модели на вашем локальном сервере (например, тег Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
-  "settings.autocomplete.local.baseUrl.description": "Базовый URL локального сервера, на котором запущена модель",
-  "settings.autocomplete.local.proxy.title": "Прокси",
-  "settings.autocomplete.local.proxy.description":
-    "Необязательный HTTP/SOCKS-прокси для доступа к локальному серверу; оставьте пустым для прямого подключения",
-  "settings.autocomplete.local.template.title": "Шаблон FIM",
-  "settings.autocomplete.local.template.description":
-    "Формат fill-in-the-middle промпта; «Авто» определяется по имени модели",
-  "settings.autocomplete.local.endpoint.title": "Эндпоинт API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Авто» использует значение по умолчанию для шаблона: Ollama или OpenAI-совместимый",
-  "settings.autocomplete.local.auto": "Авто",
+  "settings.autocomplete.custom.format.title": "Формат API",
+  "settings.autocomplete.custom.format.description":
+    "Как эндпойнт ожидает FIM-запросы: нативные prompt+suffix или клиентский шаблон через /v1/completions либо Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "FIM-шаблон",
+  "settings.autocomplete.custom.template.description":
+    "Шаблон промпта для шаблонных форматов; Auto определяется по имени модели",
+  "settings.autocomplete.custom.auto": "Авто",
+  "settings.autocomplete.custom.model.title": "Модель",
+  "settings.autocomplete.custom.model.description":
+    "Имя модели на пользовательском эндпойнте (например, deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Базовый URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "База OpenAI-совместимого API; запросы отправляются на {baseURL}/completions с prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API-ключ",
+  "settings.autocomplete.custom.apiKey.description":
+    "Отправляется как Bearer-токен; оставьте пустым, чтобы обращаться без аутентификации",
+  "settings.autocomplete.custom.apiKey.placeholder": "Пусто = без аутентификации",
+  "settings.autocomplete.custom.proxy.title": "Прокси",
+  "settings.autocomplete.custom.proxy.description":
+    "Необязательный HTTP/SOCKS-прокси для доступа к эндпойнту; пусто — используется глобальный прокси",
   "settings.notifications.sounds": "Звуки",
   "settings.notifications.enable.title": "Включить звуковые уведомления",
   "settings.notifications.enable.description":

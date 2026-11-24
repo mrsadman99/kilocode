@@ -39,6 +39,12 @@ export function buildAutocompleteSettingsMessage() {
       localProxy: config.get<string>("localProxy") ?? null,
       localTemplate: config.get<string>("localTemplate") ?? null,
       localEndpoint: config.get<string>("localEndpoint") ?? null,
+      customModel: config.get<string>("customModel") ?? null,
+      customBaseURL: config.get<string>("customBaseURL") ?? null,
+      customApiKey: config.get<string>("customApiKey") ?? null,
+      customProxy: config.get<string>("customProxy") ?? null,
+      customFormat: config.get<string>("customFormat") ?? null,
+      customTemplate: config.get<string>("customTemplate") ?? null,
     },
   }
 }
@@ -60,6 +66,15 @@ function validLocalSetting(key: string, value: unknown) {
   return false
 }
 
+function validCustomSetting(key: string, value: unknown) {
+  if (value === null || value === undefined) return true
+  if (key === "customModel" || key === "customBaseURL" || key === "customApiKey" || key === "customProxy")
+    return typeof value === "string"
+  if (key === "customFormat") return value === "openai" || value === "completions" || value === "generate"
+  if (key === "customTemplate") return value === "auto" || validFimTemplate(value)
+  return false
+}
+
 export function validAutocompleteSetting(key: string, value: unknown) {
   if (key === "model") {
     // Allow clearing back to the server-side default.
@@ -77,6 +92,7 @@ export function validAutocompleteSetting(key: string, value: unknown) {
   if (key === "enableChatAutocomplete") return typeof value === "boolean"
 
   if (key.startsWith("local")) return validLocalSetting(key, value)
+  if (key.startsWith("custom")) return validCustomSetting(key, value)
 
   return false
 }

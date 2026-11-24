@@ -909,21 +909,25 @@ export const dict = {
     "Toon suggesties voor automatisch aanvullen in het chat tekstveld",
   "settings.autocomplete.modelsHint":
     "Om te kiezen welk model wordt gebruikt voor automatisch aanvullen, zie de Modellen-instellingen.",
-  "settings.autocomplete.local.model.title": "Lokaal model",
-  "settings.autocomplete.local.model.description":
-    "Modelnaam zoals aangeboden door je lokale server (bijv. een Ollama-tag)",
-  "settings.autocomplete.local.baseUrl.title": "URL van lokale server",
-  "settings.autocomplete.local.baseUrl.description": "Basis-URL van de lokale server waarop het model draait",
-  "settings.autocomplete.local.proxy.title": "Proxy",
-  "settings.autocomplete.local.proxy.description":
-    "Optionele HTTP/SOCKS-proxy voor de lokale server; leeg laten voor directe verbinding",
-  "settings.autocomplete.local.template.title": "FIM-sjabloon",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle-promptformaat; 'Auto' wordt afgeleid uit de modelnaam",
-  "settings.autocomplete.local.endpoint.title": "API-eindpunt",
-  "settings.autocomplete.local.endpoint.description":
-    "'Auto' gebruikt de standaard van het sjabloon: Ollama-native of OpenAI-compatibel",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.format.title": "API-formaat",
+  "settings.autocomplete.custom.format.description":
+    "Hoe het eindpunt FIM-verzoeken verwacht: native prompt+suffix of een client-side sjabloon via /v1/completions of Ollama /api/generate",
+  "settings.autocomplete.custom.template.title": "FIM-sjabloon",
+  "settings.autocomplete.custom.template.description":
+    "Promptsjabloon voor de sjabloonformaten; Auto detecteert het op modelnaam",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Modelnaam op het aangepaste eindpunt (bijv. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Basis-URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI-compatibele API-basis; verzoeken gaan naar {baseURL}/completions met prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API-sleutel",
+  "settings.autocomplete.custom.apiKey.description":
+    "Verzonden als Bearer-token; leeg laten om zonder authenticatie aan te roepen",
+  "settings.autocomplete.custom.apiKey.placeholder": "Leeg = zonder authenticatie",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Optionele HTTP/SOCKS-proxy voor het eindpunt; leeg gebruikt de globale proxy",
 
   "settings.notifications.sounds": "Geluiden",
   "settings.notifications.enable.title": "Geluidsmeldingen inschakelen",
