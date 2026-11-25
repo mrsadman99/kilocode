@@ -181,8 +181,12 @@ const live: Layer.Layer<
       const cap = KiloLLM.needsEstimate({ model: input.model, configured: base.params.maxOutputTokens })
       const usage =
         cap || preflight
-          ? KiloSessionOverflow.measure({ messages: estimated, tools })
+          ? KiloSessionOverflow.measure({ messages: estimated, tools, model: input.model })
           : undefined
+      // kilocode_change start - feed the provider report back into the per-model estimate factor
+      if (usage && !input.small)
+        KiloSessionOverflow.remember({ sessionID: input.sessionID, normalized: usage.normalized, raw: usage.raw })
+      // kilocode_change end
       const maxOutputTokens = KiloLLM.capOutputTokens({
         model: input.model,
         messages: estimated,

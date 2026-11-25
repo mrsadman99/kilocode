@@ -803,3 +803,71 @@ describe("Kilo preflight compaction", () => {
     ).toBe(true)
   })
 })
+describe("Kilo estimate calibration", () => {
+  test("factor defaults to the generic heuristic", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    expect(KiloSessionOverflow.factor(mdl)).toBe(1.3)
+    expect(KiloSessionOverflow.factor()).toBe(1.3)
+  })
+
+  test("calibrate adapts the factor toward provider-reported usage", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    KiloSessionOverflow.remember({ sessionID: "s", normalized: 10_000, raw: 10_000 })
+    KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 13_000 })
+    const f = KiloSessionOverflow.factor(mdl)
+    expect(f).toBeGreaterThan(1.3)
+    expect(f).toBeLessThan(1.69)
+  })
+
+  test("calibrate ignores media payloads whose provider count diverges", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    KiloSessionOverflow.remember({ sessionID: "s", normalized: 10_000, raw: 50_000 })
+    KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 50_000 })
+    expect(KiloSessionOverflow.factor(mdl)).toBe(1.3)
+  })
+
+  test("calibrate ignores outlier ratios", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    KiloSessionOverflow.remember({ sessionID: "s", normalized: 10_000, raw: 10_000 })
+    KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 100_000 })
+    expect(KiloSessionOverflow.factor(mdl)).toBe(1.3)
+  })
+
+  test("calibrate clamps the factor to a safe range", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    for (let i = 0; i < 50; i++) {
+      KiloSessionOverflow.remember({ sessionID: "s", normalized: 10_000, raw: 10_000 })
+      KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 20_000 })
+    }
+    expect(KiloSessionOverflow.factor(mdl)).toBeLessThanOrEqual(2.0)
+    expect(KiloSessionOverflow.factor(mdl)).toBeGreaterThan(1.3)
+  })
+
+  test("calibrate consumes the pending estimate", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    KiloSessionOverflow.remember({ sessionID: "s", normalized: 10_000, raw: 10_000 })
+    KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 13_000 })
+    const f1 = KiloSessionOverflow.factor(mdl)
+    KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 20_000 })
+    expect(KiloSessionOverflow.factor(mdl)).toBe(f1)
+  })
+
+  test("measure uses the calibrated factor", () => {
+    KiloSessionOverflow.reset()
+    const mdl = model({ context: 200_000, output: 32_000 })
+    const messages = [{ role: "user" as const, content: "x".repeat(40_000) }]
+    const before = KiloSessionOverflow.measure({ messages, tools: {}, model: mdl }).normalized
+    for (let i = 0; i < 50; i++) {
+      KiloSessionOverflow.remember({ sessionID: "s", normalized: 10_000, raw: 10_000 })
+      KiloSessionOverflow.calibrate({ model: mdl, sessionID: "s", prompt: 20_000 })
+    }
+    const after = KiloSessionOverflow.measure({ messages, tools: {}, model: mdl }).normalized
+    expect(after).toBeGreaterThan(before)
+  })
+})

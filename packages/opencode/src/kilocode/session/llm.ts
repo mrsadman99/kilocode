@@ -108,7 +108,7 @@ export namespace KiloLLM {
 
     const estimated =
       input.usage?.normalized ??
-      KiloSessionOverflow.measure({ messages: input.messages, tools: input.tools }).normalized
+      KiloSessionOverflow.measure({ messages: input.messages, tools: input.tools, model: input.model }).normalized
     const tokens = Math.max(input.reported ?? 0, estimated)
     const available = context - tokens - SAFETY
     // If fewer than MIN_OUTPUT tokens remain, the input (nearly) fills the window —
