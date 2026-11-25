@@ -108,6 +108,7 @@ export const dict = {
   "dialog.model.select": "选择",
   "dialog.model.expand": "展开",
   "dialog.model.collapse": "收起",
+  "review.model.label": "审查模型",
 
   "dialog.provider.viewAll": "查看更多提供商",
 

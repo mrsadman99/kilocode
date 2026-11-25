@@ -148,6 +148,8 @@ export interface ModelSelectorBaseProps {
    * insert-only action. The persisted chat-selector preference is not changed.
    */
   collapsed?: boolean
+  /** Trigger button size — defaults to "normal". Use "small" for compact bars. */
+  size?: "small" | "normal"
 }
 
 export const ModelSelectorBase: Component<ModelSelectorBaseProps> = (props) => {
@@ -876,7 +878,7 @@ export const ModelSelectorBase: Component<ModelSelectorBaseProps> = (props) => {
           triggerAs={Button}
           triggerProps={{
             variant: "secondary",
-            size: "normal",
+            size: props.size ?? "normal",
             get disabled() {
               return props.blocked || !canOpen()
             },

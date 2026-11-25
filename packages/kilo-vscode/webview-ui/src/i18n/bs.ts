@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Odaberi",
   "dialog.model.expand": "Proširi",
   "dialog.model.collapse": "Skupi",
+  "review.model.label": "Model pregleda",
 
   "dialog.provider.viewAll": "Prikaži više provajdera",
 

@@ -1210,6 +1210,11 @@ export interface RecentsLoadedMessage {
   recents: ModelSelection[]
 }
 
+export interface ReviewModelLoadedMessage {
+  type: "reviewModelLoaded"
+  model: ModelSelection | null
+}
+
 export interface ModelUsageLoadedMessage {
   type: "modelUsageLoaded"
   usage: ModelUsageMap
@@ -2025,6 +2030,7 @@ export type ExtensionMessage =
   | AnacondaDesktopExtensionMessage
   | CustomProviderModelsFetchedMessage
   | RecentsLoadedMessage
+  | ReviewModelLoadedMessage
   | ModelSelectorExpandedLoadedMessage
   | FavoritesLoadedMessage
   | LanguageChangedMessage

@@ -83,6 +83,7 @@ import {
 import { Identifier } from "../utils/id"
 import { resolveModelSelection } from "./model-selection"
 import { COMPOSER, getAgentModel, getSelected } from "./session-model-store"
+import { createReviewModel } from "./session-review-model"
 import { isModelValid } from "./provider-utils"
 import { createSessionRecovery } from "./session-recovery"
 import { errorIDs, preserveSessionErrors, withoutResolvedSessionErrors } from "./session-errors"
@@ -780,6 +781,7 @@ export const SessionProvider: ParentComponent = (props) => {
   })
   vscode.postMessage({ type: "requestFavorites" })
   onCleanup(unsubFavorites)
+  const reviewModel = createReviewModel({ post: (m) => vscode.postMessage(m), listen: (h) => vscode.onMessage(h) })
 
   function handleError(message: Extract<ExtensionMessage, { type: "error" }>) {
     if (!message.sessionID || message.sessionID === currentSessionID()) setLoading(false)
@@ -2522,7 +2524,7 @@ export const SessionProvider: ParentComponent = (props) => {
     })
   }
 
-  function acceptSuggestion(requestID: string, index: number) {
+  function acceptSuggestion(requestID: string, index: number, model?: ModelSelection | null) {
     clearSuggestionError(requestID)
     setRespondingSuggestions((prev) => new Set(prev).add(requestID))
     const sid = suggestions().find((s) => s.id === requestID)?.sessionID ?? currentSessionID() ?? ""
@@ -2531,6 +2533,7 @@ export const SessionProvider: ParentComponent = (props) => {
       requestID,
       sessionID: sid,
       index,
+      ...(model ? { model } : {}),
     })
   }
 
@@ -3028,6 +3031,7 @@ export const SessionProvider: ParentComponent = (props) => {
     recentModels: () => store.recentModels,
     modelUsageHistory: () => store.modelUsageHistory,
     favoriteModels: () => store.favoriteModels,
+    reviewModel,
     toggleFavorite,
     variantList,
     currentVariant,

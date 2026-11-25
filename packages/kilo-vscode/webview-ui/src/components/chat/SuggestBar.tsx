@@ -2,21 +2,37 @@ import { Button } from "@kilocode/kilo-ui/button"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import type { Component } from "solid-js"
-import { For, Show } from "solid-js"
+import { createMemo, createSignal, For, Show } from "solid-js"
 import { useLanguage } from "../../context/language"
+import { useProvider } from "../../context/provider"
 import { useSession } from "../../context/session"
-import type { SuggestionRequest } from "../../types/messages"
+import type { ModelSelection, SuggestionRequest } from "../../types/messages"
+import { ModelSelectorBase } from "../shared/ModelSelector"
 
 export const SuggestBar: Component<{ request: SuggestionRequest }> = (props) => {
   const session = useSession()
   const language = useLanguage()
+  const provider = useProvider()
 
   const error = () => session.suggestionErrors().has(props.request.id)
   const responding = () => session.respondingSuggestions().has(props.request.id)
 
+  const isReview = createMemo(() => props.request.actions.some((action) => action.prompt.startsWith("/review")))
+
+  // Per-banner pick; falls back to the remembered review model, then the session model.
+  const [pick, setPick] = createSignal<ModelSelection | null>(null)
+  const remembered = createMemo(() => {
+    const model = session.reviewModel()
+    if (!model) return null
+    return provider.findModel(model) ? model : null
+  })
+  const value = createMemo<ModelSelection | null>(
+    () => pick() ?? remembered() ?? session.selected(props.request.sessionID),
+  )
+
   const accept = (index: number) => {
     if (responding()) return
-    session.acceptSuggestion(props.request.id, index)
+    session.acceptSuggestion(props.request.id, index, isReview() ? value() : undefined)
   }
 
   const dismiss = () => {
@@ -41,6 +57,19 @@ export const SuggestBar: Component<{ request: SuggestionRequest }> = (props) => 
         </div>
       </Show>
       <div data-slot="suggest-bar-actions">
+        <Show when={isReview()}>
+          <span data-slot="suggest-bar-model">
+            <ModelSelectorBase
+              value={value()}
+              onSelect={(providerID, modelID) => setPick({ providerID, modelID })}
+              collapsed
+              favorites={false}
+              size="small"
+              placement="top-end"
+              label={language.t("review.model.label")}
+            />
+          </span>
+        </Show>
         <For each={props.request.actions}>
           {(action, index) => (
             <Button

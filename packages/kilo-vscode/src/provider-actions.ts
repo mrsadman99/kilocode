@@ -193,6 +193,12 @@ export function validateFavorites(raw: unknown): Array<{ providerID: string; mod
   return raw.filter(isModelSelection).map((r) => ({ providerID: r.providerID, modelID: r.modelID }))
 }
 
+/** Validate the remembered review model from untrusted sources. */
+export function validateReviewModel(raw: unknown): { providerID: string; modelID: string } | null {
+  if (!isModelSelection(raw)) return null
+  return { providerID: raw.providerID, modelID: raw.modelID }
+}
+
 /** Validate and sanitize per-mode model selections from untrusted sources. */
 export function validateModelSelections(raw: unknown): Record<string, { providerID: string; modelID: string }> {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {}

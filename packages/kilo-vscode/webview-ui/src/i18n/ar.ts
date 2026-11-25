@@ -109,6 +109,7 @@ export const dict = {
   "dialog.model.select": "تحديد",
   "dialog.model.expand": "توسيع",
   "dialog.model.collapse": "طي",
+  "review.model.label": "نموذج المراجعة",
 
   "dialog.provider.viewAll": "عرض المزيد من الموفرين",
 

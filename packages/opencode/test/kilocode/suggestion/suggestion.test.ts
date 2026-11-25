@@ -88,12 +88,40 @@ describe("suggestion", () => {
         const list = await Suggestion.list()
         await Suggestion.accept({ requestID: list[0]!.id, index: 1 })
 
-        await expect(ask).resolves.toEqual({
-          label: "Test",
-          description: "Run tests",
-          prompt: "Run the relevant tests now.",
+        await expect(ask).resolves.toMatchObject({
+          action: {
+            label: "Test",
+            description: "Run tests",
+            prompt: "Run the relevant tests now.",
+          },
         })
         await expect(Suggestion.list()).resolves.toEqual([])
+      },
+    })
+  })
+
+  test("accept carries the selected review model to the resolved action", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await provideTestInstance({
+      directory: tmp.path,
+      fn: async () => {
+        const ask = Suggestion.show({
+          sessionID: "ses_test",
+          text: "Review changes?",
+          actions: [{ label: "Review", prompt: "/review uncommitted" }],
+        })
+
+        const list = await Suggestion.list()
+        await Suggestion.accept({
+          requestID: list[0]!.id,
+          index: 0,
+          model: { providerID: "anthropic", modelID: "claude-sonnet-4-5" },
+        })
+
+        await expect(ask).resolves.toEqual({
+          action: { label: "Review", prompt: "/review uncommitted" },
+          model: { providerID: "anthropic", modelID: "claude-sonnet-4-5" },
+        })
       },
     })
   })
@@ -122,7 +150,9 @@ describe("suggestion", () => {
           command: "review",
           actionCount: 1,
         })
-        await expect(ask).resolves.toEqual({ label: "Review", prompt: "/review uncommitted --focus tests" })
+        await expect(ask).resolves.toMatchObject({
+          action: { label: "Review", prompt: "/review uncommitted --focus tests" },
+        })
       },
     })
   })
@@ -196,7 +226,9 @@ describe("suggestion", () => {
           command: "review",
           actionCount: 2,
         })
-        await expect(ask).resolves.toEqual({ label: "Review", prompt: "/review branch release focus on tests" })
+        await expect(ask).resolves.toMatchObject({
+          action: { label: "Review", prompt: "/review branch release focus on tests" },
+        })
       },
     })
   })
@@ -219,7 +251,7 @@ describe("suggestion", () => {
 
         expect(shown).toHaveBeenCalledTimes(0)
         expect(accepted).toHaveBeenCalledTimes(0)
-        await expect(ask).resolves.toEqual({ label: "Test", prompt: "/custom-project-command" })
+        await expect(ask).resolves.toMatchObject({ action: { label: "Test", prompt: "/custom-project-command" } })
       },
     })
   })

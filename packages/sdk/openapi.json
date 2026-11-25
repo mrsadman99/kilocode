@@ -23025,6 +23025,19 @@
                     "type": "integer",
                     "minimum": 0,
                     "description": "Zero-based action index to accept"
+                  },
+                  "model": {
+                    "type": "object",
+                    "properties": {
+                      "providerID": {
+                        "type": "string"
+                      },
+                      "modelID": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["providerID", "modelID"],
+                    "additionalProperties": false
                   }
                 },
                 "required": ["index"],

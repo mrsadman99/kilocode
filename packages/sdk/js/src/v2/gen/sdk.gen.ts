@@ -10431,6 +10431,10 @@ export class Suggestion extends HeyApiClient {
       directory?: string
       workspace?: string
       index: number
+      model?: {
+        providerID: string
+        modelID: string
+      }
     },
     options?: Options<never, ThrowOnError>,
   ) {
@@ -10443,6 +10447,7 @@ export class Suggestion extends HeyApiClient {
             { in: "query", key: "directory" },
             { in: "query", key: "workspace" },
             { in: "body", key: "index" },
+            { in: "body", key: "model" },
           ],
         },
       ],

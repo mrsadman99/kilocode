@@ -116,6 +116,7 @@ export const dict = {
   "dialog.model.select": "선택",
   "dialog.model.expand": "펼치기",
   "dialog.model.collapse": "접기",
+  "review.model.label": "리뷰 모델",
 
   "dialog.provider.viewAll": "더 많은 공급자 보기",
 

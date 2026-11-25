@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Вибрати",
   "dialog.model.expand": "Розгорнути",
   "dialog.model.collapse": "Згорнути",
+  "review.model.label": "Модель рев'ю",
 
   "dialog.provider.viewAll": "Показати більше провайдерів",
 

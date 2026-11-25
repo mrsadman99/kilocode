@@ -20875,6 +20875,10 @@ export type SuggestionAcceptData = {
      * Zero-based action index to accept
      */
     index: number
+    model?: {
+      providerID: string
+      modelID: string
+    }
   }
   path: {
     requestID: string

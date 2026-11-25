@@ -17,6 +17,7 @@ export interface SuggestionContext {
   readonly sessionDirectories: ReadonlyMap<string, string>
   postMessage(msg: unknown): void
   getWorkspaceDirectory(sessionId?: string): string
+  persistReviewModel?: (model: { providerID: string; modelID: string }) => Promise<void>
 }
 
 export function recoverableSuggestions(items: RecoverableSuggestion[], tracked: Set<string>, seen: Set<string>) {
@@ -33,11 +34,17 @@ export function recoverableSuggestions(items: RecoverableSuggestion[], tracked: 
  */
 export async function routeSuggestionWebviewMessage(
   ctx: SuggestionContext,
-  message: { type: string; requestID?: string; sessionID?: string; index?: number },
+  message: {
+    type: string
+    requestID?: string
+    sessionID?: string
+    index?: number
+    model?: { providerID?: string; modelID?: string }
+  },
 ): Promise<void> {
   switch (message.type) {
     case "suggestionAccept":
-      await handleSuggestionAccept(ctx, message.requestID!, message.index!, message.sessionID)
+      await handleSuggestionAccept(ctx, message.requestID!, message.index!, message.sessionID, message.model)
       break
     case "suggestionDismiss":
       await handleSuggestionDismiss(ctx, message.requestID!, message.sessionID)
@@ -50,17 +57,32 @@ export async function handleSuggestionAccept(
   requestID: string,
   index: number,
   sessionID?: string,
+  model?: { providerID?: string; modelID?: string },
 ): Promise<void> {
   if (!ctx.client) {
     ctx.postMessage({ type: "suggestionError", requestID })
     return
   }
 
+  const pick =
+    typeof model?.providerID === "string" && typeof model?.modelID === "string"
+      ? { providerID: model.providerID, modelID: model.modelID }
+      : undefined
+
   try {
     await ctx.client.suggestion.accept(
-      { requestID, index, directory: ctx.getWorkspaceDirectory(sessionID ?? ctx.currentSessionId) },
+      {
+        requestID,
+        index,
+        directory: ctx.getWorkspaceDirectory(sessionID ?? ctx.currentSessionId),
+        ...(pick ? { model: pick } : {}),
+      },
       { throwOnError: true },
     )
+    if (pick) {
+      await ctx.persistReviewModel?.(pick)
+      ctx.postMessage({ type: "reviewModelLoaded", model: pick })
+    }
   } catch (error) {
     console.error("[Kilo New] KiloProvider: Failed to accept suggestion:", error)
     ctx.postMessage({ type: "suggestionError", requestID })

@@ -17,6 +17,14 @@ export const SuggestionAcceptPayload = Schema.Struct({
   index: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)).annotate({
     description: "Zero-based action index to accept",
   }),
+  model: Schema.optional(
+    Schema.Struct({
+      providerID: Schema.String,
+      modelID: Schema.String,
+    }),
+  ).annotate({
+    description: "Model to run the accepted review with, overriding the session model for the review turn",
+  }),
 })
 
 export const SuggestionPaths = {

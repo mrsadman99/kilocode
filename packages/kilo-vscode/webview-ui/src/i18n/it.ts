@@ -106,6 +106,7 @@ export const dict = {
   "dialog.model.select": "Seleziona",
   "dialog.model.expand": "Espandi",
   "dialog.model.collapse": "Comprimi",
+  "review.model.label": "Modello di revisione",
   "dialog.provider.viewAll": "Mostra altri provider",
   "provider.connect.title": "Connetti {{provider}}",
   "provider.connect.selectMethod": "Seleziona metodo di accesso per {{provider}}.",

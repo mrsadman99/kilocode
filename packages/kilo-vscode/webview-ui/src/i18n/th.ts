@@ -111,6 +111,7 @@ export const dict = {
   "dialog.model.select": "เลือก",
   "dialog.model.expand": "ขยาย",
   "dialog.model.collapse": "ยุบ",
+  "review.model.label": "โมเดลรีวิว",
 
   "dialog.provider.viewAll": "แสดงผู้ให้บริการเพิ่มเติม",
 

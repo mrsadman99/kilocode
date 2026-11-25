@@ -109,6 +109,8 @@ export const dict = {
   "dialog.model.expand": "Expand",
   "dialog.model.collapse": "Collapse",
 
+  "review.model.label": "Review model",
+
   "dialog.provider.viewAll": "Show more providers",
 
   "provider.connect.title": "Connect {{provider}}",

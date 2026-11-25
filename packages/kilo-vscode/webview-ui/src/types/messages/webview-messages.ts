@@ -447,6 +447,7 @@ export interface SuggestionAcceptRequest {
   requestID: string
   sessionID: string
   index: number
+  model?: ModelSelection
 }
 
 export interface SuggestionDismissRequest {
@@ -1652,6 +1653,10 @@ export interface RequestRecentsMessage {
   type: "requestRecents"
 }
 
+export interface RequestReviewModelMessage {
+  type: "requestReviewModel"
+}
+
 export interface RecordModelUsageMessage {
   type: "recordModelUsage"
   providerID: string
@@ -2024,6 +2029,7 @@ export type WebviewMessage =
   | RequestModelSelectorExpandedMessage
   | ToggleFavoriteRequest
   | RequestFavoritesMessage
+  | RequestReviewModelMessage
   | ToggleRemoteMessage
   | ToggleCaffeinationMessage
   | SetRemoteEnabledMessage

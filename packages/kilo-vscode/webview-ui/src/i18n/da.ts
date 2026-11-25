@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Vælg",
   "dialog.model.expand": "Udvid",
   "dialog.model.collapse": "Skjul",
+  "review.model.label": "Gennemgangsmodel",
 
   "dialog.provider.viewAll": "Vis flere udbydere",
 

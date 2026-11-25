@@ -161,6 +161,7 @@ import {
   fetchProviderData,
   validateRecents,
   validateFavorites,
+  validateReviewModel,
   connectProvider as connectProviderAction,
   authorizeProviderOAuth as authorizeOAuthAction,
   completeProviderOAuth as completeOAuthAction,
@@ -1743,6 +1744,11 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "requestFavorites": {
           const favorites = validateFavorites(this.extensionContext?.globalState.get("favoriteModels"))
           this.postMessage({ type: "favoritesLoaded", favorites })
+          break
+        }
+        case "requestReviewModel": {
+          const model = validateReviewModel(this.extensionContext?.globalState.get("reviewModel"))
+          this.postMessage({ type: "reviewModelLoaded", model })
           break
         }
         case "enhancePrompt": {
@@ -5110,6 +5116,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       getQuestionRevision: () => this.connectionService.getQuestionRevision(),
       pruneQuestionDirectories: (active: Set<string>, dirs: Set<string>) =>
         this.connectionService.pruneQuestionDirectories(active, dirs),
+      persistReviewModel: async (model: { providerID: string; modelID: string }) => {
+        await this.extensionContext?.globalState.update("reviewModel", model)
+      },
     }
   }
 

@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "選択",
   "dialog.model.expand": "展開",
   "dialog.model.collapse": "折りたたむ",
+  "review.model.label": "レビューモデル",
 
   "dialog.provider.viewAll": "さらにプロバイダーを表示",
 

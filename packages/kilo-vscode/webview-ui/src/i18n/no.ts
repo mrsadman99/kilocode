@@ -115,6 +115,7 @@ export const dict = {
   "dialog.model.select": "Velg",
   "dialog.model.expand": "Utvid",
   "dialog.model.collapse": "Skjul",
+  "review.model.label": "Gjennomgangsmodell",
 
   "dialog.provider.viewAll": "Vis flere leverandører",
 

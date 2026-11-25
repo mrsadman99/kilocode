@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Selecteren",
   "dialog.model.expand": "Uitvouwen",
   "dialog.model.collapse": "Samenvouwen",
+  "review.model.label": "Reviewmodel",
 
   "dialog.provider.viewAll": "Meer providers tonen",
 

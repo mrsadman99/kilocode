@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Seç",
   "dialog.model.expand": "Genişlet",
   "dialog.model.collapse": "Daralt",
+  "review.model.label": "İnceleme modeli",
 
   "dialog.provider.viewAll": "Daha fazla sağlayıcı göster",
 
