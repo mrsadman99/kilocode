@@ -411,8 +411,7 @@ export const SessionProvider: ParentComponent = (props) => {
       fallback: defaultAgent(),
     })
   }
-  // Draft scopes keep per-agent picks that transfer on promotion and remember effort.
-  const isDraftScope = (id: string) => id === COMPOSER || /^(?:sidebar-)?pending:/.test(id)
+  // Draft scopes keep per-agent picks that transfer on promotion.
   const agentDrafts = createDraftAgentSeed({
     selections: () => store.agentSelections,
     pending: pendingAgentSelection,
@@ -551,7 +550,6 @@ export const SessionProvider: ParentComponent = (props) => {
     find: provider.findModel,
     post: vscode.postMessage,
     listen: vscode.onMessage,
-    draft: isDraftScope,
     remember: rememberEffort,
   })
   const { carry: carryVariant, list: variantList, agent: variantForAgent, current: currentVariant } = variants
@@ -570,13 +568,11 @@ export const SessionProvider: ParentComponent = (props) => {
     const id = sessionID ?? currentSessionID() ?? COMPOSER
     batch(() => {
       models.select(providerID, modelID, id)
-      if (isDraftScope(id)) {
-        const model = { providerID, modelID }
-        const agent = agentForScope(id)
-        const value = store.variantSelections[variantKey(model, agent, id)] ?? variantForAgent(agent, model)
-        const list = Object.keys(provider.findModel(model)?.variants ?? {})
-        rememberEffort(agent, model, value === "" ? "" : (preserveVariant(value, list) ?? ""))
-      }
+      const model = { providerID, modelID }
+      const agent = agentForScope(id)
+      const value = store.variantSelections[variantKey(model, agent, id)] ?? variantForAgent(agent, model)
+      const list = Object.keys(provider.findModel(model)?.variants ?? {})
+      rememberEffort(agent, model, value === "" ? "" : (preserveVariant(value, list) ?? ""))
     })
   }
 
