@@ -1,34 +1,20 @@
-import type { Session, SessionStatus } from "@kilocode/sdk/v2/client"
+import type { Session } from "@kilocode/sdk/v2/client"
 import type { KiloConnectionService } from "../services/cli-backend"
 import { forkSession } from "../agent-manager/fork-session"
-import { isRunningStatus } from "../session-status"
 
 export interface ForkContext {
   connection: KiloConnectionService
   post: (message: { type: "error"; message: string }) => void
   register: (session: Session) => void
   forked: (session: Session, sourceID: string) => void
-  status: (sessionID: string) => SessionStatus["type"] | undefined
   directory: (sessionID: string) => string
 }
 
 export async function handleForkSession(ctx: ForkContext, sessionId: string, messageId?: string): Promise<void> {
-  const status =
-    ctx.status(sessionId) ??
-    (await Promise.resolve()
-      .then(() =>
-        ctx.connection.getClient().session.status({ directory: ctx.directory(sessionId) }, { throwOnError: true }),
-      )
-      .then((result) => result.data?.[sessionId]?.type ?? "idle")
-      .catch((e) => {
-        console.error("[Kilo New] refreshForkStatus failed:", e)
-        return "busy" as SessionStatus["type"]
-      }))
-  if (isRunningStatus(status)) {
-    ctx.post({ type: "error", message: "Wait for the session to finish before forking it." })
-    return
-  }
-
+  // Forking snapshots the transcript at the fork point even while the source is
+  // running: the CLI copies the messages present at that moment, drops transient
+  // parts and detaches in-flight tasks, so the fork opens in the same state the
+  // dialog was in — just like forking an idle session.
   await forkSession(
     {
       getClient: () => ctx.connection.getClient(),

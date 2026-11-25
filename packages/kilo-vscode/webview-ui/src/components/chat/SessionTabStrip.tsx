@@ -9,7 +9,7 @@ import { useConfig } from "../../context/config"
 import { useTabScroll } from "../../utils/tab-scroll"
 import { focusPrompt, focusSelectedTab, focusTabElement, handleTabKey } from "../../utils/tab-navigation"
 import { setTabWidths } from "../../utils/tab-widths"
-import { label, running } from "../../utils/session-activity"
+import { label } from "../../utils/session-activity"
 import { useVSCode } from "../../context/vscode"
 import { SessionTab } from "./SessionTab"
 import { SessionTabMenu } from "./SessionTabMenu"
@@ -33,7 +33,6 @@ export const SessionTabStrip: Component = () => {
     return items().get(id)?.title || language.t("session.untitled")
   }
   const state = (id: string) => (isPendingTab(id) ? "idle" : session.activityFor(id))
-  const working = (id: string) => running(state(id))
   const middle = (id: string, event: MouseEvent) => {
     if (event.button !== 1) return
     event.preventDefault()
@@ -147,7 +146,7 @@ export const SessionTabStrip: Component = () => {
                       <SessionTabMenu
                         showFork
                         onFork={
-                          !isPendingTab(id) && !working(id)
+                          !isPendingTab(id)
                             ? () => vscode.postMessage({ type: "forkSession", sessionId: id })
                             : undefined
                         }

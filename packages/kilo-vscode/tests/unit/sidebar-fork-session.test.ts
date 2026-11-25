@@ -16,7 +16,6 @@ function ctx(overrides: Partial<ForkContext> = {}): ForkContext {
     post: () => undefined,
     register: () => undefined,
     forked: () => undefined,
-    status: () => "idle",
     directory: () => "/repo",
     ...overrides,
   }
@@ -34,13 +33,17 @@ describe("sidebar fork session", () => {
     expect(forked).toHaveBeenCalledWith(session, "source")
   })
 
-  it("rejects a non-idle source before forking", async () => {
-    const forked = mock(() => undefined)
+  it("forks a running source immediately at the requested fork point", async () => {
+    const fork = mock(async () => ({ data: session }))
     const post = mock(() => undefined)
+    const client = { session: { fork, promptAsync: mock(async () => ({})) } }
 
-    await handleForkSession(ctx({ forked, post, status: () => "busy" }), "source")
+    await handleForkSession(ctx({ connection: { getClient: () => client } as never, post }), "source", "message")
 
-    expect(forked).not.toHaveBeenCalled()
-    expect(post).toHaveBeenCalledWith({ type: "error", message: "Wait for the session to finish before forking it." })
+    expect(fork).toHaveBeenCalledWith(
+      { sessionID: "source", directory: "/repo", messageID: "message" },
+      { throwOnError: true },
+    )
+    expect(post).not.toHaveBeenCalled()
   })
 })
