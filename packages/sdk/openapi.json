@@ -14037,7 +14037,7 @@
                   },
                   "endpoint": {
                     "type": "string",
-                    "enum": ["completions", "generate"]
+                    "enum": ["completions", "generate", "chat"]
                   },
                   "stop": {
                     "type": "array",
@@ -14049,6 +14049,9 @@
                     "type": "string"
                   },
                   "apiKey": {
+                    "type": "string"
+                  },
+                  "system": {
                     "type": "string"
                   }
                 },

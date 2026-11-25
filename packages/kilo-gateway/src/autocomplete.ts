@@ -1,13 +1,242 @@
 export type AutocompleteProviderID = "kilo" | "mistral" | "local" | "custom"
 export type DirectAutocompleteProviderID = Exclude<AutocompleteProviderID, "kilo" | "local" | "custom">
 
-/** FIM prompt templates for local models, assembled client-side. */
-export type FimTemplateID = "starcoder" | "qwen" | "codellama"
-export const FIM_TEMPLATE_IDS: readonly FimTemplateID[] = ["starcoder", "qwen", "codellama"]
-
 /** Local server API used for FIM requests. */
 export type LocalFimEndpoint = "completions" | "generate"
 export const LOCAL_FIM_ENDPOINTS: readonly LocalFimEndpoint[] = ["completions", "generate"]
+
+/** FIM prompt profiles for models whose hole must be encoded client-side. */
+export type FimTemplateID =
+  | "starcoder"
+  | "santacoder"
+  | "qwen"
+  | "qwen3"
+  | "codegemma"
+  | "codellama"
+  | "deepseek"
+  | "mellum"
+  | "seed"
+  | "codegeex"
+export const FIM_TEMPLATE_IDS: readonly FimTemplateID[] = [
+  "qwen",
+  "qwen3",
+  "codegemma",
+  "starcoder",
+  "santacoder",
+  "deepseek",
+  "mellum",
+  "seed",
+  "codellama",
+  "codegeex",
+]
+
+export function validFimTemplate(value: unknown) {
+  if (typeof value !== "string") return false
+  return FIM_TEMPLATE_IDS.includes(value as FimTemplateID)
+}
+
+export function validLocalFimEndpoint(value: unknown) {
+  if (typeof value !== "string") return false
+  return LOCAL_FIM_ENDPOINTS.includes(value as LocalFimEndpoint)
+}
+
+/**
+ * A declarative FIM profile. The HTTP transport (native suffix, raw prompt, or
+ * chat messages) is chosen separately; a profile only describes how to encode
+ * the hole for a specific model family. `pre`/`suf`/`mid` are the literal
+ * markers placed before the prefix, before the suffix, and at the generation
+ * start respectively. `order` selects prefix-suffix-middle vs suffix-first.
+ */
+export interface FimProfile {
+  label: string
+  order: "psm" | "spm"
+  pre: string
+  suf: string
+  mid: string
+  stop: string[]
+  /** Default local server API for the raw transport. */
+  endpoint?: LocalFimEndpoint
+  /** System instruction used only by the chat transport. */
+  system?: string
+  /** Supports an optional leading `<filename>` segment (Mellum). */
+  filename?: boolean
+  /** Raw role wrapper applied around the markers in raw-prompt mode (CodeGeeX). */
+  wrap?: [string, string]
+  /** Cannot be sent through the generic chat transport (would double-wrap). */
+  rawOnly?: boolean
+}
+
+const QWEN_SYSTEM = "You are a code completion assistant."
+
+export const profiles: Record<FimTemplateID, FimProfile> = {
+  qwen: {
+    label: "Qwen2.5-Coder",
+    endpoint: "generate",
+    order: "psm",
+    pre: "<|fim_prefix|>",
+    suf: "<|fim_suffix|>",
+    mid: "<|fim_middle|>",
+    stop: ["<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", "<|endoftext|>", "<|file_sep|>"],
+    rawOnly: true,
+  },
+  qwen3: {
+    label: "Qwen3-Coder / Next",
+    endpoint: "generate",
+    order: "psm",
+    pre: "<|fim_prefix|>",
+    suf: "<|fim_suffix|>",
+    mid: "<|fim_middle|>",
+    stop: ["<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", "<|endoftext|>"],
+    system: QWEN_SYSTEM,
+  },
+  codegemma: {
+    label: "CodeGemma",
+    endpoint: "generate",
+    order: "psm",
+    pre: "<|fim_prefix|>",
+    suf: "<|fim_suffix|>",
+    mid: "<|fim_middle|>",
+    stop: ["<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", "<|file_separator|>", "<|end_of_turn|>", "<eos>"],
+    rawOnly: true,
+  },
+  starcoder: {
+    label: "StarCoder / StarCoder2 / Stable Code",
+    endpoint: "completions",
+    order: "psm",
+    pre: "<fim_prefix>",
+    suf: "<fim_suffix>",
+    mid: "<fim_middle>",
+    stop: ["<fim_prefix>", "<fim_suffix>", "<fim_middle>", "<|endoftext|>", "<file_sep>"],
+    rawOnly: true,
+  },
+  santacoder: {
+    label: "SantaCoder",
+    endpoint: "completions",
+    order: "psm",
+    pre: "<fim-prefix>",
+    suf: "<fim-suffix>",
+    mid: "<fim-middle>",
+    stop: ["<fim-prefix>", "<fim-suffix>", "<fim-middle>", "<|endoftext|>"],
+    rawOnly: true,
+  },
+  deepseek: {
+    label: "DeepSeek-Coder Base",
+    endpoint: "completions",
+    order: "psm",
+    pre: "<｜fim▁begin｜>",
+    suf: "<｜fim▁hole｜>",
+    mid: "<｜fim▁end｜>",
+    stop: ["<｜fim▁begin｜>", "<｜fim▁hole｜>", "<｜fim▁end｜>"],
+    rawOnly: true,
+  },
+  mellum: {
+    label: "JetBrains Mellum",
+    endpoint: "completions",
+    order: "spm",
+    pre: "<fim_prefix>",
+    suf: "<fim_suffix>",
+    mid: "<fim_middle>",
+    stop: ["<fim_prefix>", "<fim_suffix>", "<fim_middle>"],
+    filename: true,
+    rawOnly: true,
+  },
+  seed: {
+    label: "Seed-Coder",
+    endpoint: "completions",
+    order: "spm",
+    pre: "<[fim-prefix]>",
+    suf: "<[fim-suffix]>",
+    mid: "<[fim-middle]>",
+    stop: ["<[fim-prefix]>", "<[fim-suffix]>", "<[fim-middle]>"],
+    rawOnly: true,
+  },
+  codellama: {
+    label: "CodeLlama",
+    endpoint: "generate",
+    order: "psm",
+    pre: "<PRE> ",
+    suf: " <SUF> ",
+    mid: " <MID>",
+    stop: ["<PRE>", "<SUF>", "<MID>", "<EOT>"],
+    rawOnly: true,
+  },
+  codegeex: {
+    label: "CodeGeeX4",
+    endpoint: "completions",
+    order: "spm",
+    pre: "<|code_prefix|>",
+    suf: "<|code_suffix|>",
+    mid: "<|code_middle|>",
+    stop: ["<|code_prefix|>", "<|code_suffix|>", "<|code_middle|>"],
+    wrap: ["<|user|>\n", "<|assistant|>\n"],
+  },
+}
+
+/** Match a concrete checkpoint name to a profile; returns undefined for unknown models. */
+export function matchFimProfile(model: string): FimTemplateID | undefined {
+  const name = model.toLowerCase()
+  if (name.includes("santacoder")) return "santacoder"
+  if (name.includes("starcoder") || name.includes("stable-code") || name.includes("stablecode")) return "starcoder"
+  if (name.includes("codegemma")) return "codegemma"
+  if (name.includes("qwen3-coder") || name.includes("qwen3coder")) return "qwen3"
+  if (name.includes("qwen2.5-coder") || name.includes("qwen2-coder") || name.includes("codeqwen")) return "qwen"
+  if (name.includes("deepseek-coder") || name.includes("deepseekcoder")) return "deepseek"
+  if (name.includes("mellum")) return "mellum"
+  if (name.includes("seed-coder") || name.includes("seedcoder")) return "seed"
+  if (name.includes("codegeex")) return "codegeex"
+  if (name.includes("codellama") || name.includes("code-llama") || name.includes("code_llama")) return "codellama"
+  return undefined
+}
+
+/**
+ * Resolve the profile to render. An explicit known profile wins; otherwise the
+ * checkpoint name is matched. Unknown models throw instead of silently falling
+ * back to Qwen markers, which would produce a valid request with a wrong prompt.
+ */
+export function resolveFimProfile(setting: string, model: string): FimTemplateID {
+  if (setting && setting !== "auto" && Object.hasOwn(profiles, setting)) return setting as FimTemplateID
+  const name = model?.trim() ?? ""
+  if (!name) return "qwen"
+  const inferred = matchFimProfile(name)
+  if (inferred) return inferred
+  throw new Error(
+    `No FIM profile matches "${model}". Choose a profile explicitly in Settings → Models → Autocomplete.`,
+  )
+}
+
+export interface RenderedFim {
+  prompt: string
+  stop: string[]
+  system?: string
+}
+
+/**
+ * Render the hole for a profile. In chat mode the markers become the user
+ * message content (the server applies its own chat template); role wrappers and
+ * the filename segment are raw-prompt concerns and are omitted.
+ */
+export function renderFim(
+  id: FimTemplateID,
+  prefix: string,
+  suffix: string,
+  chat = false,
+  filename?: string,
+): RenderedFim {
+  const profile = profiles[id]
+  const core =
+    profile.order === "psm"
+      ? profile.pre + prefix + profile.suf + suffix + profile.mid
+      : profile.suf + suffix + profile.pre + prefix + profile.mid
+  if (chat) {
+    if (profile.rawOnly)
+      throw new Error(`The ${profile.label} profile is raw-prompt only and cannot be sent as chat messages.`)
+    return { prompt: core, stop: profile.stop, ...(profile.system ? { system: profile.system } : {}) }
+  }
+  let prompt = core
+  if (profile.filename && filename) prompt = `<filename>${filename}\n${prompt}`
+  if (profile.wrap) prompt = profile.wrap[0] + prompt + profile.wrap[1]
+  return { prompt, stop: profile.stop }
+}
 
 export const DEFAULT_LOCAL_MODEL = "qwen2.5-coder:7b"
 export const DEFAULT_LOCAL_BASE_URL = "http://127.0.0.1:11434"
@@ -161,14 +390,4 @@ export function validAutocompleteProvider(value: unknown) {
 export function validAutocompleteModel(value: unknown) {
   if (typeof value !== "string") return false
   return models.some((m) => m.modelID === value)
-}
-
-export function validFimTemplate(value: unknown) {
-  if (typeof value !== "string") return false
-  return FIM_TEMPLATE_IDS.includes(value as FimTemplateID)
-}
-
-export function validLocalFimEndpoint(value: unknown) {
-  if (typeof value !== "string") return false
-  return LOCAL_FIM_ENDPOINTS.includes(value as LocalFimEndpoint)
 }

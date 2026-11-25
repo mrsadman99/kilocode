@@ -915,12 +915,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofuldførelsesforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For at vælge hvilken model der bruges til autofuldførelse, se Modelindstillinger.",
-  "settings.autocomplete.custom.format.title": "API-format",
-  "settings.autocomplete.custom.format.description":
-    "Hvordan endpointet forventer FIM-anmodninger: native prompt+suffix eller en klientside skabelon via /v1/completions eller Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM-skabelon",
-  "settings.autocomplete.custom.template.description":
-    "Prompts skabelon til skabelonformaterne; Auto registrerer den fra modelnavnet",
+  "settings.autocomplete.custom.transport.title": "Raw-prompt-API",
+  "settings.autocomplete.custom.transport.description": "Hvilken completions-API der modtager raw-prompten",
+  "settings.autocomplete.custom.mode.title": "Inputtilstand",
+  "settings.autocomplete.custom.mode.description":
+    "Hvordan endpointet forventer fuldførelser: native prompt+suffix, en skabelonbaseret raw-prompt eller chatbeskeder",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-profil",
+  "settings.autocomplete.custom.profile.description":
+    "Hvordan fill-in-the-middle-hullet kodet; Auto registrerer det fra modelnavnet",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto kunne ikke registrere en profil for "{{model}}" — vælg en profil eksplicit.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chattilstand kræver en model for at udfylde hullet.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Modelnavn på det brugerdefinerede endpoint (f.eks. deepseek-chat)",

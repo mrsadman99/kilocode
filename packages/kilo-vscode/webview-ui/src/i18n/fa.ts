@@ -898,12 +898,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "فعال‌سازی تکمیل خودکار متن چت",
   "settings.autocomplete.chatAutocomplete.description": "نمایش پیشنهادات تکمیل خودکار در کادر متنی چت",
   "settings.autocomplete.modelsHint": "برای انتخاب مدل مورد استفاده در تکمیل خودکار، به تنظیمات مدل‌ها مراجعه کنید.",
-  "settings.autocomplete.custom.format.title": "قالب API",
-  "settings.autocomplete.custom.format.description":
-    "نحوه انتظار نقطه پایانی برای درخواست‌های FIM: prompt+suffix بومی یا الگوی سمت کلاینت از طریق /v1/completions یا Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "الگوی FIM",
-  "settings.autocomplete.custom.template.description":
-    "الگوی پرامپت برای قالب‌های الگودار؛ Auto آن را از نام مدل تشخیص می‌دهد",
+  "settings.autocomplete.custom.transport.title": "API پرامپت خام",
+  "settings.autocomplete.custom.transport.description": "کدام API تکمیل، پرامپت خام را دریافت می‌کند",
+  "settings.autocomplete.custom.mode.title": "حالت ورودی",
+  "settings.autocomplete.custom.mode.description":
+    "نحوه انتظار نقطه پایانی برای درخواست‌های تکمیل: prompt+suffix بومی، پرامپت خام الگودار یا پیام‌های چت",
+  "settings.autocomplete.custom.mode.native": "بومی",
+  "settings.autocomplete.custom.mode.raw": "خام",
+  "settings.autocomplete.custom.mode.chat": "چت",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "نمایه FIM",
+  "settings.autocomplete.custom.profile.description":
+    "نحوه کدگذاری حفره fill-in-the-middle؛ Auto آن را از نام مدل تشخیص می‌دهد",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto نتوانست نمایه‌ای برای "{{model}}" تشخیص دهد — یک نمایه صریح انتخاب کنید.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "حالت چت برای پر کردن حفره به یک مدل نیاز دارد.",
   "settings.autocomplete.custom.auto": "خودکار",
   "settings.autocomplete.custom.model.title": "مدل",
   "settings.autocomplete.custom.model.description": "نام مدل در نقطه پایانی سفارشی (مثلاً deepseek-chat)",

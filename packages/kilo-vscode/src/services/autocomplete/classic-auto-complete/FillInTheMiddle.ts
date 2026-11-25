@@ -7,6 +7,7 @@ import {
 } from "../types"
 import { getProcessedSnippets } from "./getProcessedSnippets"
 import { codestralTemplate } from "../continuedev/core/autocomplete/templating/AutocompleteTemplate"
+import { findUriInDirs } from "../continuedev/core/util/uri"
 import { generateFim } from "../fim"
 import type { KiloConnectionService } from "../../cli-backend"
 
@@ -43,7 +44,12 @@ export class FimPromptBuilder {
       workspaceDirs,
     )
 
+    const path =
+      !autocompleteInput.isUntitledFile && this.contextProvider.modelId.startsWith("custom/")
+        ? findUriInDirs(filepathUri, workspaceDirs)
+        : undefined
     return {
+      filename: path?.foundInDir ? path.relativePathOrBasename : undefined,
       formattedPrefix,
       prunedSuffix,
       autocompleteInput,
@@ -65,7 +71,15 @@ export class FimPromptBuilder {
     const onChunk = (text: string) => {
       response += text
     }
-    const usageInfo = await generateFim(connection, modelId, formattedPrefix, prunedSuffix, onChunk, signal)
+    const usageInfo = await generateFim(
+      connection,
+      modelId,
+      formattedPrefix,
+      prunedSuffix,
+      onChunk,
+      signal,
+      prompt.filename,
+    )
 
     const fillInAtCursorSuggestion = processSuggestion(response)
 

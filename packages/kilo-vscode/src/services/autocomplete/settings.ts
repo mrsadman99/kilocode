@@ -70,7 +70,8 @@ function validCustomSetting(key: string, value: unknown) {
   if (value === null || value === undefined) return true
   if (key === "customModel" || key === "customBaseURL" || key === "customApiKey" || key === "customProxy")
     return typeof value === "string"
-  if (key === "customFormat") return value === "openai" || value === "completions" || value === "generate"
+  if (key === "customFormat")
+    return value === "openai" || value === "completions" || value === "generate" || value === "chat"
   if (key === "customTemplate") return value === "auto" || validFimTemplate(value)
   return false
 }

@@ -184,4 +184,44 @@ describe("requestLocalFim", () => {
       'data: {"choices":[{"text":"ok"}]}\n\ndata: {"choices":[{"text":""}],"usage":{"prompt_tokens":0,"completion_tokens":1}}\n\n',
     )
   })
+
+  test("sends Bearer auth when a key is configured", async () => {
+    const seen: (string | null)[] = []
+    const server = Bun.serve({
+      port: 0,
+      fetch(req) {
+        seen.push(req.headers.get("authorization"))
+        return new Response('{"response":"ok","done":true,"eval_count":1}\n', {
+          headers: { "Content-Type": "application/x-ndjson" },
+        })
+      },
+    })
+    try {
+      const target = { ...generate, url: `${server.url}api/generate`, apiKey: "sk-test" }
+      await requestLocalFim(target, { prefix: "prompt" }, AbortSignal.timeout(5000))
+      expect(seen).toEqual(["Bearer sk-test"])
+    } finally {
+      server.stop(true)
+    }
+  })
+
+  test("omits Authorization entirely when no key is configured", async () => {
+    const seen: (string | null)[] = []
+    const server = Bun.serve({
+      port: 0,
+      fetch(req) {
+        seen.push(req.headers.get("authorization"))
+        return new Response('{"response":"ok","done":true,"eval_count":1}\n', {
+          headers: { "Content-Type": "application/x-ndjson" },
+        })
+      },
+    })
+    try {
+      const target = { ...generate, url: `${server.url}api/generate` }
+      await requestLocalFim(target, { prefix: "prompt" }, AbortSignal.timeout(5000))
+      expect(seen).toEqual([null])
+    } finally {
+      server.stop(true)
+    }
+  })
 })

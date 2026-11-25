@@ -191,3 +191,127 @@ describe("fim custom provider", () => {
     }
   })
 })
+
+describe("fim custom chat provider", () => {
+  const CHAT_SSE = 'data: {"choices":[{"delta":{"content":"hi"}}]}\n\ndata: [DONE]\n\n'
+
+  function chat(dir: string, baseURL: string, extra: Record<string, unknown> = {}) {
+    return app().request("/kilo/fim", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-kilo-directory": dir },
+      body: JSON.stringify({
+        prefix: "def fib(a):",
+        suffix: "",
+        provider: "custom",
+        model: "deepseek-chat",
+        baseURL,
+        endpoint: "chat",
+        ...extra,
+      }),
+    })
+  }
+
+  test("posts a single user message and passes delta.content through", async () => {
+    const seen: { auth: string | null; body: Record<string, unknown> }[] = []
+    const server = Bun.serve({
+      port: 0,
+      hostname: "127.0.0.1",
+      async fetch(req) {
+        seen.push({ auth: req.headers.get("authorization"), body: (await req.json()) as Record<string, unknown> })
+        return new Response(CHAT_SSE, { headers: { "content-type": "text/event-stream" } })
+      },
+    })
+    try {
+      await using tmp = await tmpdir({ config: {} })
+      const response = await chat(tmp.path, `http://127.0.0.1:${server.port}`)
+      expect(response.status).toBe(200)
+      expect(response.headers.get("content-type")).toBe("text/event-stream")
+      expect(await response.text()).toBe(CHAT_SSE)
+      expect(seen.length).toBe(1)
+      expect(seen[0]?.auth).toBeNull()
+      expect(seen[0]?.body).toEqual({
+        model: "deepseek-chat",
+        messages: [{ role: "user", content: "def fib(a):" }],
+        max_tokens: 256,
+        temperature: 0.2,
+        stream: true,
+      })
+    } finally {
+      server.stop(true)
+    }
+  })
+
+  test("prepends a system message, adds stop, and sends the key as Bearer", async () => {
+    const seen: { auth: string | null; body: Record<string, unknown> }[] = []
+    const server = Bun.serve({
+      port: 0,
+      hostname: "127.0.0.1",
+      async fetch(req) {
+        seen.push({ auth: req.headers.get("authorization"), body: (await req.json()) as Record<string, unknown> })
+        return new Response(CHAT_SSE, { headers: { "content-type": "text/event-stream" } })
+      },
+    })
+    try {
+      await using tmp = await tmpdir({ config: {} })
+      const response = await chat(tmp.path, `http://127.0.0.1:${server.port}`, {
+        system: "be terse",
+        stop: ["\n\n"],
+        apiKey: "sk-test",
+      })
+      expect(response.status).toBe(200)
+      expect(seen[0]?.auth).toBe("Bearer sk-test")
+      expect(seen[0]?.body).toEqual({
+        model: "deepseek-chat",
+        messages: [
+          { role: "system", content: "be terse" },
+          { role: "user", content: "def fib(a):" },
+        ],
+        max_tokens: 256,
+        temperature: 0.2,
+        stream: true,
+        stop: ["\n\n"],
+      })
+    } finally {
+      server.stop(true)
+    }
+  })
+
+  test("rejects chat without an explicit base URL or model", async () => {
+    await using tmp = await tmpdir({ config: {} })
+    const nobase = await app().request("/kilo/fim", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-kilo-directory": tmp.path },
+      body: JSON.stringify({ prefix: "p", suffix: "", provider: "custom", model: "m", endpoint: "chat" }),
+    })
+    expect(nobase.status).toBe(400)
+    const nomodel = await app().request("/kilo/fim", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-kilo-directory": tmp.path },
+      body: JSON.stringify({
+        prefix: "p",
+        suffix: "",
+        provider: "custom",
+        baseURL: "http://127.0.0.1:1",
+        endpoint: "chat",
+      }),
+    })
+    expect(nomodel.status).toBe(400)
+  })
+
+  test("rejects chat for a non-custom provider", async () => {
+    await using tmp = await tmpdir({ config: {} })
+    const response = await app().request("/kilo/fim", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-kilo-directory": tmp.path },
+      body: JSON.stringify({
+        prefix: "p",
+        suffix: "",
+        provider: "local",
+        model: "m",
+        baseURL: "http://127.0.0.1:1",
+        endpoint: "chat",
+      }),
+    })
+    expect(response.status).toBe(400)
+  })
+})

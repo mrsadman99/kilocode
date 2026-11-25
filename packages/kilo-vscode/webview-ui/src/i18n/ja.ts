@@ -910,12 +910,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "チャットの自動補完を有効にする",
   "settings.autocomplete.chatAutocomplete.description": "チャットテキストエリアに自動補完の提案を表示",
   "settings.autocomplete.modelsHint": "オートコンプリートに使用するモデルを選択するには、モデル設定をご覧ください。",
-  "settings.autocomplete.custom.format.title": "API 形式",
-  "settings.autocomplete.custom.format.description":
-    "エンドポイントが FIM リクエストをどのように受け取るか: ネイティブの prompt+suffix、または /v1/completions もしくは Ollama /api/generate 上のクライアント側テンプレート",
-  "settings.autocomplete.custom.template.title": "FIM テンプレート",
-  "settings.autocomplete.custom.template.description":
-    "テンプレート形式用のプロンプトテンプレート。Auto はモデル名から検出します",
+  "settings.autocomplete.custom.transport.title": "Raw プロンプト API",
+  "settings.autocomplete.custom.transport.description": "Raw プロンプトを受け取る completions API",
+  "settings.autocomplete.custom.mode.title": "入力モード",
+  "settings.autocomplete.custom.mode.description":
+    "エンドポイントが補完リクエストをどのように受け取るか: ネイティブ prompt+suffix、テンプレート化された raw プロンプト、またはチャットメッセージ",
+  "settings.autocomplete.custom.mode.native": "ネイティブ",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "チャット",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM プロファイル",
+  "settings.autocomplete.custom.profile.description":
+    "fill-in-the-middle の穴をどのようにエンコードするか。Auto はモデル名から検出します",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto は "{{model}}" のプロファイルを検出できませんでした。明示的に選択してください。',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "チャットモードには穴を埋めるモデルが必要です。",
   "settings.autocomplete.custom.auto": "自動",
   "settings.autocomplete.custom.model.title": "モデル",
   "settings.autocomplete.custom.model.description": "カスタムエンドポイント上のモデル名（例: deepseek-chat）",

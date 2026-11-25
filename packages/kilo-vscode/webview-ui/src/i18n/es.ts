@@ -925,12 +925,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Mostrar sugerencias de autocompletado en el chat",
   "settings.autocomplete.modelsHint":
     "Para elegir qué modelo se usa para el autocompletado, consulta la configuración de Modelos.",
-  "settings.autocomplete.custom.format.title": "Formato de API",
-  "settings.autocomplete.custom.format.description":
-    "Cómo espera el endpoint las solicitudes FIM: prompt+suffix nativos o plantilla en el cliente vía /v1/completions u Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "Plantilla FIM",
-  "settings.autocomplete.custom.template.description":
-    "Plantilla de prompt para los formatos con plantilla; Auto la detecta por el nombre del modelo",
+  "settings.autocomplete.custom.transport.title": "API de prompt sin formato",
+  "settings.autocomplete.custom.transport.description": "Qué API de completado recibe el prompt sin formato",
+  "settings.autocomplete.custom.mode.title": "Modo de entrada",
+  "settings.autocomplete.custom.mode.description":
+    "Cómo espera el endpoint las completaciones: prompt+suffix nativos, prompt sin formato con plantilla o mensajes de chat",
+  "settings.autocomplete.custom.mode.native": "Nativo",
+  "settings.autocomplete.custom.mode.raw": "Sin formato",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Perfil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Cómo codificar el hueco fill-in-the-middle; Auto lo detecta por el nombre del modelo",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto no detectó un perfil para "{{model}}": elija un perfil explícito.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "El modo chat necesita un modelo para rellenar el hueco.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Modelo",
   "settings.autocomplete.custom.model.description":

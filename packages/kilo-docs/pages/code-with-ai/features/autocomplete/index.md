@@ -9,7 +9,7 @@ Kilo Code's autocomplete feature provides intelligent code suggestions and compl
 
 ## How Autocomplete Works
 
-The extension uses **Fill-in-the-Middle (FIM)** completion routed through the **Kilo Gateway** or a local model server. It analyzes the code before and after your cursor to generate contextually accurate inline suggestions.
+The extension uses **Fill-in-the-Middle (FIM)** completion. It sends the code before and after your cursor to the selected endpoint and inserts the generated middle. The endpoint can run on your machine or on a remote server.
 
 By default, autocomplete uses **Codestral** (`mistralai/codestral-2508`) by Mistral AI, billed through your Kilo account. Local FIM models are also supported — see [Local models](#local-models).
 
@@ -29,18 +29,27 @@ This keybinding requires `kilo-code.new.autocomplete.enableSmartInlineTaskKeybin
 
 ## Provider and Model
 
-Autocomplete requests are routed through the **Kilo Gateway** and use **Codestral** (`mistralai/codestral-2508`). It uses Kilo credits unless you add a Mistral API key via BYOK. With BYOK, your Mistral plan and usage limits apply; autocomplete is not guaranteed to be free. See [Setting up Mistral for autocomplete](/docs/code-with-ai/features/autocomplete/mistral-setup).
+By default, autocomplete requests go through the **Kilo Gateway** and use **Codestral** (`mistralai/codestral-2508`). This route uses Kilo credits unless you add a Mistral API key via BYOK. With BYOK, your Mistral plan and usage limits apply; autocomplete is not guaranteed to be free. See [Setting up Mistral for autocomplete](/docs/code-with-ai/features/autocomplete/mistral-setup).
 
 ### Local models
 
-You can also run autocomplete fully locally with a FIM-trained code model served by [Ollama](https://ollama.com/), llama.cpp, or LM Studio. In **Settings → Models**, pick **Local (Ollama)** as the autocomplete model, then configure:
+1. In **Settings → Models**, select **Custom** for autocomplete.
+2. For [Ollama](https://ollama.com/), enter the model tag (for example, `qwen2.5-coder:7b`) and server URL (`http://127.0.0.1:11434`). Choose the raw prompt mode and the Ollama transport.
+3. Leave the profile on **Auto** for a recognized checkpoint, or choose the profile matching your weights. An unrecognized server alias needs an explicit profile. Model size alone does not determine the profile.
 
-- **Local model** — the model name as served by your server, e.g. `qwen2.5-coder:7b`, `starcoder2:7b`, or `codellama:7b`.
-- **Local server URL** — defaults to `http://127.0.0.1:11434` (Ollama).
-- **FIM template** — the fill-in-the-middle prompt format: StarCoder, Qwen, or CodeLlama. **Auto** infers it from the model name.
-- **API endpoint** — Ollama-native `/api/generate` (raw prompts) or OpenAI-compatible `/v1/completions`. **Auto** uses the template default.
+### Custom endpoints
 
-Local completions run on your machine and do not use Kilo credits or provider API keys. Use a small FIM-trained model (1.5B–7B) for responsive suggestions; general chat models without FIM training produce poor completions.
+Choose the input your **server** accepts first, then the profile your **model** expects. These choices are independent of whether the server is local or hosted. A server advertising an OpenAI-compatible completions API does not necessarily implement the `suffix` field.
+
+| Input | Where Kilo sends the request | Example |
+|---|---|---|
+| Native FIM | `{baseURL}/completions` with separate `prompt` and `suffix`; no client template | DeepSeek's beta API: base URL `https://api.deepseek.com/beta`, FIM-capable model ID from your account. For open-weight Codestral, use a compatible server that handles the tokenizer's FIM encoding. |
+| Raw prompt | `{serverURL}/v1/completions` or Ollama `{serverURL}/api/generate` with one rendered `prompt` | A Mellum Base server needs a suffix-first profile. It is not interchangeable with the prefix-first StarCoder profile, even though both use the same marker strings. |
+| Chat messages | `{baseURL}/chat/completions` with the rendered FIM content in a `user` message, plus a `system` message only if the profile specifies one | For Qwen3-Coder-Next on a compatible chat server, include the API prefix (e.g. `/v1`) in the base URL. The server applies the chat template, not Kilo. |
+
+Use the model ID exposed by your server. For a private endpoint, enter its URL and optional API key; leaving the key empty sends no `Authorization` header. Set a proxy only if the endpoint needs one. Use HTTPS for remote endpoints that receive your key or source code.
+
+Profiles preserve the cursor's whitespace and use the checkpoint's markers, order and stop sequences. For example, a hosted DeepSeek endpoint with native suffix support needs **no** DeepSeek marker profile; self-hosted DeepSeek-Coder Base with a raw completions API does. Choose the model's documented input mode, not just its family name.
 
 ## Status Bar
 

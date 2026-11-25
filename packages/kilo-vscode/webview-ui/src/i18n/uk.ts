@@ -905,12 +905,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Увімкнути автодоповнення в полі чату",
   "settings.autocomplete.chatAutocomplete.description": "Показувати підказки автодоповнення в полі введення чату",
   "settings.autocomplete.modelsHint": "Щоб вибрати модель для автодоповнення, див. Налаштування моделей.",
-  "settings.autocomplete.custom.format.title": "Формат API",
-  "settings.autocomplete.custom.format.description":
-    "Як ендпойнт очікує FIM-запити: нативні prompt+suffix або клієнтський шаблон через /v1/completions чи Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM-шаблон",
-  "settings.autocomplete.custom.template.description":
-    "Шаблон промпту для шаблонних форматів; Auto визначається за назвою моделі",
+  "settings.autocomplete.custom.transport.title": "API сирого промпту",
+  "settings.autocomplete.custom.transport.description": "Який completions-API отримує сирий промпт",
+  "settings.autocomplete.custom.mode.title": "Режим введення",
+  "settings.autocomplete.custom.mode.description":
+    "Як ендпойнт очікує запити доповнення: нативні prompt+suffix, шаблонний сирий промпт або повідомлення чату",
+  "settings.autocomplete.custom.mode.native": "Нативний",
+  "settings.autocomplete.custom.mode.raw": "Сирий",
+  "settings.autocomplete.custom.mode.chat": "Чат",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-профіль",
+  "settings.autocomplete.custom.profile.description":
+    "Як кодується пропуск fill-in-the-middle; Auto визначає за назвою моделі",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto не вдалося визначити профіль для "{{model}}" — оберіть профіль явно.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Для режиму чату потрібна модель, щоб заповнити пропуск.",
   "settings.autocomplete.custom.auto": "Авто",
   "settings.autocomplete.custom.model.title": "Модель",
   "settings.autocomplete.custom.model.description": "Назва моделі на власному ендпойнті (напр. deepseek-chat)",

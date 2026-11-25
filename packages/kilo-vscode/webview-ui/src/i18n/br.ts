@@ -923,12 +923,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Mostrar sugestões de autocompletar no campo de chat",
   "settings.autocomplete.modelsHint":
     "Para escolher qual modelo é usado para autocompletar, veja as configurações de Modelos.",
-  "settings.autocomplete.custom.format.title": "Furmad API",
-  "settings.autocomplete.custom.format.description":
-    "Penaos e c'hortoz an dibenn rekedoù FIM: prompt+suffix genidik pe patrom a-gostez ar kliant dre /v1/completions pe Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "Patrom FIM",
-  "settings.autocomplete.custom.template.description":
-    "Patrom ar prompt evit ar furmadoù patrom; Auto a zizolo anezhañ diwar anv ar model",
+  "settings.autocomplete.custom.transport.title": "API prompt kriz",
+  "settings.autocomplete.custom.transport.description": "Pe API klokaat a resev ar prompt kriz",
+  "settings.autocomplete.custom.mode.title": "Mod enkas",
+  "settings.autocomplete.custom.mode.description":
+    "Penaos e c'hortoz an dibenn rekedoù klokaat: prompt+suffix genidik, prompt kriz gant patrom pe kemennadennoù kaoz",
+  "settings.autocomplete.custom.mode.native": "Genidik",
+  "settings.autocomplete.custom.mode.raw": "Kriz",
+  "settings.autocomplete.custom.mode.chat": "Kaoz",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Penaos kodanañ toull fill-in-the-middle; Auto a zizolo anezhañ diwar anv ar model",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto n\'en deus ket kavet ur profil evit "{{model}}" — dibabit ur profil splann.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Ar mod kaoz en deus ezhomm ur model evit leuniañ an toull.",
   "settings.autocomplete.custom.auto": "Emgefre",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Anv ar model war an dibenn personelaet (da sk. deepseek-chat)",

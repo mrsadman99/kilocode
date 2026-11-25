@@ -1094,7 +1094,7 @@
         "kilo-code.new.autocomplete.customBaseURL": {
           "type": "string",
           "default": "",
-          "description": "Base URL of the custom OpenAI-compatible FIM API (e.g. https://api.deepseek.com/beta). Requests are sent to {baseURL}/completions with prompt+suffix."
+          "description": "Base URL of the custom autocomplete endpoint (e.g. https://api.deepseek.com/beta). The request path depends on the selected input format (native FIM, raw prompt, or chat)."
         },
         "kilo-code.new.autocomplete.customApiKey": {
           "type": "string",
@@ -1111,32 +1111,48 @@
           "enum": [
             "openai",
             "completions",
-            "generate"
+            "generate",
+            "chat"
           ],
           "enumDescriptions": [
-            "OpenAI FIM: POST {baseURL}/completions with native prompt+suffix (e.g. DeepSeek beta API)",
-            "OpenAI-compatible /v1/completions with a client-side FIM template (llama.cpp, LM Studio, vLLM, Ollama)",
-            "Ollama-native /api/generate with a client-side FIM template"
+            "Native FIM: POST {baseURL}/completions with separate prompt+suffix; the server encodes the hole (e.g. DeepSeek beta API)",
+            "Raw prompt: OpenAI-compatible /v1/completions with a client-side FIM profile (llama.cpp, LM Studio, vLLM, Ollama)",
+            "Raw prompt: Ollama-native /api/generate with a client-side FIM profile",
+            "Chat messages: POST {baseURL}/chat/completions with the rendered FIM content in a user message (e.g. Qwen3-Coder-Next)"
           ],
           "default": "openai",
-          "description": "API format of the custom autocomplete endpoint. Templated formats wrap the prompt with FIM tokens client-side; the API key is only sent with the OpenAI FIM format."
+          "description": "Input the custom autocomplete server accepts. Native FIM sends prompt+suffix untouched; raw and chat formats encode the hole with the selected model profile. The API key and proxy apply to every format."
         },
         "kilo-code.new.autocomplete.customTemplate": {
           "type": "string",
           "enum": [
             "auto",
-            "starcoder",
             "qwen",
-            "codellama"
+            "qwen3",
+            "codegemma",
+            "starcoder",
+            "santacoder",
+            "deepseek",
+            "mellum",
+            "seed",
+            "codellama",
+            "codegeex"
           ],
           "enumDescriptions": [
-            "Infer the FIM template from the model name",
-            "StarCoder FIM tokens (<fim_prefix>/<fim_suffix>/<fim_middle>)",
-            "Qwen / Qwen2.5-Coder FIM tokens (<|fim_prefix|>/<|fim_suffix|>/<|fim_middle|>)",
-            "CodeLlama FIM tokens (<PRE>/<SUF>/<MID>)"
+            "Match the profile to the model name; unknown names require an explicit choice",
+            "Qwen2.5-Coder Base: <|fim_prefix|>/<|fim_suffix|>/<|fim_middle|>",
+            "Qwen3-Coder / Next: Qwen markers, plus a system instruction in chat mode",
+            "CodeGemma pretrained: Qwen-style markers with Gemma stop tokens",
+            "StarCoder / StarCoder2 / Stable Code: <fim_prefix>/<fim_suffix>/<fim_middle>",
+            "SantaCoder: hyphenated <fim-prefix>/<fim-suffix>/<fim-middle>",
+            "DeepSeek-Coder Base: <｜fim▁begin｜>/<｜fim▁hole｜>/<｜fim▁end｜>",
+            "JetBrains Mellum: suffix-first <fim_suffix>/<fim_prefix>/<fim_middle>, optional filename",
+            "Seed-Coder: suffix-first <[fim-suffix]>/<[fim-prefix]>/<[fim-middle]>",
+            "CodeLlama: <PRE>/<SUF>/<MID>",
+            "CodeGeeX4: role-wrapped, suffix-first <|code_suffix|>/<|code_prefix|>/<|code_middle|> (raw only)"
           ],
           "default": "auto",
-          "description": "Fill-in-the-middle prompt template used by the templated custom formats (completions/generate)."
+          "description": "Model profile used to encode the FIM hole for the raw and chat formats. Not used by native FIM."
         },
         "kilo-code.new.autocomplete.enableAutoTrigger": {
           "type": "boolean",

@@ -904,12 +904,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Sohbet metin alanında otomatik tamamlama önerileri göster",
   "settings.autocomplete.modelsHint":
     "Otomatik tamamlama için kullanılacak modeli seçmek için Modeller ayarlarına bakın.",
-  "settings.autocomplete.custom.format.title": "API biçimi",
-  "settings.autocomplete.custom.format.description":
-    "Uç noktanın FIM isteklerini nasıl beklediği: yerel prompt+suffix veya /v1/completions ya da Ollama /api/generate üzerinden istemci tarafı şablon",
-  "settings.autocomplete.custom.template.title": "FIM şablonu",
-  "settings.autocomplete.custom.template.description":
-    "Şablonlu biçimler için istem şablonu; Auto onu model adından algılar",
+  "settings.autocomplete.custom.transport.title": "Ham istem API'si",
+  "settings.autocomplete.custom.transport.description": "Ham istemi hangi tamamlama API'si alır",
+  "settings.autocomplete.custom.mode.title": "Giriş modu",
+  "settings.autocomplete.custom.mode.description":
+    "Uç noktanın tamamlamaları nasıl beklediği: yerel prompt+suffix, şablonlu ham istem veya sohbet mesajları",
+  "settings.autocomplete.custom.mode.native": "Yerel",
+  "settings.autocomplete.custom.mode.raw": "Ham",
+  "settings.autocomplete.custom.mode.chat": "Sohbet",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM profili",
+  "settings.autocomplete.custom.profile.description":
+    "Fill-in-the-middle boşluğunun nasıl kodlanacağı; Auto onu model adından algılar",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto "{{model}}" için bir profil algılayamadı — açıkça bir profil seçin.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Sohbet modu boşluğu doldurmak için bir model gerektirir.",
   "settings.autocomplete.custom.auto": "Otomatik",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Özel uç noktadaki model adı (örn. deepseek-chat)",

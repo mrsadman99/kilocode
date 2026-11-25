@@ -1,15 +1,14 @@
 import { ResponseMetaData } from "./types"
 import type { KiloConnectionService } from "../cli-backend"
-import type { AutocompleteModelDef, FimTemplateID } from "@kilocode/kilo-gateway/autocomplete"
-import { getAutocompleteModelById, validFimTemplate } from "../../shared/autocomplete-models"
+import type { AutocompleteModelDef } from "@kilocode/kilo-gateway/autocomplete"
+import { getAutocompleteModelById } from "../../shared/autocomplete-models"
 import { localFimOptions } from "./local-fim"
-import { customFimOptions } from "./custom-fim"
-import { fimTemplates, inferFimTemplate } from "./continuedev/core/autocomplete/templating/AutocompleteTemplate"
+import { customFimOptions, customPrompt } from "./custom-fim"
 
 const FIM_MAX_TOKENS = 256
 
 /** Assemble the provider-specific FIM request fields (prompt wrapping, endpoint options). */
-function fimPrompt(info: AutocompleteModelDef, prefix: string, suffix: string) {
+function fimPrompt(info: AutocompleteModelDef, prefix: string, suffix: string, filename?: string) {
   if (info.providerID === "local") {
     const local = localFimOptions(info.modelID)
     return {
@@ -22,30 +21,7 @@ function fimPrompt(info: AutocompleteModelDef, prefix: string, suffix: string) {
     }
   }
   if (info.providerID === "custom") {
-    const custom = customFimOptions()
-    if (custom.format === "openai") {
-      if (!custom.baseURL) throw new Error("Custom autocomplete base URL is not configured")
-      if (!info.modelID) throw new Error("Custom autocomplete model is not configured")
-      return {
-        prefix,
-        suffix,
-        baseURL: custom.baseURL,
-        apiKey: custom.apiKey || undefined,
-        proxy: custom.proxy || undefined,
-      }
-    }
-    const id: FimTemplateID = validFimTemplate(custom.template)
-      ? (custom.template as FimTemplateID)
-      : inferFimTemplate(info.modelID)
-    const template = fimTemplates[id]
-    return {
-      prefix: template.template(prefix, suffix),
-      suffix: "",
-      baseURL: custom.baseURL || undefined,
-      endpoint: custom.format,
-      stop: template.completionOptions?.stop ?? [],
-      proxy: custom.proxy || undefined,
-    }
+    return customPrompt(customFimOptions(), info.modelID, prefix, suffix, filename)
   }
   return { prefix, suffix }
 }
@@ -61,17 +37,18 @@ function fimPrompt(info: AutocompleteModelDef, prefix: string, suffix: string) {
  * @param signal - Optional AbortSignal to cancel the SSE stream early (e.g. when the user types again)
  */
 export async function generateFim(
-  connectionService: KiloConnectionService,
+  connectionService: Pick<KiloConnectionService, "getClientAsync">,
   modelId: string,
   prefix: string,
   suffix: string,
   onChunk: (text: string) => void,
   signal?: AbortSignal,
+  filename?: string,
 ): Promise<ResponseMetaData> {
-  const client = await connectionService.getClientAsync()
   const info = getAutocompleteModelById(modelId)
   if (!info) throw new Error(`Unknown autocomplete model: ${modelId}`)
-  const prompt = fimPrompt(info, prefix, suffix)
+  const prompt = fimPrompt(info, prefix, suffix, filename)
+  const client = await connectionService.getClientAsync()
   let cost = 0
   let inputTokens = 0
   let outputTokens = 0

@@ -21,6 +21,14 @@ import {
 } from "../speech-to-text/availability"
 import { speechToTextModelOptions } from "../speech-to-text/model-selector"
 import { AUTOCOMPLETE_SELECTOR_MODELS, getAutocompleteSelection } from "./autocomplete-model-selector"
+import {
+  formatForMode,
+  modeFromFormat,
+  profileOptions,
+  resolveAutoProfile,
+  transportFromFormat,
+  type CustomInputMode,
+} from "./custom-fim-mode"
 import { preserveVariant } from "../../context/session-variant-store"
 
 const ModelsTab: Component = () => {
@@ -152,23 +160,47 @@ const ModelsTab: Component = () => {
   }
   const customFormat = () => {
     const v = settings()["autocomplete.customFormat"]
-    return v === "completions" || v === "generate" ? v : "openai"
+    return v === "completions" || v === "generate" || v === "chat" ? v : "openai"
   }
   const customTemplate = () => {
     const v = settings()["autocomplete.customTemplate"]
     return typeof v === "string" ? v : "auto"
   }
-  const formatOptions = [
-    { value: "openai", label: "OpenAI FIM (prompt+suffix)" },
-    { value: "completions", label: "/v1/completions (templated)" },
-    { value: "generate", label: "/api/generate (Ollama)" },
-  ]
-  const templateOptions = [
-    { value: "auto", label: language.t("settings.autocomplete.custom.auto") },
-    { value: "starcoder", label: "StarCoder" },
-    { value: "qwen", label: "Qwen" },
-    { value: "codellama", label: "CodeLlama" },
-  ]
+  const inputMode = createMemo(() => modeFromFormat(customFormat()))
+  const transport = createMemo(() => transportFromFormat(customFormat()))
+  const modeOptions = createMemo(() => [
+    { value: "native", label: language.t("settings.autocomplete.custom.mode.native") },
+    { value: "raw", label: language.t("settings.autocomplete.custom.mode.raw") },
+    { value: "chat", label: language.t("settings.autocomplete.custom.mode.chat") },
+  ])
+  const transportOptions = createMemo(() => [
+    { value: "completions", label: language.t("settings.autocomplete.custom.transport.completions") },
+    { value: "generate", label: language.t("settings.autocomplete.custom.transport.generate") },
+  ])
+  const profileOpts = createMemo(() =>
+    profileOptions(language.t("settings.autocomplete.custom.auto"), inputMode() === "chat"),
+  )
+  const profileOption = () => profileOpts().find((item) => item.value === customTemplate())
+  const autoResolution = createMemo(() => resolveAutoProfile(customTemplate(), customModel(), inputMode() === "chat"))
+  const profileFeedback = createMemo(() => {
+    const res = autoResolution()
+    if (res.kind === "resolved")
+      return language.t("settings.autocomplete.custom.profile.autoResolved", { label: res.label })
+    if (res.kind === "unknown")
+      return language.t("settings.autocomplete.custom.profile.autoUnknown", { model: res.model })
+    if (res.kind === "unconfigured") return language.t("settings.autocomplete.custom.profile.chatUnconfigured")
+    return undefined
+  })
+  function selectMode(value?: string) {
+    const mode: CustomInputMode = value === "chat" ? "chat" : value === "raw" ? "raw" : "native"
+    updateSetting("autocomplete.customFormat", formatForMode(mode, transport()))
+  }
+  function selectTransport(value?: string) {
+    updateSetting("autocomplete.customFormat", value === "generate" ? "generate" : "completions")
+  }
+  function selectProfile(value?: string) {
+    updateSetting("autocomplete.customTemplate", value ?? "auto")
+  }
 
   return (
     <div>
@@ -308,41 +340,77 @@ const ModelsTab: Component = () => {
             />
           </SettingsRow>
           <SettingsRow
-            title={language.t("settings.autocomplete.custom.format.title")}
-            description={language.t("settings.autocomplete.custom.format.description")}
+            title={language.t("settings.autocomplete.custom.mode.title")}
+            description={language.t("settings.autocomplete.custom.mode.description")}
           >
             <Select
-              options={formatOptions}
-              current={formatOptions.find((item) => item.value === customFormat())}
+              options={modeOptions()}
+              current={modeOptions().find((item) => item.value === inputMode())}
               value={(item) => item.value}
               label={(item) => item.label}
-              onSelect={(item) => updateSetting("autocomplete.customFormat", item?.value ?? "openai")}
+              onSelect={(item) => selectMode(item?.value)}
               variant="secondary"
               size="small"
               triggerVariant="settings"
               triggerProps={{
-                "aria-label": `${language.t("settings.autocomplete.custom.format.title")}: ${customFormat()}`,
+                "aria-label": `${language.t("settings.autocomplete.custom.mode.title")}: ${inputMode()}`,
               }}
             />
           </SettingsRow>
-          <Show when={customFormat() !== "openai"}>
+          <Show when={inputMode() === "raw"}>
             <SettingsRow
-              title={language.t("settings.autocomplete.custom.template.title")}
-              description={language.t("settings.autocomplete.custom.template.description")}
+              title={language.t("settings.autocomplete.custom.transport.title")}
+              description={language.t("settings.autocomplete.custom.transport.description")}
             >
               <Select
-                options={templateOptions}
-                current={templateOptions.find((item) => item.value === customTemplate())}
+                options={transportOptions()}
+                current={transportOptions().find((item) => item.value === transport())}
                 value={(item) => item.value}
                 label={(item) => item.label}
-                onSelect={(item) => updateSetting("autocomplete.customTemplate", item?.value ?? "auto")}
+                onSelect={(item) => selectTransport(item?.value)}
                 variant="secondary"
                 size="small"
                 triggerVariant="settings"
                 triggerProps={{
-                  "aria-label": `${language.t("settings.autocomplete.custom.template.title")}: ${customTemplate()}`,
+                  "aria-label": `${language.t("settings.autocomplete.custom.transport.title")}: ${transport()}`,
                 }}
               />
+            </SettingsRow>
+          </Show>
+          <Show when={inputMode() !== "native"}>
+            <SettingsRow
+              title={language.t("settings.autocomplete.custom.profile.title")}
+              description={language.t("settings.autocomplete.custom.profile.description")}
+            >
+              <div style={{ display: "flex", "flex-direction": "column", "align-items": "flex-end", gap: "6px" }}>
+                <Select
+                  options={profileOpts()}
+                  current={profileOption()}
+                  value={(item) => item.value}
+                  label={(item) => item.label}
+                  onSelect={(item) => selectProfile(item?.value)}
+                  variant="secondary"
+                  size="small"
+                  triggerVariant="settings"
+                  triggerProps={{
+                    "aria-label": `${language.t("settings.autocomplete.custom.profile.title")}: ${customTemplate()}`,
+                  }}
+                />
+                <Show when={profileFeedback()}>
+                  {(text) => (
+                    <div
+                      style={{
+                        "font-size": "var(--font-size-small)",
+                        color: "var(--vscode-inputValidation-warningForeground, var(--vscode-descriptionForeground))",
+                        "text-align": "right",
+                        "max-width": "160px",
+                      }}
+                    >
+                      {text()}
+                    </div>
+                  )}
+                </Show>
+              </div>
             </SettingsRow>
           </Show>
         </Show>

@@ -888,18 +888,29 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Enable chat textarea autocomplete",
   "settings.autocomplete.chatAutocomplete.description": "Show autocomplete suggestions in the chat textarea",
   "settings.autocomplete.modelsHint": "To choose which model is used for autocompletions, see the Models settings.",
-  "settings.autocomplete.custom.format.title": "API format",
-  "settings.autocomplete.custom.format.description":
-    "How the endpoint expects FIM requests: native prompt+suffix, or a client-side template over /v1/completions or Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM template",
-  "settings.autocomplete.custom.template.description":
-    "Prompt template for the templated formats; Auto detects it from the model name",
+  "settings.autocomplete.custom.mode.title": "Input mode",
+  "settings.autocomplete.custom.mode.description":
+    "How the endpoint expects completion requests: native prompt+suffix, a templated raw prompt, or chat messages",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.title": "Raw prompt API",
+  "settings.autocomplete.custom.transport.description": "Which completions API receives the raw prompt",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM profile",
+  "settings.autocomplete.custom.profile.description":
+    "How to encode the fill-in-the-middle hole; Auto detects it from the model name",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto couldn\'t detect a profile for "{{model}}" — choose an explicit profile.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chat mode needs a model to fill in the middle.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Model name on the custom endpoint (e.g. deepseek-chat)",
   "settings.autocomplete.custom.baseUrl.title": "Base URL",
   "settings.autocomplete.custom.baseUrl.description":
-    "OpenAI-compatible API base; requests go to {baseURL}/completions with prompt+suffix",
+    "Base URL of the custom autocomplete endpoint; the request path depends on the input mode",
   "settings.autocomplete.custom.apiKey.title": "API key",
   "settings.autocomplete.custom.apiKey.description":
     "Sent as a Bearer token; leave empty to call the endpoint without authentication",

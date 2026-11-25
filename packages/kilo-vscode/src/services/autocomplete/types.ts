@@ -71,6 +71,7 @@ export interface FimCompletionResult extends ResponseMetaData {
 
 export interface FimAutocompletePrompt {
   autocompleteInput: AutocompleteInput
+  filename?: string
   formattedPrefix: string
   prunedSuffix: string
 }

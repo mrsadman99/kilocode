@@ -74,9 +74,11 @@ export async function requestLocalFim(
   signal: AbortSignal,
   send: (url: string, init: RequestInit) => Promise<Response> = fetch,
 ) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" }
+  if (target.apiKey) headers.Authorization = `Bearer ${target.apiKey}`
   const response = await send(target.url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     signal,
     body: JSON.stringify(localFimBody(target, payload)),
   })

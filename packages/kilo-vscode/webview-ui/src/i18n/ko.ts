@@ -904,11 +904,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "채팅 텍스트 영역 자동완성 활성화",
   "settings.autocomplete.chatAutocomplete.description": "채팅 텍스트 영역에서 자동완성 제안 표시",
   "settings.autocomplete.modelsHint": "자동 완성에 사용되는 모델을 선택하려면 모델 설정을 참조하세요.",
-  "settings.autocomplete.custom.format.title": "API 형식",
-  "settings.autocomplete.custom.format.description":
-    "엔드포인트가 FIM 요청을 받는 방식: 네이티브 prompt+suffix 또는 /v1/completions나 Ollama /api/generate의 클라이언트 측 템플릿",
-  "settings.autocomplete.custom.template.title": "FIM 템플릿",
-  "settings.autocomplete.custom.template.description": "템플릿 형식용 프롬프트 템플릿; Auto는 모델 이름에서 감지합니다",
+  "settings.autocomplete.custom.transport.title": "Raw 프롬프트 API",
+  "settings.autocomplete.custom.transport.description": "Raw 프롬프트를 받을 completions API",
+  "settings.autocomplete.custom.mode.title": "입력 모드",
+  "settings.autocomplete.custom.mode.description":
+    "엔드포인트가 완성을 요청하는 방식: 네이티브 prompt+suffix, 템플릿화된 raw 프롬프트, 또는 채팅 메시지",
+  "settings.autocomplete.custom.mode.native": "네이티브",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "채팅",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM 프로필",
+  "settings.autocomplete.custom.profile.description":
+    "fill-in-the-middle 구멍을 인코딩하는 방법; Auto가 모델 이름에서 감지합니다",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto가 "{{model}}"의 프로필을 감지하지 못했습니다. 명시적으로 선택하세요.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "채팅 모드에는 구멍을 채울 모델이 필요합니다.",
   "settings.autocomplete.custom.auto": "자동",
   "settings.autocomplete.custom.model.title": "모델",
   "settings.autocomplete.custom.model.description": "사용자 지정 엔드포인트의 모델 이름 (예: deepseek-chat)",

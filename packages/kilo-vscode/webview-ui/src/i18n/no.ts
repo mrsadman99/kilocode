@@ -877,11 +877,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofullføringsforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For å velge hvilken modell som brukes til autofullføring, se Modellinnstillinger.",
-  "settings.autocomplete.custom.format.title": "API-format",
-  "settings.autocomplete.custom.format.description":
-    "Hvordan endepunktet forventer FIM-forespørsler: native prompt+suffix eller en klientside mal via /v1/completions eller Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM-mal",
-  "settings.autocomplete.custom.template.description": "Promptmal for malformatene; Auto oppdager den fra modellnavnet",
+  "settings.autocomplete.custom.transport.title": "Raw-prompt-API",
+  "settings.autocomplete.custom.transport.description": "Hvilket completions-API som mottar raw-prompten",
+  "settings.autocomplete.custom.mode.title": "Inndatamodus",
+  "settings.autocomplete.custom.mode.description":
+    "Hvordan endepunktet forventer fullføringer: native prompt+suffix, en malbasert raw-prompt eller chatmeldinger",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-profil",
+  "settings.autocomplete.custom.profile.description":
+    "Hvordan fill-in-the-middle-hullet kodes; Auto oppdager det fra modellnavnet",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto fant ingen profil for "{{model}}" — velg en profil eksplisitt.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chatmodus trenger en modell for å fylle hullet.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Modell",
   "settings.autocomplete.custom.model.description":

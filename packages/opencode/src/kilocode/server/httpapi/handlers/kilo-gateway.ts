@@ -42,7 +42,7 @@ import { ModelCache } from "@/provider/model-cache"
 import { InstanceHttpApi } from "@/server/routes/instance/httpapi/api"
 import { AudioTranscriptionsBody, CloudSessionImportError, FimBody } from "../groups/kilo-gateway"
 import { requestLocalFim } from "@kilocode/kilo-gateway/local-fim"
-import { requestCustomFim } from "@kilocode/kilo-gateway/custom-fim"
+import { requestCustomChat, requestCustomFim } from "@kilocode/kilo-gateway/custom-fim"
 import { loopback } from "@/kilocode/server/loopback"
 
 const FIM_TIMEOUT_MS = 30_000
@@ -172,7 +172,10 @@ export const kiloGatewayHandlers = HttpApiBuilder.group(InstanceHttpApi, "kilo",
             const transport = bypass ? direct : send
             return await ApiLog.trace(
               { provider: target.provider, model: target.model, url: target.url, proxy, direct: bypass },
-              () => requestCustomFim(target, ctx.payload, signal, transport),
+              () =>
+                "endpoint" in target
+                  ? requestCustomChat(target, ctx.payload, signal, transport)
+                  : requestCustomFim(target, ctx.payload, signal, transport),
             )
           }
           const run = async (url: string): Promise<Response> => {

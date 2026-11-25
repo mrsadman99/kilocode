@@ -136,4 +136,24 @@ describe("autocomplete settings", () => {
     expect(validAutocompleteSetting("localTemplate", "codestral")).toBe(false)
     expect(validAutocompleteSetting("localEndpoint", "chat")).toBe(false)
   })
+
+  it("accepts every custom API format including chat", async () => {
+    const { validAutocompleteSetting } = await import("../settings")
+
+    expect(validAutocompleteSetting("customFormat", "openai")).toBe(true)
+    expect(validAutocompleteSetting("customFormat", "completions")).toBe(true)
+    expect(validAutocompleteSetting("customFormat", "generate")).toBe(true)
+    expect(validAutocompleteSetting("customFormat", "chat")).toBe(true)
+    expect(validAutocompleteSetting("customFormat", "bogus")).toBe(false)
+    expect(validAutocompleteSetting("customFormat", null)).toBe(true)
+  })
+
+  it("accepts the expanded FIM profile set for the custom template", async () => {
+    const { validAutocompleteSetting } = await import("../settings")
+
+    expect(validAutocompleteSetting("customTemplate", "auto")).toBe(true)
+    expect(validAutocompleteSetting("customTemplate", "qwen")).toBe(true)
+    expect(validAutocompleteSetting("customTemplate", "mellum")).toBe(true)
+    expect(validAutocompleteSetting("customTemplate", "codestral")).toBe(false)
+  })
 })

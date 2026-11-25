@@ -909,12 +909,23 @@ export const dict = {
     "Toon suggesties voor automatisch aanvullen in het chat tekstveld",
   "settings.autocomplete.modelsHint":
     "Om te kiezen welk model wordt gebruikt voor automatisch aanvullen, zie de Modellen-instellingen.",
-  "settings.autocomplete.custom.format.title": "API-formaat",
-  "settings.autocomplete.custom.format.description":
-    "Hoe het eindpunt FIM-verzoeken verwacht: native prompt+suffix of een client-side sjabloon via /v1/completions of Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM-sjabloon",
-  "settings.autocomplete.custom.template.description":
-    "Promptsjabloon voor de sjabloonformaten; Auto detecteert het op modelnaam",
+  "settings.autocomplete.custom.transport.title": "Raw-prompt-API",
+  "settings.autocomplete.custom.transport.description": "Welke completions-API de raw-prompt ontvangt",
+  "settings.autocomplete.custom.mode.title": "Invoermodus",
+  "settings.autocomplete.custom.mode.description":
+    "Hoe het eindpunt completions verwacht: native prompt+suffix, een getemplateerde raw-prompt of chatberichten",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-profiel",
+  "settings.autocomplete.custom.profile.description":
+    "Hoe het fill-in-the-middle-gat wordt gecodeerd; Auto detecteert het op modelnaam",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto kon geen profiel detecteren voor "{{model}}" — kies expliciet een profiel.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chatmodus heeft een model nodig om het gat te vullen.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Modelnaam op het aangepaste eindpunt (bijv. deepseek-chat)",

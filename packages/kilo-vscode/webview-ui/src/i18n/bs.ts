@@ -915,12 +915,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Prikaži prijedloge automatskog dovršavanja u polju chata",
   "settings.autocomplete.modelsHint":
     "Da odaberete koji se model koristi za automatsko dovršavanje, pogledajte postavke Modela.",
-  "settings.autocomplete.custom.format.title": "Format API-ja",
-  "settings.autocomplete.custom.format.description":
-    "Kako endpoint očekuje FIM zahtjeve: native prompt+suffix ili šablon na strani klijenta putem /v1/completions ili Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM šablon",
-  "settings.autocomplete.custom.template.description":
-    "Šablon prompta za šablonske formate; Auto ga otkriva iz naziva modela",
+  "settings.autocomplete.custom.transport.title": "API sirovog prompta",
+  "settings.autocomplete.custom.transport.description": "Koji completions API prima sirovi prompt",
+  "settings.autocomplete.custom.mode.title": "Način unosa",
+  "settings.autocomplete.custom.mode.description":
+    "Kako endpoint očekuje zahtjeve za dopunu: native prompt+suffix, šablonski sirovi prompt ili chat poruke",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Sirovi",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM profil",
+  "settings.autocomplete.custom.profile.description":
+    "Kako kodirati fill-in-the-middle rupu; Auto je otkriva iz naziva modela",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto nije otkrio profil za "{{model}}" — odaberite profil eksplicitno.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chat način treba model da popuni rupu.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Naziv modela na prilagođenom endpointu (npr. deepseek-chat)",

@@ -17317,10 +17317,11 @@ export type KiloFimData = {
     maxTokens?: number
     temperature?: number
     baseURL?: string
-    endpoint?: "completions" | "generate"
+    endpoint?: "completions" | "generate" | "chat"
     stop?: Array<string>
     proxy?: string
     apiKey?: string
+    system?: string
   }
   path?: never
   query?: {

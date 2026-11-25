@@ -934,12 +934,24 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Autovervollständigungsvorschläge im Chat-Textfeld anzeigen",
   "settings.autocomplete.modelsHint":
     "Um zu wählen, welches Modell für die Autovervollständigung verwendet wird, siehe Modelleinstellungen.",
-  "settings.autocomplete.custom.format.title": "API-Format",
-  "settings.autocomplete.custom.format.description":
-    "Wie der Endpunkt FIM-Anfragen erwartet: natives prompt+suffix oder eine clientseitige Vorlage über /v1/completions oder Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "FIM-Vorlage",
-  "settings.autocomplete.custom.template.description":
-    "Prompt-Vorlage für die Templated-Formate; Auto erkennt sie am Modellnamen",
+  "settings.autocomplete.custom.transport.title": "Raw-Prompt-API",
+  "settings.autocomplete.custom.transport.description": "Welche Completions-API den Raw-Prompt erhält",
+  "settings.autocomplete.custom.mode.title": "Eingabemodus",
+  "settings.autocomplete.custom.mode.description":
+    "Wie der Endpunkt Completions erwartet: natives prompt+suffix, ein templatisierter Raw-Prompt oder Chat-Nachrichten",
+  "settings.autocomplete.custom.mode.native": "Nativ",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-Profil",
+  "settings.autocomplete.custom.profile.description":
+    "Wie die Fill-in-the-Middle-Lücke kodiert wird; Auto erkennt sie am Modellnamen",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto konnte kein Profil für "{{model}}" erkennen — explizites Profil wählen.',
+  "settings.autocomplete.custom.profile.chatUnconfigured":
+    "Der Chat-Modus benötigt ein Modell, um die Lücke zu füllen.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Modell",
   "settings.autocomplete.custom.model.description":

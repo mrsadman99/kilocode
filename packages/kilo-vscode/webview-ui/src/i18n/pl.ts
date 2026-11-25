@@ -873,12 +873,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Włącz autouzupełnianie czatu",
   "settings.autocomplete.chatAutocomplete.description": "Pokaż sugestie autouzupełniania w polu czatu",
   "settings.autocomplete.modelsHint": "Aby wybrać model używany do autouzupełniania, zobacz Ustawienia modeli.",
-  "settings.autocomplete.custom.format.title": "Format API",
-  "settings.autocomplete.custom.format.description":
-    "Jak endpoint oczekuje żądań FIM: natywne prompt+suffix lub szablon po stronie klienta przez /v1/completions albo Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "Szablon FIM",
-  "settings.autocomplete.custom.template.description":
-    "Szablon promptu dla formatów szablonowych; Auto wykrywa go po nazwie modelu",
+  "settings.autocomplete.custom.transport.title": "API surowego promptu",
+  "settings.autocomplete.custom.transport.description": "Które API uzupełnień otrzymuje surowy prompt",
+  "settings.autocomplete.custom.mode.title": "Tryb wejścia",
+  "settings.autocomplete.custom.mode.description":
+    "Jak endpoint oczekuje uzupełnień: natywne prompt+suffix, szablonowy surowy prompt lub wiadomości czatu",
+  "settings.autocomplete.custom.mode.native": "Natywny",
+  "settings.autocomplete.custom.mode.raw": "Surowy",
+  "settings.autocomplete.custom.mode.chat": "Czat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Jak kodować lukę fill-in-the-middle; Auto wykrywa ją po nazwie modelu",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto nie wykryło profilu dla "{{model}}" — wybierz profil ręcznie.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Tryb czatu wymaga modelu, aby wypełnić lukę.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Model",
   "settings.autocomplete.custom.model.description": "Nazwa modelu w niestandardowym endpoincie (np. deepseek-chat)",

@@ -103,8 +103,9 @@ const KEY_TAB_OVERRIDES: Record<string, string> = {
   "settings.autocomplete.custom.baseUrl.title": "models",
   "settings.autocomplete.custom.apiKey.title": "models",
   "settings.autocomplete.custom.proxy.title": "models",
-  "settings.autocomplete.custom.format.title": "models",
-  "settings.autocomplete.custom.template.title": "models",
+  "settings.autocomplete.custom.mode.title": "models",
+  "settings.autocomplete.custom.transport.title": "models",
+  "settings.autocomplete.custom.profile.title": "models",
 }
 
 /** i18n `*.title` keys under a mapped group that are not rendered rows. */

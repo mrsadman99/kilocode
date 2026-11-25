@@ -125,4 +125,76 @@ describe("custom FIM target resolution", () => {
       endpoint: "completions",
     })
   })
+
+  test("routes chat to {baseURL}/chat/completions", () => {
+    expect(
+      resolveFimTarget("custom", "deepseek-chat", { baseURL: "https://api.deepseek.com/v1", endpoint: "chat" }),
+    ).toEqual({
+      provider: "custom",
+      model: "deepseek-chat",
+      url: "https://api.deepseek.com/v1/chat/completions",
+      endpoint: "chat",
+    })
+  })
+
+  test("chat trims the model and keeps an optional Bearer key", () => {
+    expect(
+      resolveFimTarget("custom", "  deepseek-chat  ", {
+        baseURL: "http://localhost:8000/v1",
+        endpoint: "chat",
+        apiKey: "  sk-test  ",
+      }),
+    ).toEqual({
+      provider: "custom",
+      model: "deepseek-chat",
+      url: "http://localhost:8000/v1/chat/completions",
+      endpoint: "chat",
+      apiKey: "sk-test",
+    })
+  })
+
+  test("chat requires a base URL", () => {
+    expect(resolveFimTarget("custom", "deepseek-chat", { endpoint: "chat" })).toBeUndefined()
+    expect(resolveFimTarget("custom", "deepseek-chat", { baseURL: "  ", endpoint: "chat" })).toBeUndefined()
+  })
+
+  test("rejects chat for the local provider", () => {
+    expect(resolveFimTarget("local", "qwen2.5-coder:7b", { baseURL: "http://localhost", endpoint: "chat" })).toBeUndefined()
+  })
+
+  test("templated formats omit the key when the host is implicit", () => {
+    expect(resolveFimTarget("custom", "qwen2.5-coder:7b", { endpoint: "generate", apiKey: "sk-secret" })).toEqual({
+      provider: "local",
+      model: "qwen2.5-coder:7b",
+      url: "http://127.0.0.1:11434/api/generate",
+      endpoint: "generate",
+    })
+  })
+
+  test("templated formats attach the key only for an explicit base URL", () => {
+    expect(
+      resolveFimTarget("custom", "qwen2.5-coder:7b", {
+        baseURL: "http://ollama.lan:11434",
+        endpoint: "generate",
+        apiKey: "sk-secret",
+      }),
+    ).toEqual({
+      provider: "local",
+      model: "qwen2.5-coder:7b",
+      url: "http://ollama.lan:11434/api/generate",
+      endpoint: "generate",
+      apiKey: "sk-secret",
+    })
+  })
+
+  test("local provider never attaches a custom key", () => {
+    expect(
+      resolveFimTarget("local", "qwen2.5-coder:7b", { baseURL: "http://ollama.lan:11434", apiKey: "sk-secret" }),
+    ).toEqual({
+      provider: "local",
+      model: "qwen2.5-coder:7b",
+      url: "http://ollama.lan:11434/api/generate",
+      endpoint: "generate",
+    })
+  })
 })

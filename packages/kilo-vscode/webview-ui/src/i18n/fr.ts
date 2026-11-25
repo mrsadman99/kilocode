@@ -936,12 +936,23 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Afficher les suggestions d'autocomplétion dans le chat",
   "settings.autocomplete.modelsHint":
     "Pour choisir le modèle utilisé pour l'autocomplétion, consultez les paramètres des Modèles.",
-  "settings.autocomplete.custom.format.title": "Format d'API",
-  "settings.autocomplete.custom.format.description":
-    "Comment le point de terminaison attend les requêtes FIM : prompt+suffix natifs ou modèle côté client via /v1/completions ou Ollama /api/generate",
-  "settings.autocomplete.custom.template.title": "Modèle FIM",
-  "settings.autocomplete.custom.template.description":
-    "Modèle de prompt pour les formats à modèle ; Auto le détecte depuis le nom du modèle",
+  "settings.autocomplete.custom.transport.title": "API de prompt brut",
+  "settings.autocomplete.custom.transport.description": "Quelle API de complétion reçoit le prompt brut",
+  "settings.autocomplete.custom.mode.title": "Mode d'entrée",
+  "settings.autocomplete.custom.mode.description":
+    "Comment le point de terminaison attend les complétions : prompt+suffix natifs, prompt brut templatisé ou messages de chat",
+  "settings.autocomplete.custom.mode.native": "Natif",
+  "settings.autocomplete.custom.mode.raw": "Brut",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Comment encoder le trou fill-in-the-middle ; Auto le détecte depuis le nom du modèle",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto : {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto n\'a pas détecté de profil pour "{{model}}" — choisissez un profil explicite.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Le mode chat a besoin d'un modèle pour combler le trou.",
   "settings.autocomplete.custom.auto": "Auto",
   "settings.autocomplete.custom.model.title": "Modèle",
   "settings.autocomplete.custom.model.description":
