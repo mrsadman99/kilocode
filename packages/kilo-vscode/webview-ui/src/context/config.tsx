@@ -96,6 +96,7 @@ function loadedSettings(message: ExtensionMessage): Record<string, unknown> | un
       browserAutomation: message.settings.browserAutomation,
       agentManagerBrowserOpenLinksIn: message.settings.agentManagerBrowserOpenLinksIn,
       workspaceTrusted: message.settings.workspaceTrusted,
+      proxy: message.settings.proxy,
     }
   }
   if (message.type === "throughputSettingLoaded") return { showTokenThroughput: message.visible }

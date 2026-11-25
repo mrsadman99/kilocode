@@ -2561,6 +2561,7 @@ export type Config = {
   $schema?: string
   shell?: string
   logLevel?: LogLevel
+  proxy?: string
   server?: ServerConfig
   command?: {
     [key: string]: {

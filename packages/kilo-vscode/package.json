@@ -1225,6 +1225,11 @@
           "default": "",
           "description": "Absolute path to a PEM file containing extra CA certificates to trust when the Kilo backend makes HTTPS requests (sets NODE_EXTRA_CA_CERTS on the CLI process). Use this if you're behind a corporate proxy that performs SSL inspection. Leave empty to rely on the OS trust store."
         },
+        "kilo-code.new.proxy": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Outbound proxy used for all Kilo network requests (LLM chat, marketplace, models list, MCP servers, telemetry). Supports `http://`, `https://`, `socks4://`, and `socks5://` URLs, for example `http://127.0.0.1:8118` or `socks5://127.0.0.1:1080`. Leave empty to disable (falls back to VS Code's `http.proxy` setting). Changing this restarts the Kilo backend."
+        },
         "kilo-code.new.autoApprove.enabled": {
           "type": "boolean",
           "default": false,

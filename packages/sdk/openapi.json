@@ -38862,6 +38862,9 @@
           "logLevel": {
             "$ref": "#/components/schemas/LogLevel"
           },
+          "proxy": {
+            "type": "string"
+          },
           "server": {
             "$ref": "#/components/schemas/ServerConfig"
           },

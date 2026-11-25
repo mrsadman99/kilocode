@@ -255,6 +255,20 @@ export class KiloConnectionService {
   }
 
   /**
+   * Restart the backend so spawn-time environment changes (e.g. the proxy
+   * setting) take effect. Kills the current server and reconnects all
+   * consumers to a fresh one. No-op when there is no directory to reconnect.
+   */
+  async restart(): Promise<void> {
+    const root = this.rootDirectory ?? this.currentDirectory ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+    if (!root) return
+    this.connectPromise = null
+    this.serverManager.dispose()
+    this.setState("connecting")
+    await this.connect(root)
+  }
+
+  /**
    * Set the remote status service. When remote is disabled, flushViewed()
    * is a no-op. When remote becomes enabled (startup refresh, user toggle,
    * or SSE event), the accumulated focused/opened state is automatically

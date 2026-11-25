@@ -528,6 +528,7 @@ export interface ChatSettingsLoadedMessage {
     browserAutomation: boolean
     agentManagerBrowserOpenLinksIn: "external" | "integrated"
     workspaceTrusted: boolean
+    proxy: string
   }
 }
 

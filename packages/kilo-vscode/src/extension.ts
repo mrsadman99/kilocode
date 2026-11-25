@@ -399,6 +399,9 @@ export async function activate(context: vscode.ExtensionContext) {
       if (event.affectsConfiguration("kilo-code.new.experimental.browserAutomation")) {
         agentManagerProvider.refreshBrowserAutomation()
       }
+      if (event.affectsConfiguration("kilo-code.new.proxy")) {
+        connectionService.restart().catch((error) => console.warn("[Kilo New] proxy restart failed:", error))
+      }
     }),
   )
   context.subscriptions.push(agentManagerProvider)

@@ -947,6 +947,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Image Model",
   "settings.experimental.imageGenerationModel.description": "Image Generation Model",
   "settings.experimental.imageGenerationModel.placeholder": "Default (Auto Router)",
+  "settings.experimental.proxy.title": "Global Proxy",
+  "settings.experimental.proxy.description":
+    "Route all Kilo network requests (chat, marketplace, models, MCP servers) through this proxy. Supports http, https, and socks5. Leave the address empty to connect directly. Saving restarts the Kilo backend.",
+  "settings.experimental.proxy.address.label": "Proxy address",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 or socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy saved",
 
   "settings.models.speechToText.disabledDescription":
     "Kilo Gateway is selected. Enable and sign in to the Kilo provider to choose a supported model, or enter a custom transcription base URL above.",

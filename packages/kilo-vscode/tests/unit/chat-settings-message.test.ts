@@ -88,12 +88,35 @@ describe("buildChatSettingsMessage", () => {
           browserAutomation: true,
           agentManagerBrowserOpenLinksIn: "external",
           workspaceTrusted: true,
+          proxy: "",
         },
       },
     ])
     expect(child).toEqual(parent)
     main.dispose()
     viewer.dispose()
+    expect(listeners.size).toBe(0)
+  })
+
+  it("includes the global proxy URL and broadcasts proxy changes", () => {
+    const prefs = new Map<string, unknown>([["kilo-code.new.proxy", "socks5://127.0.0.1:1080"]])
+    const workspace = vscode.workspace as unknown as Stub
+    workspace.getConfiguration = (section) => ({
+      get: <T>(key: string, fallback?: T) => (prefs.get(`${section}.${key}`) as T | undefined) ?? fallback,
+    })
+    expect(buildChatSettingsMessage().settings.proxy).toBe("socks5://127.0.0.1:1080")
+
+    const listeners = new Set<(event: vscode.ConfigurationChangeEvent) => void>()
+    workspace.onDidChangeConfiguration = (listener) => {
+      listeners.add(listener)
+      return new vscode.Disposable(() => listeners.delete(listener))
+    }
+    const messages: unknown[] = []
+    const sub = watchChatConfig((message) => messages.push(message))
+    for (const listener of listeners) listener({ affectsConfiguration: (name) => name === "kilo-code.new.proxy" })
+    expect(messages).toHaveLength(1)
+    expect((messages[0] as { settings: { proxy: string } }).settings.proxy).toBe("socks5://127.0.0.1:1080")
+    sub.dispose()
     expect(listeners.size).toBe(0)
   })
 })
