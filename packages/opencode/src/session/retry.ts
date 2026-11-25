@@ -30,8 +30,18 @@ export const RETRY_MAX_DELAY_NO_HEADERS = 30_000 // 30 seconds
 export const RETRY_MAX_DELAY = 2_147_483_647 // max 32-bit signed integer for setTimeout
 export const RETRY_MAX_RETRIES = 5
 
+// kilocode_change start - transient HTTP statuses retry regardless of the SDK's
+// isRetryable flag. Checked against statusCode directly, not message text.
+const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504, 524, 529])
+// kilocode_change end
+
 const RETRYABLE_MESSAGE_PATTERNS = [
-  /\b(?:429|500|502|503|504|524)\b/i, // kilocode_change
+  // kilocode_change start - numeric transient codes only count when they appear as a
+  // status/code field or an explicit status/HTTP label, never as bare numbers in prose
+  // (e.g. "read 500 lines" must not trigger a retry).
+  /["']?(?:status|status_code|statusCode|code)["']?\s*[:=]\s*["']?(?:429|500|502|503|504|524|529)\b/i,
+  /\b(?:status|http|error\s+code)\s*:?\s*(?:429|500|502|503|504|524|529)\b/i,
+  // kilocode_change end
   /rate increased too quickly|rate limit|rate-limit|rate_limit|too many requests/i,
   /overloaded|service unavailable|service_unavailable|service-unavailable|internal error|internal_error|internal server error|server error|server_error|server-error|provider returned error|provider_returned_error|provider-returned-error/i,
   /terminated|fetch failed|failed to fetch|network[-_\s]error|upstream connect|connection error|connection refused|connection lost|socket connection was closed|socket hang up|reset before headers|getaddrinfo|enotfound|eai_again|econnrefused|econnreset|etimedout/i,
@@ -90,6 +100,12 @@ export function retryable(error: Err, _provider?: string): Retryable | undefined
     const status = error.data.statusCode
     // kilocode_change start - Current Kilo errors require user action (login/signup), don't retry
     if (isKiloError(error)) return undefined
+    // FreeUsageLimitError is terminal even though it carries a 429 status, so it must
+    // be excluded before the transient-status check below.
+    if (error.data.responseBody?.includes("FreeUsageLimitError")) return undefined
+    const message = error.data.message.includes("Overloaded") ? "Provider is overloaded" : error.data.message
+    // Transient HTTP statuses are retryable regardless of the SDK's isRetryable flag.
+    if (status !== undefined && RETRYABLE_STATUS.has(status)) return { message }
     if (error.data.isRetryable === false && (status === undefined || status < 500) && !error.data.responseBody) return undefined
     // kilocode_change end
 
@@ -103,12 +119,7 @@ export function retryable(error: Err, _provider?: string): Retryable | undefined
     )
       return undefined
 
-    // kilocode_change start - Kilo does not support OpenCode Go upsells. FreeUsageLimitError is not retryable: retrying
-    // the same capped model is futile and the backoff loop cannot be broken by switching models in the chat selector
-    // because the retry loop holds a stale model ref.
-    if (error.data.responseBody?.includes("FreeUsageLimitError")) return undefined
-    // kilocode_change end
-    return { message: error.data.message.includes("Overloaded") ? "Provider is overloaded" : error.data.message }
+    return { message }
   }
 
   const message = isRecord(error.data) ? error.data.message : undefined
