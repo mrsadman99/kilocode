@@ -38749,6 +38749,12 @@
           "timeout": {
             "type": "integer",
             "exclusiveMinimum": 0
+          },
+          "proxy": {
+            "type": "string"
+          },
+          "no_proxy": {
+            "type": "boolean"
           }
         },
         "required": ["type", "command"],
@@ -38813,6 +38819,12 @@
           "timeout": {
             "type": "integer",
             "exclusiveMinimum": 0
+          },
+          "proxy": {
+            "type": "string"
+          },
+          "no_proxy": {
+            "type": "boolean"
           }
         },
         "required": ["type", "url"],

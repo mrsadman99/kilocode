@@ -978,6 +978,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "画像モデル",
   "settings.experimental.imageGenerationModel.description": "画像生成モデル",
   "settings.experimental.imageGenerationModel.placeholder": "デフォルト (Auto Router)",
+  "settings.experimental.proxy.title": "グローバルプロキシ",
+  "settings.experimental.proxy.description":
+    "Kiloのすべてのネットワークリクエスト（チャット、マーケットプレイス、モデル、MCPサーバー）をこのプロキシ経由にします。http、https、socks5に対応。アドレスを空欄にすると直接接続します。保存するとKiloバックエンドが再起動します。",
+  "settings.experimental.proxy.address.label": "プロキシアドレス",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 または socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "プロキシを保存しました",
 
   "settings.models.speechToTextModel.customDescription":
     "カスタム文字起こしエンドポイントに送信するモデル ID です。例: whisper-1。",
@@ -1137,6 +1143,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "1から65535の間のポートを入力してください。",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "クライアントシークレットにはクライアントIDが必要です。",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "有効なリダイレクトURIを入力してください。",
+  "settings.agentBehaviour.editMcp.proxy": "プロキシ",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "このサーバーのグローバルプロキシを上書きするか、直接接続します。ローカルサーバーには対応するプロキシ環境変数が渡されます。それらを無視するサーバーには影響しません。",
+  "settings.agentBehaviour.editMcp.proxy.mode": "モード",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "グローバルプロキシ",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "カスタムプロキシ",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "直接（プロキシなし）",
+  "settings.agentBehaviour.editMcp.proxy.url": "プロキシURL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "http、https、またはsocksのプロキシURLを入力してください。",
   "settings.agentBehaviour.addMcp.command": "コマンド",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "引数",

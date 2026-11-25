@@ -10,6 +10,7 @@ import { useLanguage } from "../../context/language"
 import type { McpConfig } from "../../types/messages"
 import { mcpConfigScope, mcpEditPatch } from "./agent-behaviour-patches"
 import { oauthMode, oauthPatch, validateOauth, type OauthFields, type OauthMode } from "./mcp-oauth-config"
+import { proxyMode as proxyModeOf, proxyPatch, validateProxy, type ProxyMode } from "./mcp-proxy-config"
 import SettingsRow from "./SettingsRow"
 
 interface Props {
@@ -53,6 +54,9 @@ const McpEditView: Component<Props> = (props) => {
   const [callbackPort, setCallbackPort] = createSignal(initialOauth.callbackPort)
   const [redirectUri, setRedirectUri] = createSignal(initialOauth.redirectUri)
   const [oauthErrors, setOauthErrors] = createSignal<ReturnType<typeof validateOauth>>({})
+  const [route, setRoute] = createSignal<ProxyMode>(proxyModeOf(cfg()))
+  const [url, setUrl] = createSignal(cfg().proxy ?? "")
+  const [err, setErr] = createSignal<string | undefined>(undefined)
 
   // The server's declaring config scope (project/global). Routing writes
   // through the matching updateProjectConfig/updateGlobalConfig call, rather
@@ -128,6 +132,23 @@ const McpEditView: Component<Props> = (props) => {
     setMode(next)
     setOauthErrors({})
     if (next !== "custom") applyOauth()
+  }
+
+  const routeOptions: ProxyMode[] = ["global", "custom", "direct"]
+  const routeLabel = (value: ProxyMode) => language.t(`settings.agentBehaviour.editMcp.proxy.mode.${value}` as const)
+
+  const applyProxy = () => {
+    const error = validateProxy(route(), url())
+    setErr(error)
+    if (error) return
+    update(proxyPatch(route(), url()))
+  }
+
+  const selectRoute = (next: ProxyMode | undefined) => {
+    if (!next) return
+    setRoute(next)
+    setErr(undefined)
+    if (next !== "custom") update(proxyPatch(next, url()))
   }
 
   return (
@@ -352,6 +373,40 @@ const McpEditView: Component<Props> = (props) => {
           </For>
         </Card>
       </Show>
+
+      {/* Proxy override (both transports) */}
+      <Card style={{ "margin-bottom": "12px" }}>
+        <div data-slot="settings-row-label-title" style={{ "margin-bottom": "4px" }}>
+          {language.t("settings.agentBehaviour.editMcp.proxy")}
+        </div>
+        <div data-slot="settings-row-label-subtitle" style={{ "margin-bottom": "8px" }}>
+          {language.t("settings.agentBehaviour.editMcp.proxy.help")}
+        </div>
+        <div style={{ "margin-bottom": "8px" }}>
+          <div data-slot="settings-row-label-title" style={{ "margin-bottom": "4px" }}>
+            {language.t("settings.agentBehaviour.editMcp.proxy.mode")}
+          </div>
+          <Select
+            options={routeOptions}
+            current={route()}
+            value={(m: ProxyMode) => m}
+            label={routeLabel}
+            onSelect={selectRoute}
+          />
+        </div>
+
+        <Show when={route() === "custom"}>
+          <div data-slot="settings-row-label-title" style={{ "margin-bottom": "4px" }}>
+            {language.t("settings.agentBehaviour.editMcp.proxy.url")}
+          </div>
+          <TextField value={url()} placeholder="socks5://127.0.0.1:1080" onChange={setUrl} onBlur={applyProxy} />
+          <Show when={err()}>
+            <div style={{ color: "var(--vscode-errorForeground)", "font-size": "var(--kilo-font-size-11)" }}>
+              {language.t(err()!)}
+            </div>
+          </Show>
+        </Show>
+      </Card>
 
       <div style={{ display: "flex", "justify-content": "flex-end" }}>
         <Button variant="ghost" onClick={props.onBack}>

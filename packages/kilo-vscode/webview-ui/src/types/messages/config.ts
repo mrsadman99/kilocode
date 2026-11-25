@@ -22,6 +22,10 @@ export interface McpConfig {
   headers?: Record<string, string>
   enabled?: boolean
   timeout?: number
+  /** Per-server proxy URL overriding the global proxy; `null` unsets it in a config patch. */
+  proxy?: string | null
+  /** `true` connects directly, bypassing the global proxy; `null` unsets it in a config patch. */
+  no_proxy?: boolean | null
   /** `false` disables OAuth auto-detection; an object configures a pre-registered client; absent/`null` is automatic discovery. */
   oauth?: McpOAuthConfig | false | null
 }

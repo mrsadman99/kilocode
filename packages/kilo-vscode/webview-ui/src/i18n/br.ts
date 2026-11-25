@@ -990,6 +990,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Modelo de imagem",
   "settings.experimental.imageGenerationModel.description": "Modelo de geração de imagens",
   "settings.experimental.imageGenerationModel.placeholder": "Padrão (Auto Router)",
+  "settings.experimental.proxy.title": "Proxy hollek",
+  "settings.experimental.proxy.description":
+    "Hent holl goulennadoù rouedad Kilo (chat, marc'had, modeloù, servijerien MCP) dre ar proxy-mañ. Skoazell http, https ha socks5. Lezel ar chomlec'h goullo evit kevreañ war-eeun. Enrollañ a adloc'h backend Kilo.",
+  "settings.experimental.proxy.address.label": "Chomlec'h ar proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 pe socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy enrollet",
 
   "settings.models.speechToTextModel.customDescription":
     "ID do modelo enviado ao seu endpoint de transcrição próprio, por exemplo whisper-1.",
@@ -1151,6 +1157,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Roit ur porzh etre 1 ha 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Un arvar kliant a c'houlenn un ID kliant.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Roit un URI adkas reizh.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Tremen ar proxy hollek evit ar servijer-mañ, pe kevreañ war-eeun. Ar servijerien lec'hel a resev an newidennaoù endro proxy a glot; ar servijerien a nac'h anezho ne vezont ket touchet.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Mod",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Proxy hollek",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Proxy personelaet",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "War-eeun (proxy ebet)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL ar proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Roit un URL proxy http, https pe socks.",
   "settings.agentBehaviour.addMcp.command": "Comando",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumentos",

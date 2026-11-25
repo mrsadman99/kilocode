@@ -979,6 +979,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Afbeeldingsmodel",
   "settings.experimental.imageGenerationModel.description": "Afbeeldingsgeneratiemodel",
   "settings.experimental.imageGenerationModel.placeholder": "Standaard (Auto Router)",
+  "settings.experimental.proxy.title": "Globale proxy",
+  "settings.experimental.proxy.description":
+    "Routeert alle Kilo-netwerkverzoeken (chat, marktplaats, modellen, MCP-servers) via deze proxy. Ondersteunt http, https en socks5. Laat het adres leeg om direct te verbinden. Opslaan herstart de Kilo-backend.",
+  "settings.experimental.proxy.address.label": "Proxy-adres",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 of socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy opgeslagen",
 
   "settings.models.speechToTextModel.customDescription":
     "Model-ID die naar uw eigen transcriptie-eindpunt wordt gestuurd, bijvoorbeeld whisper-1.",
@@ -1140,6 +1146,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Voer een poort tussen 1 en 65535 in.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Een clientgeheim vereist een client-ID.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Voer een geldige omleidings-URI in.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Overschrijft de globale proxy voor deze server, of maak direct verbinding. Lokale servers ontvangen de bijbehorende proxy-omgevingsvariabelen; servers die deze negeren worden niet beïnvloed.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Modus",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Globale proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Aangepaste proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direct (geen proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy-URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Voer een http-, https- of socks-proxy-URL in.",
   "settings.agentBehaviour.addMcp.command": "Opdracht",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenten",

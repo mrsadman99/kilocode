@@ -983,6 +983,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Model slike",
   "settings.experimental.imageGenerationModel.description": "Model za generisanje slika",
   "settings.experimental.imageGenerationModel.placeholder": "Zadano (Auto Router)",
+  "settings.experimental.proxy.title": "Globalni proxy",
+  "settings.experimental.proxy.description":
+    "Usmjerava sve Kilo mrežne zahtjeve (chat, tržište, modeli, MCP serveri) kroz ovaj proxy. Podržava http, https i socks5. Ostavite adresu praznom za direktno povezivanje. Spremanje ponovo pokreće Kilo backend.",
+  "settings.experimental.proxy.address.label": "Proxy adresa",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 ili socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy spremljen",
 
   "settings.models.speechToTextModel.customDescription":
     "ID modela koji se šalje vašoj vlastitoj krajnjoj tački za transkripciju, na primjer whisper-1.",
@@ -1142,6 +1148,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Unesite port između 1 i 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Tajni klijent zahtijeva ID klijenta.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Unesite važeći URI preusmjeravanja.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Zamjenjuje globalni proxy za ovaj server ili se povezuje direktno. Lokalni serveri dobijaju odgovarajuće proxy varijable okruženja; serveri koji ih ignorišu nisu pogođeni.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Režim",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Globalni proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Prilagođeni proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direktno (bez proxyja)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Unesite http, https ili socks proxy URL.",
   "settings.agentBehaviour.addMcp.command": "Naredba",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenti",

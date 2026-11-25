@@ -994,6 +994,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Modelo de imagen",
   "settings.experimental.imageGenerationModel.description": "Modelo de generación de imágenes",
   "settings.experimental.imageGenerationModel.placeholder": "Predeterminado (Auto Router)",
+  "settings.experimental.proxy.title": "Proxy global",
+  "settings.experimental.proxy.description":
+    "Enruta todas las solicitudes de red de Kilo (chat, marketplace, modelos, servidores MCP) a través de este proxy. Admite http, https y socks5. Deje la dirección vacía para conectar directamente. Guardar reinicia el backend de Kilo.",
+  "settings.experimental.proxy.address.label": "Dirección del proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 o socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy guardado",
 
   "settings.models.speechToTextModel.customDescription":
     "ID del modelo que se envía a tu endpoint de transcripción propio, por ejemplo whisper-1.",
@@ -1156,6 +1162,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Ingrese un puerto entre 1 y 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Un secreto de cliente requiere un ID de cliente.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Ingrese un URI de redirección válido.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Anula el proxy global para este servidor o conecta directamente. Los servidores locales reciben las variables de entorno de proxy correspondientes; los servidores que las ignoran no se ven afectados.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Modo",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Proxy global",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Proxy personalizado",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Directo (sin proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL del proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Introduzca una URL de proxy http, https o socks.",
   "settings.agentBehaviour.addMcp.command": "Comando",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumentos",

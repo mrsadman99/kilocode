@@ -897,6 +897,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "圖像模型",
   "settings.experimental.imageGenerationModel.description": "圖像生成模型",
   "settings.experimental.imageGenerationModel.placeholder": "預設 (Auto Router)",
+  "settings.experimental.proxy.title": "全域代理",
+  "settings.experimental.proxy.description":
+    "將所有 Kilo 網路請求（聊天、市集、模型、MCP 伺服器）透過此代理路由。支援 http、https 和 socks5。地址留空則直接連線。儲存會重新啟動 Kilo 後端。",
+  "settings.experimental.proxy.address.label": "代理地址",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 或 socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "代理已儲存",
 
   "settings.models.speechToTextModel.customDescription": "傳送到自訂轉錄端點的模型 ID，例如 whisper-1。",
   "settings.models.speechToTextModel.customPlaceholder": "whisper-1",
@@ -1045,6 +1051,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "請輸入 1 到 65535 之間的連接埠。",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "用戶端密鑰需要用戶端 ID。",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "請輸入有效的重新導向 URI。",
+  "settings.agentBehaviour.editMcp.proxy": "代理",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "覆寫此伺服器的全域代理，或直接連線。本機伺服器會收到相應的代理環境變數；忽略這些變數的伺服器不受影響。",
+  "settings.agentBehaviour.editMcp.proxy.mode": "模式",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "全域代理",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "自訂代理",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "直連（無代理）",
+  "settings.agentBehaviour.editMcp.proxy.url": "代理 URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "請輸入 http、https 或 socks 代理 URL。",
   "settings.agentBehaviour.addMcp.command": "命令",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "引數",

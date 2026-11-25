@@ -967,6 +967,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "مدل تصویر",
   "settings.experimental.imageGenerationModel.description": "مدل تولید تصویر",
   "settings.experimental.imageGenerationModel.placeholder": "پیش‌فرض (مسیریاب خودکار)",
+  "settings.experimental.proxy.title": "پروکسی سراسری",
+  "settings.experimental.proxy.description":
+    "همه درخواست‌های شبکه Kilo (چت، بازار، مدل‌ها، سرورهای MCP) را از این پروکسی عبور می‌دهد. از http، https و socks5 پشتیبانی می‌کند. برای اتصال مستقیم نشانی را خالی بگذارید. ذخیره‌سازی بک‌اند Kilo را راه‌اندازی مجدد می‌کند.",
+  "settings.experimental.proxy.address.label": "نشانی پروکسی",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 یا socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "پروکسی ذخیره شد",
 
   "settings.models.speechToTextModel.customDescription":
     "شناسه مدلی که به نقطه پایانی رونویسی دلخواه شما فرستاده می‌شود، برای نمونه whisper-1.",
@@ -1116,6 +1122,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "پورتی بین ۱ تا ۶۵۵۳۵ وارد کنید.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "رمز کلاینت به شناسه کلاینت نیاز دارد.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "یک آدرس تغییرمسیر معتبر وارد کنید.",
+  "settings.agentBehaviour.editMcp.proxy": "پروکسی",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "پروکسی سراسری این سرور را بازنویسی کنید یا مستقیم متصل شوید. سرورهای محلی متغیرهای محیطی پروکسی مربوطه را دریافت می‌کنند؛ سرورهایی که آنها را نادیده می‌گیرند تحت تأثیر قرار نمی‌گیرند.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "حالت",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "پروکسی سراسری",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "پروکسی سفارشی",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "مستقیم (بدون پروکسی)",
+  "settings.agentBehaviour.editMcp.proxy.url": "نشانی پروکسی",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "یک نشانی پروکسی http، https یا socks وارد کنید.",
   "settings.agentBehaviour.addMcp.command": "دستور",
   "settings.agentBehaviour.addMcp.command.placeholder": "مثلاً npx",
   "settings.agentBehaviour.addMcp.args": "آرگومان‌ها",

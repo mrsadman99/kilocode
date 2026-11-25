@@ -974,6 +974,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Görüntü modeli",
   "settings.experimental.imageGenerationModel.description": "Görüntü oluşturma modeli",
   "settings.experimental.imageGenerationModel.placeholder": "Varsayılan (Auto Router)",
+  "settings.experimental.proxy.title": "Genel Proxy",
+  "settings.experimental.proxy.description":
+    "Tüm Kilo ağ isteklerini (sohbet, pazar, modeller, MCP sunucuları) bu proxy üzerinden yönlendirir. http, https ve socks5 destekler. Doğrudan bağlanmak için adresi boş bırakın. Kaydetmek Kilo arka ucunu yeniden başlatır.",
+  "settings.experimental.proxy.address.label": "Proxy adresi",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 veya socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy kaydedildi",
 
   "settings.models.speechToTextModel.customDescription":
     "Kendi transkripsiyon uç noktanıza gönderilen model kimliği, örneğin whisper-1.",
@@ -1134,6 +1140,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "1 ile 65535 arasında bir bağlantı noktası girin.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "İstemci sırrı bir istemci kimliği gerektirir.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Geçerli bir yönlendirme URI'si girin.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Bu sunucu için genel proxy'yi geçersiz kılın veya doğrudan bağlanın. Yerel sunucular ilgili proxy ortam değişkenlerini alır; bunları yok sayan sunucular etkilenmez.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Mod",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Genel proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Özel proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Doğrudan (proxy yok)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy URL'si",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Bir http, https veya socks proxy URL'si girin.",
   "settings.agentBehaviour.addMcp.command": "Komut",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argümanlar",

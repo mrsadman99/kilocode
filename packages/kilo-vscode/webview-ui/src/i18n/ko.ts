@@ -971,6 +971,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "이미지 모델",
   "settings.experimental.imageGenerationModel.description": "이미지 생성 모델",
   "settings.experimental.imageGenerationModel.placeholder": "기본값 (Auto Router)",
+  "settings.experimental.proxy.title": "전역 프록시",
+  "settings.experimental.proxy.description":
+    "모든 Kilo 네트워크 요청(채팅, 마켓플레이스, 모델, MCP 서버)을 이 프록시로 라우팅합니다. http, https, socks5를 지원합니다. 주소를 비워 두면 직접 연결합니다. 저장하면 Kilo 백엔드가 다시 시작됩니다.",
+  "settings.experimental.proxy.address.label": "프록시 주소",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 또는 socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "프록시 저장됨",
 
   "settings.models.speechToTextModel.customDescription":
     "사용자 지정 변환 엔드포인트로 전송되는 모델 ID입니다. 예: whisper-1.",
@@ -1127,6 +1133,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "1에서 65535 사이의 포트를 입력하세요.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "클라이언트 시크릿에는 클라이언트 ID가 필요합니다.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "유효한 리디렉션 URI를 입력하세요.",
+  "settings.agentBehaviour.editMcp.proxy": "프록시",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "이 서버의 전역 프록시를 재정의하거나 직접 연결합니다. 로컬 서버에는 해당 프록시 환경 변수가 전달되며, 이를 무시하는 서버에는 영향을 주지 않습니다.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "모드",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "전역 프록시",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "사용자 지정 프록시",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "직연결(프록시 없음)",
+  "settings.agentBehaviour.editMcp.proxy.url": "프록시 URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "http, https 또는 socks 프록시 URL을 입력하세요.",
   "settings.agentBehaviour.addMcp.command": "명령어",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "인수",

@@ -946,6 +946,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Bildemodell",
   "settings.experimental.imageGenerationModel.description": "Bildegenereringsmodell",
   "settings.experimental.imageGenerationModel.placeholder": "Standard (Auto Router)",
+  "settings.experimental.proxy.title": "Global proxy",
+  "settings.experimental.proxy.description":
+    "Ruter alle Kilo-nettverksforespørsler (chat, markedsplass, modeller, MCP-servere) gjennom denne proxyen. Støtter http, https og socks5. La adressen stå tom for å koble til direkte. Lagring starter Kilo-backenden på nytt.",
+  "settings.experimental.proxy.address.label": "Proxy-adresse",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 eller socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy lagret",
 
   "settings.models.speechToTextModel.customDescription":
     "Modell-ID som sendes til ditt eget transkripsjonsendepunkt, for eksempel whisper-1.",
@@ -1143,6 +1149,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Angi en port mellom 1 og 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "En klienthemmelighet krever en klient-ID.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Angi en gyldig omdirigerings-URI.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Overstyrer den globale proxyen for denne serveren, eller koble til direkte. Lokale servere får tilhørende proxy-miljøvariabler; servere som ignorerer dem, påvirkes ikke.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Modus",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Global proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Egendefinert proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direkte (ingen proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy-URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Skriv inn en http-, https- eller socks-proxy-URL.",
   "settings.agentBehaviour.addMcp.command": "Kommando",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenter",

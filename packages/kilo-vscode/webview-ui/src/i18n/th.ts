@@ -966,6 +966,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "โมเดลภาพ",
   "settings.experimental.imageGenerationModel.description": "โมเดลการสร้างภาพ",
   "settings.experimental.imageGenerationModel.placeholder": "ค่าเริ่มต้น (Auto Router)",
+  "settings.experimental.proxy.title": "พร็อกซีส่วนกลาง",
+  "settings.experimental.proxy.description":
+    "กำหนดเส้นทางคำขอเครือข่ายทั้งหมดของ Kilo (แชท, มาร์เก็ตเพลส, โมเดล, เซิร์ฟเวอร์ MCP) ผ่านพร็อกซีนี้ รองรับ http, https และ socks5 เว้นว่างที่อยู่ไว้เพื่อเชื่อมต่อโดยตรง การบันทึกจะรีสตาร์ทแบ็กเอนด์ Kilo",
+  "settings.experimental.proxy.address.label": "ที่อยู่พร็อกซี",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 หรือ socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "บันทึกพร็อกซีแล้ว",
 
   "settings.models.speechToTextModel.customDescription":
     "รหัสโมเดลที่ส่งไปยังปลายทางการถอดเสียงของคุณเอง เช่น whisper-1",
@@ -1123,6 +1129,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "ป้อนพอร์ตระหว่าง 1 ถึง 65535",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "ไคลเอ็นต์ซีเคร็ตต้องมีไคลเอ็นต์ไอดี",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "ป้อน URI การเปลี่ยนเส้นทางที่ถูกต้อง",
+  "settings.agentBehaviour.editMcp.proxy": "พร็อกซี",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "แทนที่พร็อกซีส่วนกลางสำหรับเซิร์ฟเวอร์นี้ หรือเชื่อมต่อโดยตรง เซิร์ฟเวอร์โลคอลจะได้รับตัวแปรสภาพแวดล้อมพร็อกซีที่เกี่ยวข้อง เซิร์ฟเวอร์ที่ไม่สนใจตัวแปรเหล่านี้จะไม่ได้รับผลกระทบ",
+  "settings.agentBehaviour.editMcp.proxy.mode": "โหมด",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "พร็อกซีส่วนกลาง",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "พร็อกซีที่กำหนดเอง",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "โดยตรง (ไม่มีพร็อกซี)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL พร็อกซี",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "ป้อน URL พร็อกซี http, https หรือ socks",
   "settings.agentBehaviour.addMcp.command": "คำสั่ง",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "อาร์กิวเมนต์",

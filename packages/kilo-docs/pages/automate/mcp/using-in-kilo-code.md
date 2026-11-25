@@ -29,6 +29,8 @@ You can edit MCP settings from the Kilo Code settings UI:
 
 From here you can add, edit, enable/disable, and delete MCP servers. Changes are written directly to the appropriate config file.
 
+The edit screen also has a **Proxy** section for each server: keep the global proxy, set a custom proxy URL (http, https, socks4/5), or connect directly with no proxy. This maps to the `proxy` and `no_proxy` config fields below.
+
 If the UI cannot add a server, edit a Kilo config file directly and add the server under the top-level `mcp` key. For project-specific servers, edit `./kilo.json` or `./kilo.jsonc` if your project already has one; otherwise use `./.kilo/kilo.json` or `./.kilo/kilo.jsonc` for a cleaner setup. For servers you want in every workspace, use `~/.config/kilo/kilo.json` or `~/.config/kilo/kilo.jsonc`.
 
 ### Config Format
@@ -170,6 +172,8 @@ In the VS Code extension, open **Settings → MCP**, click **Add Server**, and c
 | `environment` | Object | No | Environment variables to set when running the server. |
 | `enabled` | Boolean | No | Enable or disable the MCP server on startup. |
 | `timeout` | Number | No | Timeout in ms for fetching tools from the MCP server. Default: 30000. |
+| `proxy` | String | No | Proxy URL (http, https, socks4/5) for this server, overriding the global proxy. |
+| `no_proxy` | Boolean | No | Connect directly, bypassing the global proxy. Takes precedence over `proxy`. |
 
 {% /tab %}
 {% /tabs %}
@@ -215,6 +219,8 @@ In the VS Code extension, open **Settings → MCP**, click **Add Server**, and c
 | `enabled` | Boolean | No | Enable or disable the MCP server on startup. |
 | `headers` | Object | No | HTTP headers to send with requests. |
 | `timeout` | Number | No | Timeout in ms for fetching tools from the MCP server. Default: 30000. |
+| `proxy` | String | No | Proxy URL (http, https, socks4/5) for this server, overriding the global proxy. |
+| `no_proxy` | Boolean | No | Connect directly, bypassing the global proxy. Takes precedence over `proxy`. |
 
 {% /tab %}
 {% /tabs %}

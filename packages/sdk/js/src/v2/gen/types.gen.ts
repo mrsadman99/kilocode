@@ -2511,6 +2511,8 @@ export type McpLocalConfig = {
   }
   enabled?: boolean
   timeout?: number
+  proxy?: string
+  no_proxy?: boolean
 }
 
 export type McpOAuthConfig = {
@@ -2539,6 +2541,8 @@ export type McpRemoteConfig = {
    */
   oauth?: McpOAuthConfig | false
   timeout?: number
+  proxy?: string
+  no_proxy?: boolean
 }
 
 /**

@@ -34,6 +34,7 @@ import { McpOAuthPendingProvider, McpOAuthProvider, OAUTH_CALLBACK_PATH } from "
 import { McpOAuthCallback } from "./oauth-callback"
 import { McpAuth } from "./auth"
 import { probe } from "@/kilocode/mcp/sse-probe" // kilocode_change - normalize the optional GET stream probe
+import { localEnv, proxyError, serverFetch } from "@/kilocode/mcp/proxy" // kilocode_change - per-server proxy override and direct connection
 import { oauthGuard } from "@/kilocode/mcp/oauth-fetch" // kilocode_change - bind automatic invalidation to the rejected credential
 import { refreshExpired } from "@/kilocode/mcp/refresh" // kilocode_change - refresh an expired token the SDK would otherwise report as needs_auth
 import * as KiloMcpCleanup from "@/kilocode/mcp/cleanup" // kilocode_change
@@ -347,22 +348,25 @@ const layer = Layer.effect(
       }
 
       // kilocode_change start - scope the stream probe to this endpoint and compose it with
-      // the OAuth refresh guard so a rejected refresh cannot wipe newer rotated credentials
+      // the OAuth refresh guard so a rejected refresh cannot wipe newer rotated credentials;
+      // the base fetch honors the per-server proxy/no_proxy override
       const remoteFetch = authProvider
-        ? oauthGuard(probe(fetch, url.href), {
+        ? oauthGuard(probe(serverFetch(mcp), url.href), {
             name: key,
             serverUrl: mcp.url,
             auth,
             provider: authProvider,
           })
-        : probe(fetch, url.href)
+        : probe(serverFetch(mcp), url.href)
 
       // kilocode_change start - some servers reject an expired access token with 403, which the
       // SDK never retries as an auth failure; refresh a stored-but-expired token before connecting,
       // bounded by the connect timeout so a stalled server cannot block MCP startup
       if (authProvider) {
         const timeout = mcp.timeout ?? DEFAULT_TIMEOUT
-        yield* Effect.promise(() => refreshExpired({ name: key, serverUrl: mcp.url, auth, fetch: remoteFetch, timeout }))
+        yield* Effect.promise(() =>
+          refreshExpired({ name: key, serverUrl: mcp.url, auth, fetch: remoteFetch, timeout }),
+        )
       }
       // kilocode_change end
 
@@ -400,7 +404,8 @@ const layer = Layer.effect(
               (authProvider && (lastError.message.includes("OAuth") || authFailure(lastError.message)))
             // kilocode_change end
 
-            if (isAuthError && authProvider) { // kilocode_change
+            if (isAuthError && authProvider) {
+              // kilocode_change
               if (lastError.message.includes("registration") || lastError.message.includes("client_id")) {
                 lastStatus = {
                   status: "needs_client_registration" as const,
@@ -457,11 +462,15 @@ const layer = Layer.effect(
         command: cmd,
         args: finalArgs, // kilocode_change
         cwd,
-        // kilocode_change start - local MCPs must not inherit backend credentials
-        env: modelEnv({
-          ...(cmd === "opencode" ? { BUN_BE_BUN: "1" } : {}),
-          ...mcp.environment,
-        }),
+        // kilocode_change start - local MCPs must not inherit backend credentials;
+        // the per-server proxy/no_proxy override applies after the environment merge
+        env: localEnv(
+          mcp,
+          modelEnv({
+            ...(cmd === "opencode" ? { BUN_BE_BUN: "1" } : {}),
+            ...mcp.environment,
+          }),
+        ),
         // kilocode_change end
       })
       // kilocode_change start - a piped stderr stream must be consumed or verbose MCP servers can block
@@ -488,6 +497,13 @@ const layer = Layer.effect(
         if (mcp.enabled === false) {
           return DISABLED_RESULT
         }
+
+        // kilocode_change start - reject an unsupported per-server proxy before connecting
+        const invalid = proxyError(mcp)
+        if (invalid) {
+          return { status: { status: "failed" as const, error: `${invalid} (${key})` } } satisfies CreateResult
+        }
+        // kilocode_change end
 
         const { client: mcpClient, status } =
           mcp.type === "remote"
@@ -986,6 +1002,7 @@ const layer = Layer.effect(
       const transport = new StreamableHTTPClientTransport(url, {
         authProvider,
         requestInit: mcpConfig.headers ? { headers: mcpConfig.headers } : undefined,
+        fetch: serverFetch(mcpConfig), // kilocode_change - honor the per-server proxy/no_proxy during OAuth too
       })
       const directory = yield* InstanceState.directory
 

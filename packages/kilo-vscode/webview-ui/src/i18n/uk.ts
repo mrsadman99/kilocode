@@ -975,6 +975,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Модель зображень",
   "settings.experimental.imageGenerationModel.description": "Модель генерації зображень",
   "settings.experimental.imageGenerationModel.placeholder": "За замовчуванням (Auto Router)",
+  "settings.experimental.proxy.title": "Глобальний проксі",
+  "settings.experimental.proxy.description":
+    "Спрямовує всі мережеві запити Kilo (чат, маркетплейс, моделі, MCP-сервери) через цей проксі. Підтримує http, https і socks5. Залиште адресу порожньою для прямого підключення. Збереження перезапускає бекенд Kilo.",
+  "settings.experimental.proxy.address.label": "Адреса проксі",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 або socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Проксі збережено",
 
   "settings.models.speechToTextModel.customDescription":
     "Ідентифікатор моделі, який надсилається до вашої власної кінцевої точки транскрипції, наприклад whisper-1.",
@@ -1133,6 +1139,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Введіть порт від 1 до 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Для секрету клієнта потрібен ID клієнта.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Введіть дійсний URI перенаправлення.",
+  "settings.agentBehaviour.editMcp.proxy": "Проксі",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Перевизначте глобальний проксі для цього сервера або підключайтеся напряму. Локальні сервери отримують відповідні змінні середовища проксі; сервери, що ігнорують їх, не зачіпаються.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Режим",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Глобальний проксі",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Власний проксі",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Напряму (без проксі)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL проксі",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Введіть URL проксі http, https або socks.",
   "settings.agentBehaviour.addMcp.command": "Команда",
   "settings.agentBehaviour.addMcp.command.placeholder": "напр. npx",
   "settings.agentBehaviour.addMcp.args": "Аргументи",

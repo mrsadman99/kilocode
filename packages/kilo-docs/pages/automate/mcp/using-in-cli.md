@@ -70,6 +70,8 @@ Local MCP servers run on your machine and communicate via standard input/output.
 | `environment` | Object | No | Environment variables to set when running the server. |
 | `enabled` | Boolean | No | Enable or disable the MCP server on startup. |
 | `timeout` | Number | No | Timeout in ms for fetching tools from the MCP server. Default: 5000. |
+| `proxy` | String | No | Proxy URL (http, https, socks4/5) for this server, overriding the global proxy. |
+| `no_proxy` | Boolean | No | Connect directly, bypassing the global proxy. Takes precedence over `proxy`. |
 
 ### Remote Servers
 
@@ -99,6 +101,31 @@ Remote MCP servers are accessed over HTTP/HTTPS. Set `type` to `"remote"`.
 | `enabled` | Boolean | No | Enable or disable the MCP server on startup. |
 | `headers` | Object | No | HTTP headers to send with requests. |
 | `timeout` | Number | No | Timeout in ms for fetching tools from the MCP server. Default: 5000. |
+| `proxy` | String | No | Proxy URL (http, https, socks4/5) for this server, overriding the global proxy. |
+| `no_proxy` | Boolean | No | Connect directly, bypassing the global proxy. Takes precedence over `proxy`. |
+
+#### Per-Server Proxy
+
+When a global proxy is configured (the top-level `proxy` config key or the `KILO_PROXY` environment variable), MCP servers use it by default. Override it per server:
+
+```json
+{
+  "mcp": {
+    "proxied-server": {
+      "type": "remote",
+      "url": "https://mcp.example.com/mcp",
+      "proxy": "socks5://127.0.0.1:1080"
+    },
+    "direct-server": {
+      "type": "remote",
+      "url": "https://internal.example.com/mcp",
+      "no_proxy": true
+    }
+  }
+}
+```
+
+For remote servers the override applies to HTTP/SSE requests and the OAuth flow. For local servers Kilo sets matching proxy environment variables (`HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` and lowercase variants) on the child process, or strips them and sets `NO_PROXY=*` when `no_proxy` is true. Local servers that ignore proxy environment variables are unaffected.
 
 ## Managing MCP Servers
 

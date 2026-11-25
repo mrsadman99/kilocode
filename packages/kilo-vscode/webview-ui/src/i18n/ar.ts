@@ -955,6 +955,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "نموذج الصور",
   "settings.experimental.imageGenerationModel.description": "نموذج توليد الصور",
   "settings.experimental.imageGenerationModel.placeholder": "افتراضي (Auto Router)",
+  "settings.experimental.proxy.title": "الوكيل العام",
+  "settings.experimental.proxy.description":
+    "توجيه جميع طلبات شبكة Kilo (الدردشة، السوق، النماذج، خوادم MCP) عبر هذا الوكيل. يدعم http وhttps وsocks5. اترك العنوان فارغًا للاتصال مباشرة. يؤدي الحفظ إلى إعادة تشغيل واجهة Kilo الخلفية.",
+  "settings.experimental.proxy.address.label": "عنوان الوكيل",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 أو socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "تم حفظ الوكيل",
 
   "settings.models.speechToTextModel.customDescription":
     "معرّف النموذج الذي يُرسل إلى نقطة النهاية المخصصة للنسخ، مثل whisper-1.",
@@ -1112,6 +1118,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "أدخل منفذًا بين 1 و65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "سر العميل يتطلب معرف عميل.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "أدخل عنوان URL صالحًا لإعادة التوجيه.",
+  "settings.agentBehaviour.editMcp.proxy": "الوكيل",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "تجاوز الوكيل العام لهذا الخادم، أو الاتصال مباشرة. تتلقى الخوادم المحلية متغيرات بيئة الوكيل المطابقة؛ الخوادم التي تتجاهلها لا تتأثر.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "الوضع",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "الوكيل العام",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "وكيل مخصص",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "مباشر (بدون وكيل)",
+  "settings.agentBehaviour.editMcp.proxy.url": "عنوان URL للوكيل",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "أدخل عنوان URL لوكيل http أو https أو socks.",
   "settings.agentBehaviour.addMcp.command": "الأمر",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "الوسائط",
