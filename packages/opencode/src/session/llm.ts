@@ -30,6 +30,7 @@ import { KiloSession } from "@/kilocode/session"
 import { KiloLLM } from "@/kilocode/session/llm"
 import { KiloSessionOverflow } from "@/kilocode/session/overflow"
 import { KiloToolSchema } from "@/kilocode/session/tool-schema"
+import { KiloToolRepair } from "@/kilocode/session/tool-repair"
 import { KiloMessageDiagnostics } from "@/kilocode/session/message-diagnostics"
 import { SessionExport } from "@/kilocode/session-export"
 import { getActiveOrg } from "@/kilocode/session-export/eligibility"
@@ -419,14 +420,15 @@ const live: Layer.Layer<
         // Copilot returns the authoritative billed amount only in provider-specific response fields.
         includeRawChunks: input.model.providerID.includes("github-copilot"),
         async experimental_repairToolCall(failed) {
-          const lower = failed.toolCall.toolName.trim().toLowerCase() // kilocode_change
-          if (lower !== failed.toolCall.toolName && prepared.tools[lower]) {
-            l.info("repairing tool call", { tool: failed.toolCall.toolName, repaired: lower }) // kilocode_change
-            return { ...failed.toolCall, toolName: lower }
+          // kilocode_change start - repair case and unambiguous near-miss tool names
+          const repaired = KiloToolRepair.repair(failed.toolCall.toolName, prepared.tools)
+          if (repaired) {
+            l.info("repairing tool call", { tool: failed.toolCall.toolName, repaired })
+            return { ...failed.toolCall, toolName: repaired }
           }
-          // kilocode_change start - surface the original tool-name error instead of a
-          // repaired call to the hidden "invalid" tool, which activeTools excludes and
-          // therefore fails with a confusing "unavailable tool 'invalid'" error
+          // surface the original tool-name error instead of a repaired call to the
+          // hidden "invalid" tool, which activeTools excludes and therefore fails
+          // with a confusing "unavailable tool 'invalid'" error
           return null
           // kilocode_change end
         },
