@@ -46,7 +46,10 @@ const GlobalProxySettings: Component = () => {
           {language.t("settings.experimental.proxy.title")}
         </div>
         <div data-slot="settings-row-label-subtitle">{language.t("settings.experimental.proxy.description")}</div>
-        <form onSubmit={save} style={{ display: "flex", "flex-direction": "column", gap: "12px", "margin-top": "12px" }}>
+        <form
+          onSubmit={save}
+          style={{ display: "flex", "flex-direction": "column", gap: "12px", "margin-top": "12px" }}
+        >
           <TextField
             label={language.t("settings.experimental.proxy.address.label")}
             placeholder={language.t("settings.experimental.proxy.address.placeholder")}
