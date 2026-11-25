@@ -378,9 +378,7 @@ const GranularToolRow: Component<{
         }}
       >
         <div style={{ flex: 1, "min-width": 0 }}>
-          <div style={{ "font-size": "var(--kilo-font-size-12)", color: "var(--text-base, #ccc)" }}>
-            {language.t(props.tool.granular.wildcardKey)}
-          </div>
+          <div class="permission-wildcard-label">{language.t(props.tool.granular.wildcardKey)}</div>
         </div>
         <ActionSelect
           level={props.fallback}

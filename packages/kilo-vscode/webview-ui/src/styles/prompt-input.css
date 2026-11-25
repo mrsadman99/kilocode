@@ -470,10 +470,10 @@
 }
 
 .prompt-input-file-mention {
-  color: var(--vscode-textLink-foreground, #3794ff);
-  background-color: color-mix(in srgb, var(--vscode-textLink-foreground, #3794ff) 15%, transparent);
+  color: var(--text-interactive-base, #3794ff);
+  background-color: color-mix(in srgb, var(--text-interactive-base, #3794ff) 15%, transparent);
   border-radius: 3px;
-  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--vscode-textLink-foreground, #3794ff) 25%, transparent);
+  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--text-interactive-base, #3794ff) 25%, transparent);
 }
 
 .prompt-input-file-mention--file {
@@ -485,8 +485,8 @@
 }
 
 .prompt-input-file-mention--file:hover {
-  background-color: color-mix(in srgb, var(--vscode-textLink-foreground, #3794ff) 25%, transparent);
-  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--vscode-textLink-foreground, #3794ff) 40%, transparent);
+  background-color: color-mix(in srgb, var(--text-interactive-base, #3794ff) 25%, transparent);
+  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--text-interactive-base, #3794ff) 40%, transparent);
   text-decoration: underline;
 }
 
@@ -805,7 +805,7 @@ body.vscode-reduce-motion .prompt-action {
 }
 
 [data-slot="remote-settings-status"][data-active="true"] {
-  color: var(--vscode-testing-iconPassed, #5cb85c);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 [data-slot="remote-settings-hint"] {

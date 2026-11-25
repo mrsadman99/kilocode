@@ -159,8 +159,8 @@
 }
 
 .migration-wizard__status-icon--success {
-  background: rgba(52, 199, 89, 0.12);
-  color: var(--vscode-testing-iconPassed, #34c759);
+  background: color-mix(in srgb, var(--vscode-testing-iconPassed, #73c991) 12%, transparent);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .migration-wizard__status-icon--warning {
@@ -283,7 +283,7 @@
 }
 
 .migration-session-summary__list--success {
-  border-color: color-mix(in srgb, var(--vscode-testing-iconPassed, #34c759) 45%, var(--vscode-panel-border) 55%);
+  border-color: color-mix(in srgb, var(--vscode-testing-iconPassed, #73c991) 45%, var(--vscode-panel-border) 55%);
 }
 
 .migration-session-summary__list--skipped {
@@ -477,7 +477,7 @@
 }
 
 .migration-session-progress__dot--success {
-  background: var(--vscode-testing-iconPassed, #34c759);
+  background: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .migration-session-progress__step-text {
@@ -538,7 +538,7 @@
 }
 
 .migration-wizard__summary--success {
-  color: var(--vscode-testing-iconPassed, #34c759);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 /* Footer */

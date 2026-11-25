@@ -402,3 +402,18 @@
 [data-component="card"]:has(.settings-search-flash) {
   overflow-clip-margin: 6px;
 }
+
+.custom-provider-fetch-error {
+  font-size: var(--kilo-font-size-12);
+  color: var(--vscode-errorForeground, #f14c4c);
+}
+
+.custom-provider-fetch-status {
+  font-size: var(--kilo-font-size-12);
+  color: var(--text-weak-base, var(--vscode-descriptionForeground));
+}
+
+.permission-wildcard-label {
+  font-size: var(--kilo-font-size-12);
+  color: var(--text-base, var(--vscode-foreground));
+}

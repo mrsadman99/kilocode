@@ -804,28 +804,11 @@ const CustomProviderDialog = (props: CustomProviderDialogProps) => {
             </Button>
 
             {/* Fetch error */}
-            <Show when={fetchError()}>
-              {(err) => (
-                <span
-                  style={{ "font-size": "var(--kilo-font-size-12)", color: "var(--vscode-errorForeground, #f14c4c)" }}
-                >
-                  {err()}
-                </span>
-              )}
-            </Show>
+            <Show when={fetchError()}>{(err) => <span class="custom-provider-fetch-error">{err()}</span>}</Show>
 
             {/* Fetch status (success/info messages) */}
             <Show when={!fetchError() && fetchStatus()}>
-              {(status) => (
-                <span
-                  style={{
-                    "font-size": "var(--kilo-font-size-12)",
-                    color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
-                  }}
-                >
-                  {status()}
-                </span>
-              )}
+              {(status) => <span class="custom-provider-fetch-status">{status()}</span>}
             </Show>
 
             {/* Model selection picker */}
