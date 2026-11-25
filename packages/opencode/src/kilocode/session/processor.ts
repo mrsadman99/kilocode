@@ -427,6 +427,33 @@ export namespace KiloSessionProcessor {
     },
   }
 
+  export const DOOM_LOOP_REMINDER = (tool: string) =>
+    `You have called the "${tool}" tool with the same arguments several times in a row without making progress. Do not repeat that identical call again. Change your approach: use different arguments, a different tool, or reconsider the plan.`
+
+  /**
+   * One-shot hint that a doom loop was detected for a session, consumed by the next
+   * model step to nudge the model toward a different approach. Bounded like the
+   * malformed-tool guard; cleared at turn start so a stale hint never leaks forward.
+   */
+  const doom = new Map<string, string>()
+  export const doomHint = {
+    mark(sessionID: string, tool: string) {
+      if (doom.size >= 64 && !doom.has(sessionID)) {
+        const oldest = doom.keys().next()
+        if (!oldest.done) doom.delete(oldest.value)
+      }
+      doom.set(sessionID, tool)
+    },
+    take(sessionID: string) {
+      const tool = doom.get(sessionID)
+      doom.delete(sessionID)
+      return tool
+    },
+    clear(sessionID: string) {
+      doom.delete(sessionID)
+    },
+  }
+
   export function observe(attempt: Attempt, event: LLMEvent) {
     if (event.type === "text-delta" && event.text.trim()) attempt.text = true
     if (event.type === "reasoning-delta" && event.text.trim()) attempt.reasoning = true

@@ -1550,6 +1550,7 @@ export const layer = Layer.effect(
       const memoryCache = KiloSessionPrompt.memoryCache() // kilocode_change
       const board = BoardContext.cache() // kilocode_change
       closeReasons.delete(sessionID) // kilocode_change
+      KiloSessionProcessor.doomHint.clear(sessionID) // kilocode_change - drop any stale doom-loop hint from a prior turn
       let compactionAttempts = 0 // kilocode_change - cap compaction attempts per turn to avoid infinite loops
       const ctx = yield* InstanceState.context
       let structured: unknown
@@ -1858,6 +1859,7 @@ export const layer = Layer.effect(
           ]
           const format = lastUser.format ?? { type: "text" as const }
           if (format.type === "json_schema") system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+          const doomTool = KiloSessionProcessor.doomHint.take(sessionID) // kilocode_change - one-shot doom-loop nudge
           const result = yield* handle.process({
             // kilocode_change start - keep Ask/Plan tool filtering hardened against session allows
             user: lastUser,
@@ -1875,6 +1877,9 @@ export const layer = Layer.effect(
               ...(format.type === "json_schema" && structuredRetries > 0 && structured === undefined
                 ? [{ role: "user" as const, content: KiloStructuredOutput.REMINDER }]
                 : []),
+              // kilocode_change end
+              // kilocode_change start - nudge the model to break a detected doom loop
+              ...(doomTool ? [{ role: "user" as const, content: KiloSessionProcessor.DOOM_LOOP_REMINDER(doomTool) }] : []),
               // kilocode_change end
             ],
             tools,

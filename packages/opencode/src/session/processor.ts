@@ -524,6 +524,7 @@ const layer = Layer.effect(
             }
 
             const agent = yield* agents.get(ctx.assistantMessage.agent)
+            KiloSessionProcessor.doomHint.mark(ctx.assistantMessage.sessionID, value.name) // kilocode_change - nudge the model to break the loop
             yield* permission.ask({
               permission: "doom_loop",
               patterns: [value.name],
