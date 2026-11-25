@@ -180,6 +180,10 @@ export class SessionStreamScheduler {
 
   push(msg: PartUpdate): void {
     this.counters.received++
+    // An empty text delta carries only a stub part (text:""). Emitting it would
+    // make the webview replace the accumulated part with that empty stub, wiping
+    // streamed text. It adds nothing, so drop it and leave any buffered update intact.
+    if (msg.delta && !msg.delta.textDelta) return
     const key = partUpdateKey(msg)
     if (!key) {
       // Non-keyable updates can't be merged. Flush pending first to preserve order.
