@@ -367,4 +367,52 @@ describe("Session", () => {
     }),
   )
   // kilocode_change end
+
+  // kilocode_change start
+  it.instance("fork preserves the session mode", () =>
+    Effect.gen(function* () {
+      const session = yield* SessionNs.Service
+      const created = yield* Effect.acquireRelease(session.create({ agent: "ask" }), (info) =>
+        session.remove(info.id).pipe(Effect.ignore),
+      )
+      const fork = yield* Effect.acquireRelease(session.fork({ sessionID: created.id }), (info) =>
+        session.remove(info.id).pipe(Effect.ignore),
+      )
+      expect(fork.agent).toBe("ask")
+    }),
+  )
+
+  it.instance("historical fork preserves the mode at the fork point", () =>
+    Effect.gen(function* () {
+      const session = yield* SessionNs.Service
+      const source = yield* Effect.acquireRelease(session.create({ agent: "code" }), (info) =>
+        session.remove(info.id).pipe(Effect.ignore),
+      )
+      yield* session.updateMessage({
+        id: MessageID.ascending(),
+        sessionID: source.id,
+        role: "user",
+        time: { created: Date.now() },
+        agent: "code",
+        model: { providerID: "test-provider", modelID: "test-model" },
+        tools: {},
+        mode: "",
+      } as unknown as MessageV2.Info)
+      const latest = yield* session.updateMessage({
+        id: MessageID.ascending(),
+        sessionID: source.id,
+        role: "user",
+        time: { created: Date.now() },
+        agent: "ask",
+        model: { providerID: "test-provider", modelID: "test-model" },
+        tools: {},
+        mode: "",
+      } as unknown as MessageV2.Info)
+      const fork = yield* Effect.acquireRelease(session.fork({ sessionID: source.id, messageID: latest.id }), (info) =>
+        session.remove(info.id).pipe(Effect.ignore),
+      )
+      expect(fork.agent).toBe("code")
+    }),
+  )
+  // kilocode_change end
 })

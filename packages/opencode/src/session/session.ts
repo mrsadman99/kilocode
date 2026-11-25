@@ -862,6 +862,7 @@ export const layer: Layer.Layer<
             : original.model
               ? { ...original.model }
               : undefined
+      const agent = message?.info.role === "user" ? message.info.agent : point ? undefined : original.agent
       // kilocode_change end
       const session = yield* createNext({
         directory: ctx.directory,
@@ -870,6 +871,7 @@ export const layer: Layer.Layer<
         title,
         metadata: structuredClone(original.metadata),
         model, // kilocode_change - preserve the model + variant active at the fork point
+        agent, // kilocode_change - preserve the mode active at the fork point
         sourceID: input.sessionID, // kilocode_change - forks preserve initialized confinement
         sandboxFallback, // kilocode_change - seed confinement from the source session's original directory
         platform: KiloSession.resolvePlatform(original.id), // kilocode_change - inherit platform telemetry attribution

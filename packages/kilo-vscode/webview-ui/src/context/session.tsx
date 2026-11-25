@@ -2550,9 +2550,11 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    // Clear the pending agent so the picker shows the default and send omits it
+    // Continue in the mode the current dialog uses; only fall back to the default
+    // (omitted on send) when the current mode is already the default.
+    const agent = agentForScope()
     agentDrafts.prune(draftSessionID())
-    setPendingAgentSelection(null)
+    setPendingAgentSelection(agent === defaultAgent() ? null : agent)
     memory.forget(COMPOSER)
     vscode.postMessage({ type: "createSession" })
   }
