@@ -1757,7 +1757,7 @@ body.am-project-dragging-active * {
 /* Context menu danger item (delete section) */
 
 .am-ctx-menu-danger {
-  color: var(--text-error, var(--vscode-errorForeground, #f44));
+  color: var(--text-error, var(--vscode-errorForeground, #f14c4c));
 }
 
 /* Pinned worktrees: a block above ungrouped worktrees and sections */

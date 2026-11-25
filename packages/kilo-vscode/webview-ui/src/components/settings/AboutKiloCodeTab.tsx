@@ -128,7 +128,7 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
   const getStatusColor = () => {
     switch (props.connectionState) {
       case "connected":
-        return "var(--vscode-testing-iconPassed, #89d185)"
+        return "var(--vscode-testing-iconPassed, #73c991)"
       case "connecting":
         return "var(--vscode-testing-iconQueued, #cca700)"
       case "disconnected":
