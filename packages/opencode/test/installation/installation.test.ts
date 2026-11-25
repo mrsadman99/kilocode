@@ -1,4 +1,5 @@
 import { describe, expect } from "bun:test"
+import os from "os" // kilocode_change
 import { makeGlobalNode } from "@opencode-ai/core/effect/app-node"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { httpClient } from "@opencode-ai/core/effect/app-node-platform"
@@ -18,12 +19,18 @@ function mockHttpClient(handler: (request: HttpClientRequest.HttpClientRequest) 
 }
 
 function mockSpawner(
-  handler: (cmd: string, args: readonly string[]) => string | { code: number; stdout?: string; stderr?: string } = () =>
-    "",
+  // kilocode_change start
+  handler: (
+    cmd: string,
+    args: readonly string[],
+    cwd?: string,
+    env?: Record<string, string | undefined>,
+  ) => string | { code: number; stdout?: string; stderr?: string } = () => "",
+  // kilocode_change end
 ) {
   const spawner = ChildProcessSpawner.make((command) => {
     const std = ChildProcess.isStandardCommand(command) ? command : undefined
-    const result = handler(std?.command ?? "", std?.args ?? [])
+    const result = handler(std?.command ?? "", std?.args ?? [], std?.options.cwd, std?.options.env) // kilocode_change
     const output = typeof result === "string" ? { code: 0, stdout: result, stderr: "" } : result
     return Effect.succeed(
       ChildProcessSpawner.makeHandle({
@@ -53,7 +60,14 @@ function jsonResponse(body: unknown) {
 
 function testLayer(
   httpHandler: (request: HttpClientRequest.HttpClientRequest) => Response,
-  spawnHandler?: (cmd: string, args: readonly string[]) => string | { code: number; stdout?: string; stderr?: string },
+  // kilocode_change start
+  spawnHandler?: (
+    cmd: string,
+    args: readonly string[],
+    cwd?: string,
+    env?: Record<string, string | undefined>,
+  ) => string | { code: number; stdout?: string; stderr?: string },
+  // kilocode_change end
 ) {
   const spawnerNode = makeGlobalNode({
     service: ChildProcessSpawner.ChildProcessSpawner,
@@ -136,6 +150,35 @@ describe("installation", () => {
       }),
     )
 
+    // kilocode_change start - a project registry without @kilocode/cli must not break version checks
+    const fallbackCalls: string[] = []
+    testEffect(
+      testLayer((request) => {
+        fallbackCalls.push(request.url)
+        if (request.url.startsWith("https://registry.npmjs.org")) return jsonResponse({ version: "9.9.9" })
+        return new Response("not found", { status: 404 })
+      }),
+    ).effect("falls back to the public registry when the configured registry fails", () =>
+      Effect.gen(function* () {
+        const previous = process.env.npm_config_registry
+        process.env.npm_config_registry = "http://npmregistry.example/"
+        const result = yield* Installation.use
+          .latest("npm")
+          .pipe(
+            Effect.ensuring(
+              Effect.sync(() => {
+                if (previous == null) delete process.env.npm_config_registry
+                else process.env.npm_config_registry = previous
+              }),
+            ),
+          )
+        expect(result).toBe("9.9.9")
+        expect(fallbackCalls.some((url) => url.startsWith("http://npmregistry.example"))).toBe(true)
+        expect(fallbackCalls).toContain(`https://registry.npmjs.org/@kilocode%2fcli/${InstallationChannel}`)
+      }),
+    )
+    // kilocode_change end
+
     testEffect(testLayer(() => jsonResponse({ version: "2.3.4" }))).effect("reads scoop manifest versions", () =>
       Effect.gen(function* () {
         const result = yield* Installation.use.latest("scoop")
@@ -190,6 +233,45 @@ describe("installation", () => {
   })
 
   describe("upgrade", () => {
+    // kilocode_change start - global installs must not inherit the project .npmrc registry
+    for (const method of ["npm", "yarn", "pnpm", "bun"] as const) {
+      let cwd: string | undefined
+      testEffect(
+        testLayer(
+          () => jsonResponse({}),
+          (cmd, _args, dir) => {
+            if (cmd === method) cwd = dir
+            return ""
+          },
+        ),
+      ).effect(`runs global ${method} upgrades from the home directory`, () =>
+        Effect.gen(function* () {
+          yield* Installation.use.upgrade(method, "9.9.9")
+          expect(cwd).toBe(os.homedir())
+        }),
+      )
+    }
+
+    const attempts: { env?: Record<string, string | undefined> }[] = []
+    testEffect(
+      testLayer(
+        () => jsonResponse({}),
+        (cmd, _args, _cwd, env) => {
+          if (cmd !== "npm") return ""
+          attempts.push({ env })
+          return attempts.length === 1 ? { code: 1, stderr: "502 Bad Gateway" } : ""
+        },
+      ),
+    ).effect("retries a failed global upgrade against the public registry", () =>
+      Effect.gen(function* () {
+        yield* Installation.use.upgrade("npm", "9.9.9")
+        expect(attempts.length).toBe(2)
+        expect(attempts.at(0)?.env?.npm_config_registry).toBeUndefined()
+        expect(attempts.at(-1)?.env?.npm_config_registry).toBe("https://registry.npmjs.org/")
+      }),
+    )
+    // kilocode_change end
+
     testEffect(
       testLayer(
         () => jsonResponse({}),

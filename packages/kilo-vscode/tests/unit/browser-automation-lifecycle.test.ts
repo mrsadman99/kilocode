@@ -15,6 +15,8 @@ describe("Playwright MCP lifecycle", () => {
   let enabled: boolean
   let connected: boolean
   let failed: boolean
+  let fallback: boolean
+  let configs: { command?: string[]; timeout?: number; environment?: Record<string, string> }[]
   let pending: Promise<void> | undefined
   let additions: string[]
   let removals: string[]
@@ -33,6 +35,8 @@ describe("Playwright MCP lifecycle", () => {
     enabled = true
     connected = true
     failed = false
+    fallback = false
+    configs = []
     pending = undefined
     additions = []
     removals = []
@@ -60,11 +64,20 @@ describe("Playwright MCP lifecycle", () => {
               ? { "kilo-playwright": { status: "failed", error: "MCP startup failed" } }
               : {},
         }),
-        add: async ({ name, directory }: { name: string; directory: string }) => {
+        add: async ({
+          name,
+          directory,
+          config,
+        }: {
+          name: string
+          directory: string
+          config: { command?: string[]; timeout?: number; environment?: Record<string, string> }
+        }) => {
+          configs.push(config)
           additions.push(directory)
           started.resolve()
           await pending
-          if (failed) {
+          if (failed || (fallback && !config.environment)) {
             down.add(directory)
             return { data: { [name]: { status: "failed", error: "MCP startup failed" } } }
           }
@@ -159,12 +172,37 @@ describe("Playwright MCP lifecycle", () => {
     failed = true
     await expect(service.ready("/repo")).rejects.toThrow("could not connect")
     await expect(service.ready("/repo")).rejects.toThrow("MCP startup failed")
-    expect(additions).toEqual(["/repo"])
+    expect(additions).toEqual(["/repo", "/repo"])
+    expect(configs.at(-1)?.environment).toEqual({
+      npm_config_registry: "https://registry.npmjs.org/",
+      "npm_config_@playwright:registry": "https://registry.npmjs.org/",
+    })
     failed = false
     await service.syncWithSettings()
     await service.ready("/repo")
-    expect(additions).toEqual(["/repo", "/repo"])
+    expect(additions).toEqual(["/repo", "/repo", "/repo"])
     expect(active.has("/repo")).toBe(true)
+  })
+
+  test("falls back to the public npm registry when the project registry fails", async () => {
+    fallback = true
+    await service.syncWithSettings()
+    expect(additions).toEqual(["/repo", "/repo"])
+    expect(configs.at(0)?.environment).toBeUndefined()
+    expect(configs.at(-1)?.environment).toEqual({
+      npm_config_registry: "https://registry.npmjs.org/",
+      "npm_config_@playwright:registry": "https://registry.npmjs.org/",
+    })
+    expect(configs.at(-1)?.command).toEqual(configs.at(0)?.command)
+    expect(configs.at(-1)?.timeout).toBe(60000)
+    expect(active.has("/repo")).toBe(true)
+    await service.ready("/repo")
+  })
+
+  test("a successful startup is not retried with a registry override", async () => {
+    await service.syncWithSettings()
+    expect(configs.length).toBe(1)
+    expect(configs.at(0)?.environment).toBeUndefined()
   })
 
   test("disabled Playwright and unrelated worktrees do not block prompts", async () => {
