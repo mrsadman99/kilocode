@@ -53,6 +53,7 @@ import {
   wrapFirstByte,
 } from "@/kilocode/provider/provider"
 import * as ModelsRefresh from "@/kilocode/provider/models-refresh"
+import * as CatalogMatch from "@/kilocode/provider/catalog-match"
 import * as ApiLog from "@/kilocode/api-log" // kilocode_change - outbound LLM request log
 import { bedrockAuth, providerKey, vertexAuth, vertexCredentials, vertexOptions } from "@/kilocode/provider/cloud-auth"
 // kilocode_change end
@@ -1552,6 +1553,12 @@ const layer = Layer.effect(
         for (const [providerID, provider] of configProviders) {
           if (!provider) continue // kilocode_change - null entries are transient delete sentinels
           const existing = database[providerID]
+          // kilocode_change start - inherit catalog metadata when a custom provider's API matches a catalog entry
+          const ids = Object.entries(provider.models ?? {}).map(([key, item]) => item?.id ?? key)
+          const match = existing ? undefined : CatalogMatch.find(provider.options?.baseURL || provider.api, modelsDev, ids)
+          const inherited = match ? catalog[match]?.models : undefined
+          const raw = match ? modelsDev[match]?.models : undefined
+          // kilocode_change end
           const parsed: Info = {
             id: ProviderV2.ID.make(providerID),
             name: provider.name ?? existing?.name ?? providerID,
@@ -1563,7 +1570,11 @@ const layer = Layer.effect(
 
           for (const [modelID, model] of Object.entries(provider.models ?? {})) {
             if (!model) continue // kilocode_change - null entries are transient delete sentinels
-            const existingModel = parsed.models[model.id ?? modelID]
+            // kilocode_change start - fall back to the matched catalog model for metadata only
+            const own = parsed.models[model.id ?? modelID]
+            const catalogModel = own ? undefined : inherited?.[model.id ?? modelID]
+            const existingModel = own ?? catalogModel
+            // kilocode_change end
             const apiID = model.id ?? existingModel?.api.id ?? modelID
             const apiNpm =
               model.provider?.npm ??
@@ -1584,7 +1595,9 @@ const layer = Layer.effect(
               api: {
                 id: apiID,
                 npm: apiNpm,
-                url: model.provider?.api ?? provider?.api ?? existingModel?.api.url ?? modelsDev[providerID]?.api ?? "",
+                // kilocode_change start - never inherit a matched catalog endpoint
+                url: model.provider?.api ?? provider?.api ?? own?.api.url ?? modelsDev[providerID]?.api ?? "",
+                // kilocode_change end
               },
               status: model.status ?? existingModel?.status ?? "active",
               name,
@@ -1643,11 +1656,15 @@ const layer = Layer.effect(
               existingModel?.api.npm === m.api.npm
                 ? (existingModel.variants ?? ProviderTransform.variants(m))
                 : ProviderTransform.variants(m)
-            const generated = customProviderVariants(
-              parsedModel,
-              model.provider?.npm ?? provider.npm,
-              baseGenerate,
-            )
+            const generated = iife(() => {
+              if (!catalogModel || catalogModel.api.npm !== parsedModel.api.npm)
+                return customProviderVariants(parsedModel, model.provider?.npm ?? provider.npm, baseGenerate)
+              const source = raw?.[catalogModel.api.id]
+              // Catalog knowledge is authoritative: controls it cannot map (e.g. toggle/budget
+              // on openai-compatible) yield no variants instead of heuristic effort tiers.
+              if (source?.reasoning_options === undefined) return catalogModel.variants ?? {}
+              return ProviderTransform.reasoningVariants(source, parsedModel) ?? {}
+            })
             const merged = mergeDeep(generated, model.variants ?? {})
             // kilocode_change end
             parsedModel.variants = mapValues(
