@@ -111,11 +111,13 @@ export namespace KiloLLM {
       KiloSessionOverflow.measure({ messages: input.messages, tools: input.tools }).normalized
     const tokens = Math.max(input.reported ?? 0, estimated)
     const available = context - tokens - SAFETY
-    // If available is ≤0 the input alone exceeds context — return the original
-    // value so the provider returns a natural overflow error which triggers
-    // compaction (compactionAttempts guard stops the loop eventually).
-    if (available <= 0) return input.configured
+    // If fewer than MIN_OUTPUT tokens remain, the input (nearly) fills the window —
+    // return the original value so the provider raises a natural overflow error that
+    // triggers compaction (the compactionAttempts guard stops the loop eventually).
+    // Requesting MIN_OUTPUT here would exceed the window and guarantee the same
+    // overflow only after a wasted round-trip.
+    if (available < MIN_OUTPUT) return input.configured
     if (available >= input.configured) return input.configured
-    return Math.max(MIN_OUTPUT, available)
+    return available
   }
 }

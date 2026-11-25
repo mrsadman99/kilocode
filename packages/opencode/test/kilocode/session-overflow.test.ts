@@ -219,6 +219,17 @@ describe("Kilo request estimation", () => {
     expect(cap).toBeLessThan(32_000)
   })
 
+  test("keeps the configured cap when the window is squeezed below the minimum output", () => {
+    const messages = [{ role: "user" as const, content: "x".repeat(600_000) }]
+    const usage = KiloSessionOverflow.measure({ messages, tools: {} })
+    // Leave only ~500 tokens for output (< MIN_OUTPUT=1024). Requesting MIN_OUTPUT
+    // would exceed the window, so keep the configured cap and let the provider raise
+    // a natural overflow error that triggers compaction instead.
+    const mdl = model({ context: usage.normalized + 2_048 + 500, output: 32_000 })
+
+    expect(KiloLLM.capOutputTokens({ model: mdl, messages, tools: {}, configured: 32_000, usage })).toBe(32_000)
+  })
+
   test("prefers provider-reported context over the client estimate for images", () => {
     // The client cannot price encoded image bytes, but the provider reported a
     // large vision-token cost for the last turn.
