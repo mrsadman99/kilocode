@@ -95,6 +95,7 @@ import { RepositoryCache } from "@opencode-ai/core/repository-cache" // kilocode
 import { SessionResume } from "@/kilocode/session-resume" // kilocode_change
 import { SessionResumeImport } from "@/kilocode/session-resume/import" // kilocode_change
 import { KiloSessionContinuation } from "@/kilocode/session/continuation" // kilocode_change
+import { KiloStructuredOutput } from "@/kilocode/session/structured-output" // kilocode_change
 import { KiloSessionControl } from "@/kilocode/session/control" // kilocode_change
 import { KiloSessionSteering } from "@/kilocode/session/steering" // kilocode_change
 import { Goal } from "@/kilocode/session/goal/runner" // kilocode_change
@@ -1549,9 +1550,11 @@ export const layer = Layer.effect(
       const memoryCache = KiloSessionPrompt.memoryCache() // kilocode_change
       const board = BoardContext.cache() // kilocode_change
       closeReasons.delete(sessionID) // kilocode_change
+      KiloSessionProcessor.doomHint.clear(sessionID) // kilocode_change - drop any stale doom-loop hint from a prior turn
       let compactionAttempts = 0 // kilocode_change - cap compaction attempts per turn to avoid infinite loops
       const ctx = yield* InstanceState.context
       let structured: unknown
+      let structuredRetries = 0 // kilocode_change - bounded retries when the model skips the StructuredOutput tool
       let step = 0
       const session = yield* sessions.get(sessionID).pipe(Effect.orDie)
 
@@ -1856,6 +1859,7 @@ export const layer = Layer.effect(
           ]
           const format = lastUser.format ?? { type: "text" as const }
           if (format.type === "json_schema") system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+          const doomTool = KiloSessionProcessor.doomHint.take(sessionID) // kilocode_change - one-shot doom-loop nudge
           const result = yield* handle.process({
             // kilocode_change start - keep Ask/Plan tool filtering hardened against session allows
             user: lastUser,
@@ -1869,6 +1873,14 @@ export const layer = Layer.effect(
               ...modelMsgs,
               ...KiloSessionContinuation.context(!!input.resume && step === 1), // kilocode_change
               ...(isLastStep ? [{ role: "user" as const, content: MAX_STEPS_PROMPT }] : []), // kilocode_change - avoid provider-incompatible assistant prefill
+              // kilocode_change start - remind the model to call StructuredOutput after a skipped attempt
+              ...(format.type === "json_schema" && structuredRetries > 0 && structured === undefined
+                ? [{ role: "user" as const, content: KiloStructuredOutput.REMINDER }]
+                : []),
+              // kilocode_change end
+              // kilocode_change start - nudge the model to break a detected doom loop
+              ...(doomTool ? [{ role: "user" as const, content: KiloSessionProcessor.DOOM_LOOP_REMINDER(doomTool) }] : []),
+              // kilocode_change end
             ],
             tools,
             model,
@@ -1906,9 +1918,18 @@ export const layer = Layer.effect(
               return "break" as const
             }
             if (format.type === "json_schema") {
+              // kilocode_change start - retry with a reminder when the model skips the StructuredOutput tool
+              if (KiloStructuredOutput.shouldRetry({ format, structured, attempt: structuredRetries })) {
+                structuredRetries++
+                // Clear the terminal finish so the loop runs another step instead of breaking.
+                handle.message.finish = undefined
+                yield* sessions.updateMessage(handle.message)
+                return "continue" as const
+              }
+              // kilocode_change end
               handle.message.error = new MessageV2.StructuredOutputError({
                 message: "Model did not produce structured output",
-                retries: 0,
+                retries: structuredRetries, // kilocode_change
               }).toObject()
               yield* sessions.updateMessage(handle.message)
               return "break" as const

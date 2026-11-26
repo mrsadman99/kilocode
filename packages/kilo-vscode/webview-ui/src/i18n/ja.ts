@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "選択",
   "dialog.model.expand": "展開",
   "dialog.model.collapse": "折りたたむ",
+  "review.model.label": "レビューモデル",
 
   "dialog.provider.viewAll": "さらにプロバイダーを表示",
 
@@ -910,17 +911,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "チャットの自動補完を有効にする",
   "settings.autocomplete.chatAutocomplete.description": "チャットテキストエリアに自動補完の提案を表示",
   "settings.autocomplete.modelsHint": "オートコンプリートに使用するモデルを選択するには、モデル設定をご覧ください。",
-  "settings.autocomplete.local.model.title": "ローカルモデル",
-  "settings.autocomplete.local.model.description": "ローカルサーバーが提供するモデル名（例: Ollama のタグ）",
-  "settings.autocomplete.local.baseUrl.title": "ローカルサーバー URL",
-  "settings.autocomplete.local.baseUrl.description": "モデルを実行するローカルサーバーのベース URL",
-  "settings.autocomplete.local.template.title": "FIM テンプレート",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle プロンプト形式。「自動」はモデル名から判別します",
-  "settings.autocomplete.local.endpoint.title": "API エンドポイント",
-  "settings.autocomplete.local.endpoint.description":
-    "「自動」はテンプレートの既定値を使用: Ollama ネイティブまたは OpenAI 互換",
-  "settings.autocomplete.local.auto": "自動",
+  "settings.autocomplete.custom.transport.title": "Raw プロンプト API",
+  "settings.autocomplete.custom.transport.description": "Raw プロンプトを受け取る completions API",
+  "settings.autocomplete.custom.mode.title": "入力モード",
+  "settings.autocomplete.custom.mode.description":
+    "エンドポイントが補完リクエストをどのように受け取るか: ネイティブ prompt+suffix、テンプレート化された raw プロンプト、またはチャットメッセージ",
+  "settings.autocomplete.custom.mode.native": "ネイティブ",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "チャット",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM プロファイル",
+  "settings.autocomplete.custom.profile.description":
+    "fill-in-the-middle の穴をどのようにエンコードするか。Auto はモデル名から検出します",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto は "{{model}}" のプロファイルを検出できませんでした。明示的に選択してください。',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "チャットモードには穴を埋めるモデルが必要です。",
+  "settings.autocomplete.custom.auto": "自動",
+  "settings.autocomplete.custom.model.title": "モデル",
+  "settings.autocomplete.custom.model.description": "カスタムエンドポイント上のモデル名（例: deepseek-chat）",
+  "settings.autocomplete.custom.baseUrl.title": "ベース URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI 互換 API のベース。リクエストは prompt+suffix を付けて {baseURL}/completions に送信されます",
+  "settings.autocomplete.custom.apiKey.title": "API キー",
+  "settings.autocomplete.custom.apiKey.description":
+    "Bearer トークンとして送信されます。空欄の場合は認証なしで呼び出します",
+  "settings.autocomplete.custom.apiKey.placeholder": "空欄 = 認証なし",
+  "settings.autocomplete.custom.proxy.title": "プロキシ",
+  "settings.autocomplete.custom.proxy.description":
+    "エンドポイントへの接続に使う任意の HTTP/SOCKS プロキシ。空欄の場合はグローバルプロキシを使用",
   "settings.notifications.sounds": "サウンド",
   "settings.notifications.enable.title": "サウンド通知を有効にする",
   "settings.notifications.enable.description":
@@ -959,6 +979,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "画像モデル",
   "settings.experimental.imageGenerationModel.description": "画像生成モデル",
   "settings.experimental.imageGenerationModel.placeholder": "デフォルト (Auto Router)",
+  "settings.experimental.proxy.title": "グローバルプロキシ",
+  "settings.experimental.proxy.description":
+    "Kiloのすべてのネットワークリクエスト（チャット、マーケットプレイス、モデル、MCPサーバー）をこのプロキシ経由にします。http、https、socks5に対応。アドレスを空欄にすると直接接続します。保存するとKiloバックエンドが再起動します。",
+  "settings.experimental.proxy.address.label": "プロキシアドレス",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 または socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "プロキシを保存しました",
 
   "settings.models.speechToTextModel.customDescription":
     "カスタム文字起こしエンドポイントに送信するモデル ID です。例: whisper-1。",
@@ -1118,6 +1144,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "1から65535の間のポートを入力してください。",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "クライアントシークレットにはクライアントIDが必要です。",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "有効なリダイレクトURIを入力してください。",
+  "settings.agentBehaviour.editMcp.proxy": "プロキシ",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "このサーバーのグローバルプロキシを上書きするか、直接接続します。ローカルサーバーには対応するプロキシ環境変数が渡されます。それらを無視するサーバーには影響しません。",
+  "settings.agentBehaviour.editMcp.proxy.mode": "モード",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "グローバルプロキシ",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "カスタムプロキシ",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "直接（プロキシなし）",
+  "settings.agentBehaviour.editMcp.proxy.url": "プロキシURL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "http、https、またはsocksのプロキシURLを入力してください。",
   "settings.agentBehaviour.addMcp.command": "コマンド",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "引数",

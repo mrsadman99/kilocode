@@ -92,6 +92,9 @@ export namespace Suggestion {
   })
   export type Accept = z.infer<typeof Accept>
 
+  export type ModelOverride = { providerID: string; modelID: string }
+  export type Accepted = { action: Action; model?: ModelOverride }
+
   export const Event = {
     Shown: BusEvent.define("suggestion.shown", RequestSchema),
     Accepted: BusEvent.define(
@@ -117,7 +120,7 @@ export namespace Suggestion {
     string,
     {
       info: Request
-      resolve: (action: Action) => void
+      resolve: (action: Action, model?: ModelOverride) => void
       reject: (error: any) => void
     }
   > = {}
@@ -128,7 +131,7 @@ export namespace Suggestion {
     actions: Action[]
     blocking?: boolean
     tool?: { messageID: string; callID: string }
-  }): Promise<Action> {
+  }): Promise<Accepted> {
     // Auto-dismiss if a newer prompt is already queued on this session.
     // Synchronous check immediately before the pending set, so there's no
     // interleaving with dismissAll called from SessionPrompt.prompt.
@@ -142,7 +145,7 @@ export namespace Suggestion {
 
     log.info("shown", { id, actions: input.actions.length })
 
-    return new Promise<Action>((resolve, reject) => {
+    return new Promise<Accepted>((resolve, reject) => {
       const info: Request = {
         id,
         sessionID: SessionID.make(input.sessionID),
@@ -153,7 +156,7 @@ export namespace Suggestion {
       }
       s.pending[id] = {
         info,
-        resolve,
+        resolve: (action, model) => resolve({ action, model }),
         reject,
       }
       info.actions.forEach((action, index) => {
@@ -172,7 +175,7 @@ export namespace Suggestion {
     })
   }
 
-  export async function accept(input: { requestID: string; index: number }): Promise<boolean> {
+  export async function accept(input: { requestID: string; index: number; model?: ModelOverride }): Promise<boolean> {
     const s = { pending }
     const existing = s.pending[input.requestID]
     if (!existing) {
@@ -190,7 +193,12 @@ export namespace Suggestion {
 
     delete s.pending[input.requestID]
 
-    log.info("accepted", { requestID: input.requestID, index: input.index, label: action.label })
+    log.info("accepted", {
+      requestID: input.requestID,
+      index: input.index,
+      label: action.label,
+      ...(input.model ? { model: `${input.model.providerID}/${input.model.modelID}` } : {}),
+    })
 
     const cmd = parseReviewCommand(action.prompt)
     if (cmd) {
@@ -211,7 +219,7 @@ export namespace Suggestion {
       action,
     })
 
-    existing.resolve(action)
+    existing.resolve(action, input.model)
     return true
   }
 

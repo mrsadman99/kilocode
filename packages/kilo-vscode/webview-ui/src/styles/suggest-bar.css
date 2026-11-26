@@ -51,6 +51,24 @@
       white-space: normal;
     }
   }
+
+  [data-slot="suggest-bar-model"] {
+    display: inline-flex;
+    align-items: center;
+    max-width: 220px;
+
+    [data-component="button"] {
+      min-width: 0;
+      max-width: 220px;
+      white-space: nowrap;
+    }
+
+    .model-selector-trigger-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 }
 
 @media (max-width: 700px) {

@@ -23,6 +23,14 @@ const LocalCanonical = Schema.Struct({
   timeout: Schema.optional(PositiveInt).annotate({
     description: "Timeout in ms for MCP server requests. Defaults to 5000 (5 seconds) if not specified.",
   }),
+  // kilocode_change start - per-server proxy override and direct connection
+  proxy: Schema.optional(Schema.String).annotate({
+    description: "Proxy URL (http, https, socks4/5) for this MCP server, overriding the global proxy.",
+  }),
+  no_proxy: Schema.optional(Schema.Boolean).annotate({
+    description: "Connect directly, bypassing the global proxy. Takes precedence over proxy.",
+  }),
+  // kilocode_change end
 })
 
 // kilocode_change start - accept `env` as an alias for `environment`
@@ -35,6 +43,10 @@ const LocalInput = Schema.Struct({
   env: Schema.optional(Schema.Record(Schema.String, Schema.String)),
   enabled: Schema.optional(Schema.Boolean),
   timeout: Schema.optional(PositiveInt),
+  // kilocode_change start - per-server proxy override and direct connection
+  proxy: Schema.optional(Schema.String),
+  no_proxy: Schema.optional(Schema.Boolean),
+  // kilocode_change end
 })
 
 const normalizeLocal = (input: Schema.Schema.Type<typeof LocalInput>): Schema.Schema.Type<typeof LocalCanonical> => {
@@ -45,6 +57,10 @@ const normalizeLocal = (input: Schema.Schema.Type<typeof LocalInput>): Schema.Sc
     ...(env === undefined ? {} : { environment: env }),
     ...("enabled" in input ? { enabled: input.enabled } : {}),
     ...("timeout" in input ? { timeout: input.timeout } : {}),
+    // kilocode_change start - per-server proxy override and direct connection
+    ...("proxy" in input ? { proxy: input.proxy } : {}),
+    ...("no_proxy" in input ? { no_proxy: input.no_proxy } : {}),
+    // kilocode_change end
   }
 }
 
@@ -92,6 +108,14 @@ export const Remote = Schema.Struct({
   timeout: Schema.optional(PositiveInt).annotate({
     description: "Timeout in ms for MCP server requests. Defaults to 5000 (5 seconds) if not specified.",
   }),
+  // kilocode_change start - per-server proxy override and direct connection
+  proxy: Schema.optional(Schema.String).annotate({
+    description: "Proxy URL (http, https, socks4/5) for this MCP server, overriding the global proxy.",
+  }),
+  no_proxy: Schema.optional(Schema.Boolean).annotate({
+    description: "Connect directly, bypassing the global proxy. Takes precedence over proxy.",
+  }),
+  // kilocode_change end
 }).annotate({ identifier: "McpRemoteConfig" })
 export type Remote = Schema.Schema.Type<typeof Remote>
 

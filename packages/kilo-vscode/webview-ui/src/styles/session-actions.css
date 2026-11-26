@@ -277,16 +277,16 @@
   width: 5px;
   height: 5px;
   border-radius: 999px;
-  background: #34d399;
+  background: var(--syntax-diff-add, #318430);
   opacity: 0;
 }
 
 .session-diff-add {
-  color: #34d399;
+  color: var(--syntax-diff-add, #318430);
 }
 
 .session-diff-del {
-  color: #f87171;
+  color: var(--syntax-diff-delete, #da3319);
 }
 
 .session-changes-tooltip {

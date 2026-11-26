@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Vælg",
   "dialog.model.expand": "Udvid",
   "dialog.model.collapse": "Skjul",
+  "review.model.label": "Gennemgangsmodel",
 
   "dialog.provider.viewAll": "Vis flere udbydere",
 
@@ -915,16 +916,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Vis autofuldførelsesforslag i chatfeltet",
   "settings.autocomplete.modelsHint":
     "For at vælge hvilken model der bruges til autofuldførelse, se Modelindstillinger.",
-  "settings.autocomplete.local.model.title": "Lokal model",
-  "settings.autocomplete.local.model.description": "Modelnavn som serveret af din lokale server (f.eks. et Ollama-tag)",
-  "settings.autocomplete.local.baseUrl.title": "URL til lokal server",
-  "settings.autocomplete.local.baseUrl.description": "Basis-URL for den lokale server, der kører modellen",
-  "settings.autocomplete.local.template.title": "FIM-skabelon",
-  "settings.autocomplete.local.template.description": "Fill-in-the-middle-promptformat; 'Auto' udledes af modelnavnet",
-  "settings.autocomplete.local.endpoint.title": "API-endpoint",
-  "settings.autocomplete.local.endpoint.description":
-    "'Auto' bruger skabelonens standard: Ollama-native eller OpenAI-kompatibel",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "Raw-prompt-API",
+  "settings.autocomplete.custom.transport.description": "Hvilken completions-API der modtager raw-prompten",
+  "settings.autocomplete.custom.mode.title": "Inputtilstand",
+  "settings.autocomplete.custom.mode.description":
+    "Hvordan endpointet forventer fuldførelser: native prompt+suffix, en skabelonbaseret raw-prompt eller chatbeskeder",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-profil",
+  "settings.autocomplete.custom.profile.description":
+    "Hvordan fill-in-the-middle-hullet kodet; Auto registrerer det fra modelnavnet",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto kunne ikke registrere en profil for "{{model}}" — vælg en profil eksplicit.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chattilstand kræver en model for at udfylde hullet.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Modelnavn på det brugerdefinerede endpoint (f.eks. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Basis-URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI-kompatibel API-base; anmodninger sendes til {baseURL}/completions med prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API-nøgle",
+  "settings.autocomplete.custom.apiKey.description":
+    "Sendes som Bearer-token; lad være tom for at kalde uden godkendelse",
+  "settings.autocomplete.custom.apiKey.placeholder": "Tom = uden godkendelse",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Valgfri HTTP/SOCKS-proxy til endpointet; tom bruger den globale proxy",
   "settings.notifications.sounds": "Lyde",
   "settings.notifications.enable.title": "Aktivér lydnotifikationer",
   "settings.notifications.enable.description":
@@ -963,6 +984,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Billedmodel",
   "settings.experimental.imageGenerationModel.description": "Billedgenereringsmodel",
   "settings.experimental.imageGenerationModel.placeholder": "Standard (Auto Router)",
+  "settings.experimental.proxy.title": "Global proxy",
+  "settings.experimental.proxy.description":
+    "Routerer alle Kilo-netværksanmodninger (chat, markedsplads, modeller, MCP-servere) gennem denne proxy. Understøtter http, https og socks5. Lad adressen være tom for at forbinde direkte. Gemning genstarter Kilo-backenden.",
+  "settings.experimental.proxy.address.label": "Proxy-adresse",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 eller socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy gemt",
 
   "settings.models.speechToTextModel.customDescription":
     "Model-id, der sendes til dit eget transskriptionsendpoint, for eksempel whisper-1.",
@@ -1121,6 +1148,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Angiv en port mellem 1 og 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "En klienthemmelighed kræver et klient-ID.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Angiv en gyldig omdirigerings-URI.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Tilsidesætter den globale proxy for denne server, eller forbind direkte. Lokale servere får tilsvarende proxy-miljøvariabler; servere, der ignorerer dem, påvirkes ikke.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Tilstand",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Global proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Brugerdefineret proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direkte (ingen proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy-URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Indtast en http-, https- eller socks-proxy-URL.",
   "settings.agentBehaviour.addMcp.command": "Kommando",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenter",

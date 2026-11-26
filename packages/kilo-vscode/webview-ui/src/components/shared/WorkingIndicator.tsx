@@ -123,13 +123,7 @@ export const WorkingIndicator: Component<WorkingIndicatorProps> = (props) => {
         <span class="sr-only">{language.t("session.messages.scrollToBottom")}</span>
       </Button>
       <Show when={isRetrying()}>
-        <Button
-          variant="secondary"
-          size="small"
-          onClick={handleCancelRetry}
-          class="working-cancel"
-          style={{ "font-weight": "600", color: "var(--vscode-errorForeground, #f85149)" }}
-        >
+        <Button variant="secondary" size="small" onClick={handleCancelRetry} class="working-cancel">
           {language.t("ui.sessionTurn.cancel") || "Cancel"}
         </Button>
       </Show>

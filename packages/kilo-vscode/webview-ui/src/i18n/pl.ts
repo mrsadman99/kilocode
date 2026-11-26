@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "Wybierz",
   "dialog.model.expand": "Rozwiń",
   "dialog.model.collapse": "Zwiń",
+  "review.model.label": "Model przeglądu",
 
   "dialog.provider.viewAll": "Zobacz więcej dostawców",
 
@@ -873,17 +874,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Włącz autouzupełnianie czatu",
   "settings.autocomplete.chatAutocomplete.description": "Pokaż sugestie autouzupełniania w polu czatu",
   "settings.autocomplete.modelsHint": "Aby wybrać model używany do autouzupełniania, zobacz Ustawienia modeli.",
-  "settings.autocomplete.local.model.title": "Model lokalny",
-  "settings.autocomplete.local.model.description": "Nazwa modelu udostępnianego przez lokalny serwer (np. tag Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL lokalnego serwera",
-  "settings.autocomplete.local.baseUrl.description": "Bazowy URL lokalnego serwera, na którym działa model",
-  "settings.autocomplete.local.template.title": "Szablon FIM",
-  "settings.autocomplete.local.template.description":
-    "Format promptu fill-in-the-middle; „Auto” jest wykrywany z nazwy modelu",
-  "settings.autocomplete.local.endpoint.title": "Punkt końcowy API",
-  "settings.autocomplete.local.endpoint.description":
-    "„Auto” używa domyślnego dla szablonu: natywnego Ollama lub zgodnego z OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "API surowego promptu",
+  "settings.autocomplete.custom.transport.description": "Które API uzupełnień otrzymuje surowy prompt",
+  "settings.autocomplete.custom.mode.title": "Tryb wejścia",
+  "settings.autocomplete.custom.mode.description":
+    "Jak endpoint oczekuje uzupełnień: natywne prompt+suffix, szablonowy surowy prompt lub wiadomości czatu",
+  "settings.autocomplete.custom.mode.native": "Natywny",
+  "settings.autocomplete.custom.mode.raw": "Surowy",
+  "settings.autocomplete.custom.mode.chat": "Czat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Jak kodować lukę fill-in-the-middle; Auto wykrywa ją po nazwie modelu",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto nie wykryło profilu dla "{{model}}" — wybierz profil ręcznie.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Tryb czatu wymaga modelu, aby wypełnić lukę.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Nazwa modelu w niestandardowym endpoincie (np. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Bazowy URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Baza API kompatybilnego z OpenAI; żądania trafiają do {baseURL}/completions z prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Klucz API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Wysyłany jako token Bearer; pozostaw puste, aby wywoływać bez uwierzytelniania",
+  "settings.autocomplete.custom.apiKey.placeholder": "Puste = bez uwierzytelniania",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Opcjonalny proxy HTTP/SOCKS do łączenia się z endpointem; puste używa globalnego proxy",
   "settings.notifications.sounds": "Dźwięki",
   "settings.notifications.enable.title": "Włącz powiadomienia dźwiękowe",
   "settings.notifications.enable.description":
@@ -922,6 +942,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Model obrazu",
   "settings.experimental.imageGenerationModel.description": "Model generowania obrazów",
   "settings.experimental.imageGenerationModel.placeholder": "Domyślny (Auto Router)",
+  "settings.experimental.proxy.title": "Globalny proxy",
+  "settings.experimental.proxy.description":
+    "Kieruje wszystkie żądania sieciowe Kilo (czat, marketplace, modele, serwery MCP) przez ten proxy. Obsługuje http, https i socks5. Pozostaw adres pusty, aby łączyć się bezpośrednio. Zapisanie ponownie uruchamia backend Kilo.",
+  "settings.experimental.proxy.address.label": "Adres proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 lub socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Zapisano proxy",
 
   "settings.models.speechToTextModel.customDescription":
     "Identyfikator modelu wysyłany do własnego punktu końcowego transkrypcji, na przykład whisper-1.",
@@ -1123,6 +1149,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Wprowadź port z zakresu od 1 do 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Sekret klienta wymaga ID klienta.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Wprowadź prawidłowy URI przekierowania.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Zastępuje globalny proxy dla tego serwera lub łączy bezpośrednio. Lokalne serwery otrzymują odpowiednie zmienne środowiskowe proxy; serwery, które je ignorują, nie są objęte zmianą.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Tryb",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Globalny proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Własny proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Bezpośrednio (bez proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Wprowadź adres URL proxy http, https lub socks.",
   "settings.agentBehaviour.addMcp.command": "Polecenie",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenty",

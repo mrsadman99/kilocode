@@ -8,7 +8,7 @@ interface FileInfo {
 }
 
 export class ImportDefinitionsService {
-  static N = 10
+  static N = 20
 
   public cache: PrecalculatedLruCache<FileInfo> = new PrecalculatedLruCache<FileInfo>(
     this._getFileInfo.bind(this),

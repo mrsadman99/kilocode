@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Odaberi",
   "dialog.model.expand": "Proširi",
   "dialog.model.collapse": "Skupi",
+  "review.model.label": "Model pregleda",
 
   "dialog.provider.viewAll": "Prikaži više provajdera",
 
@@ -915,18 +916,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Prikaži prijedloge automatskog dovršavanja u polju chata",
   "settings.autocomplete.modelsHint":
     "Da odaberete koji se model koristi za automatsko dovršavanje, pogledajte postavke Modela.",
-  "settings.autocomplete.local.model.title": "Lokalni model",
-  "settings.autocomplete.local.model.description":
-    "Naziv modela kako ga poslužuje vaš lokalni server (npr. Ollama oznaka)",
-  "settings.autocomplete.local.baseUrl.title": "URL lokalnog servera",
-  "settings.autocomplete.local.baseUrl.description": "Osnovni URL lokalnog servera na kojem model radi",
-  "settings.autocomplete.local.template.title": "FIM šablon",
-  "settings.autocomplete.local.template.description":
-    "Format fill-in-the-middle prompta; „Auto“ se otkriva iz naziva modela",
-  "settings.autocomplete.local.endpoint.title": "API endpoint",
-  "settings.autocomplete.local.endpoint.description":
-    "„Auto“ koristi zadanu vrijednost šablona: Ollama izvorni ili OpenAI kompatibilan",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "API sirovog prompta",
+  "settings.autocomplete.custom.transport.description": "Koji completions API prima sirovi prompt",
+  "settings.autocomplete.custom.mode.title": "Način unosa",
+  "settings.autocomplete.custom.mode.description":
+    "Kako endpoint očekuje zahtjeve za dopunu: native prompt+suffix, šablonski sirovi prompt ili chat poruke",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Sirovi",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM profil",
+  "settings.autocomplete.custom.profile.description":
+    "Kako kodirati fill-in-the-middle rupu; Auto je otkriva iz naziva modela",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto nije otkrio profil za "{{model}}" — odaberite profil eksplicitno.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chat način treba model da popuni rupu.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Naziv modela na prilagođenom endpointu (npr. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Bazni URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Baza OpenAI-kompatibilnog API-ja; zahtjevi idu na {baseURL}/completions sa prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API ključ",
+  "settings.autocomplete.custom.apiKey.description":
+    "Šalje se kao Bearer token; ostavite prazno za pozive bez autentifikacije",
+  "settings.autocomplete.custom.apiKey.placeholder": "Prazno = bez autentifikacije",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Opcionalni HTTP/SOCKS proxy za pristup endpointu; prazno koristi globalni proxy",
   "settings.notifications.sounds": "Zvukovi",
   "settings.notifications.enable.title": "Omogući zvučne obavijesti",
   "settings.notifications.enable.description":
@@ -965,6 +984,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Model slike",
   "settings.experimental.imageGenerationModel.description": "Model za generisanje slika",
   "settings.experimental.imageGenerationModel.placeholder": "Zadano (Auto Router)",
+  "settings.experimental.proxy.title": "Globalni proxy",
+  "settings.experimental.proxy.description":
+    "Usmjerava sve Kilo mrežne zahtjeve (chat, tržište, modeli, MCP serveri) kroz ovaj proxy. Podržava http, https i socks5. Ostavite adresu praznom za direktno povezivanje. Spremanje ponovo pokreće Kilo backend.",
+  "settings.experimental.proxy.address.label": "Proxy adresa",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 ili socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy spremljen",
 
   "settings.models.speechToTextModel.customDescription":
     "ID modela koji se šalje vašoj vlastitoj krajnjoj tački za transkripciju, na primjer whisper-1.",
@@ -1124,6 +1149,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Unesite port između 1 i 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Tajni klijent zahtijeva ID klijenta.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Unesite važeći URI preusmjeravanja.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Zamjenjuje globalni proxy za ovaj server ili se povezuje direktno. Lokalni serveri dobijaju odgovarajuće proxy varijable okruženja; serveri koji ih ignorišu nisu pogođeni.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Režim",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Globalni proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Prilagođeni proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direktno (bez proxyja)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Unesite http, https ili socks proxy URL.",
   "settings.agentBehaviour.addMcp.command": "Naredba",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenti",

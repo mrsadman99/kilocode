@@ -6,6 +6,10 @@ import { Tool } from "../../tool/tool"
 import { Suggestion } from "./index"
 import { SessionStatus } from "../../session/status"
 import { SessionID } from "../../session/schema"
+import { Session } from "../../session/session"
+import { parseReviewCommand } from "../review/command"
+import { ProviderV2 } from "@opencode-ai/core/provider"
+import { ModelV2 } from "@opencode-ai/core/model"
 
 const log = Log.create({ service: "tool.suggest" })
 
@@ -61,11 +65,17 @@ export function resolvePrompt(prompt: string, commands: Command.Interface) {
   })
 }
 
-export const SuggestTool = Tool.define<typeof Params, Meta, Command.Service | SessionStatus.Service, "suggest">(
+export const SuggestTool = Tool.define<
+  typeof Params,
+  Meta,
+  Command.Service | SessionStatus.Service | Session.Service,
+  "suggest"
+>(
   "suggest",
   Effect.gen(function* () {
     const commands = yield* Command.Service
     const status = yield* SessionStatus.Service
+    const sessions = yield* Session.Service
     return {
       description: DESCRIPTION,
       parameters: Params,
@@ -93,7 +103,7 @@ export const SuggestTool = Tool.define<typeof Params, Meta, Command.Service | Se
             .set(SessionID.make(ctx.sessionID), { type: "idle" })
             .pipe(Effect.catchCause((cause) => Effect.sync(() => log.warn("failed to set idle status", { cause }))))
 
-          const action = yield* Effect.promise(() =>
+          const accepted = yield* Effect.promise(() =>
             promise
               .catch((error) => {
                 if (error instanceof Suggestion.DismissedError) return undefined
@@ -107,7 +117,7 @@ export const SuggestTool = Tool.define<typeof Params, Meta, Command.Service | Se
           // Restore busy immediately on accept so the session doesn't flash idle
           // while the follow-up response is being generated. The next runLoop
           // iteration sets busy too, but not until after the stream finalizes.
-          if (action) {
+          if (accepted) {
             yield* status
               .set(SessionID.make(ctx.sessionID), { type: "busy" })
               .pipe(
@@ -115,7 +125,7 @@ export const SuggestTool = Tool.define<typeof Params, Meta, Command.Service | Se
               )
           }
 
-          if (!action) {
+          if (!accepted) {
             const metadata: Meta = {
               accepted: undefined,
               dismissed: true,
@@ -125,6 +135,23 @@ export const SuggestTool = Tool.define<typeof Params, Meta, Command.Service | Se
               title: "Suggestion dismissed",
               output: "User dismissed the suggestion.",
               metadata,
+            }
+          }
+
+          const action = accepted.action
+          // Run the review with the model picked in the suggestion bar. The prompt
+          // loop reads the last user message's model on each iteration, so retarget
+          // it before the review template is injected as this tool's output.
+          if (accepted.model && parseReviewCommand(action.prompt)) {
+            const user = ctx.messages.findLast((m) => m.info.role === "user")
+            if (user && user.info.role === "user") {
+              yield* sessions.updateMessage({
+                ...user.info,
+                model: {
+                  providerID: ProviderV2.ID.make(accepted.model.providerID),
+                  modelID: ModelV2.ID.make(accepted.model.modelID),
+                },
+              })
             }
           }
 

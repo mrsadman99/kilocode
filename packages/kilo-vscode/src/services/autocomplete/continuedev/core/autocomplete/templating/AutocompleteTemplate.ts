@@ -1,40 +1,33 @@
-// Fill in the middle prompts
+// Fill in the middle prompts.
 //
-// Codestral is the only Gateway autocomplete model. The StarCoder, Qwen and
-// CodeLlama templates below are used for local models (Ollama, llama.cpp,
-// LM Studio), where the FIM prompt is assembled client-side.
+// Codestral is native-only FIM (the server receives `prompt` and `suffix`
+// separately), so it has no client-side template. This module keeps the
+// prefix/suffix compiler used by the classic autocomplete path to fold in
+// cross-file snippets, and re-exports the shared FIM profile registry used by
+// the local/custom transports to encode the hole for other model families.
 
-import { CompletionOptions } from "../../index.js"
 import { getLastNUriRelativePathParts, getShortestUniqueRelativeUriPaths } from "../../util/uri.js"
 import { AutocompleteSnippet } from "../types.js"
 
-type TemplateRenderer = (
-  prefix: string,
-  suffix: string,
-  filepath: string,
-  reponame: string,
-  language: string,
-  snippets: AutocompleteSnippet[],
-  workspaceUris: string[],
-) => string
+export {
+  FIM_TEMPLATE_IDS,
+  matchFimProfile,
+  profiles,
+  renderFim,
+  resolveFimProfile,
+  validFimTemplate,
+} from "@kilocode/kilo-gateway/autocomplete"
+export type { FimProfile, FimTemplateID, LocalFimEndpoint, RenderedFim } from "@kilocode/kilo-gateway/autocomplete"
 
-export interface AutocompleteTemplate {
-  compilePrefixSuffix?: (
+export const codestralTemplate = {
+  compilePrefixSuffix: (
     prefix: string,
     suffix: string,
     filepath: string,
-    reponame: string,
+    _reponame: string,
     snippets: AutocompleteSnippet[],
     workspaceUris: string[],
-  ) => [string, string]
-  template: TemplateRenderer
-  completionOptions?: Partial<CompletionOptions>
-  /** Default local server API for this template; "generate" is Ollama-native. */
-  endpoint?: "completions" | "generate"
-}
-
-export const codestralTemplate = {
-  compilePrefixSuffix: (prefix, suffix, filepath, _reponame, snippets, workspaceUris): [string, string] => {
+  ): [string, string] => {
     function getFileName(snippet: { uri: string; uniquePath: string }) {
       return snippet.uri.startsWith("file://") ? snippet.uniquePath : snippet.uri
     }
@@ -57,55 +50,4 @@ export const codestralTemplate = {
 
     return [`${otherFiles}\n\n+++++ ${getFileName(relativePaths[relativePaths.length - 1])}\n${prefix}`, suffix]
   },
-  template: (prefix: string, suffix: string): string => {
-    return `[SUFFIX]${suffix}[PREFIX]${prefix}`
-  },
-  completionOptions: {
-    stop: ["[PREFIX]", "[SUFFIX]", "\n+++++ "],
-  },
-} satisfies AutocompleteTemplate
-
-export const starcoderTemplate = {
-  template: (prefix: string, suffix: string): string => {
-    return `<fim_prefix>${prefix}<fim_suffix>${suffix}<fim_middle>`
-  },
-  completionOptions: {
-    stop: ["<fim_prefix>", "<fim_suffix>", "<fim_middle>", "<|endoftext|>", "<file_sep>"],
-  },
-  endpoint: "completions",
-} satisfies AutocompleteTemplate
-
-export const qwenTemplate = {
-  template: (prefix: string, suffix: string): string => {
-    return `<|fim_prefix|>${prefix}<|fim_suffix|>${suffix}<|fim_middle|>`
-  },
-  completionOptions: {
-    stop: ["<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", "<|endoftext|>", "<file_sep>"],
-  },
-  endpoint: "generate",
-} satisfies AutocompleteTemplate
-
-export const codeLlamaTemplate = {
-  template: (prefix: string, suffix: string): string => {
-    return `<PRE> ${prefix} <SUF> ${suffix} <MID>`
-  },
-  completionOptions: {
-    stop: ["<PRE>", "<SUF>", "<MID>", "<EOT>"],
-  },
-  endpoint: "generate",
-} satisfies AutocompleteTemplate
-
-export const fimTemplates = {
-  starcoder: starcoderTemplate,
-  qwen: qwenTemplate,
-  codellama: codeLlamaTemplate,
-}
-
-export type FimTemplateID = keyof typeof fimTemplates
-
-export function inferFimTemplate(model: string): FimTemplateID {
-  const name = model.toLowerCase()
-  if (name.includes("starcoder")) return "starcoder"
-  if (name.includes("llama")) return "codellama"
-  return "qwen"
 }

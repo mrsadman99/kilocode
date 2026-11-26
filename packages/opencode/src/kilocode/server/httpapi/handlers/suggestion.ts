@@ -19,7 +19,7 @@ export const suggestionHandlers = HttpApiBuilder.group(InstanceHttpApi, "suggest
       payload: typeof SuggestionAcceptPayload.Type
     }) {
       const ok = yield* Effect.promise(() =>
-        Suggestion.accept({ requestID: ctx.params.requestID, index: ctx.payload.index }),
+        Suggestion.accept({ requestID: ctx.params.requestID, index: ctx.payload.index, model: ctx.payload.model }),
       )
       if (!ok) return yield* new HttpApiError.NotFound({})
       return true

@@ -344,9 +344,13 @@ describe("sendMessage / sendCommand draft id contract", () => {
     expect(body).not.toContain("effectiveSelection ?? undefined")
   })
 
-  it("createSession and clearCurrentSession do not pin the provisional default agent", () => {
-    expect(extractFunctionBody(source, "createSession")).toContain("setPendingAgentSelection(null)")
-    expect(extractFunctionBody(source, "createSession")).not.toContain("setPendingAgentSelection(defaultAgent())")
+  it("createSession continues the current mode without pinning the default agent", () => {
+    const create = extractFunctionBody(source, "createSession")
+    expect(create).toContain("setPendingAgentSelection(agent === defaultAgent() ? null : agent)")
+    expect(create).not.toContain("setPendingAgentSelection(defaultAgent())")
+  })
+
+  it("clearCurrentSession does not pin the provisional default agent", () => {
     expect(extractFunctionBody(source, "clearCurrentSession")).toContain("setPendingAgentSelection(null)")
     expect(extractFunctionBody(source, "clearCurrentSession")).not.toContain("setPendingAgentSelection(defaultAgent())")
   })

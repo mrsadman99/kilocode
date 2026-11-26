@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "bun:test"
 import * as vscode from "vscode"
-import { buildProxyEnv } from "../../src/services/cli-backend/server-manager"
+import { buildKiloProxyEnv, buildProxyEnv } from "../../src/services/cli-backend/server-manager"
 
 type Info = { globalValue?: unknown; workspaceValue?: unknown; workspaceFolderValue?: unknown }
 type WorkspaceStub = {
@@ -133,6 +133,28 @@ describe("buildProxyEnv", () => {
       http_proxy: "",
       https_proxy: "",
       no_proxy: "",
+    })
+  })
+})
+
+describe("buildKiloProxyEnv", () => {
+  it("returns an empty object when kilo-code.new.proxy is unset", () => {
+    expect(buildKiloProxyEnv({ get: (_key, fallback) => fallback })).toEqual({})
+  })
+
+  it("returns an empty object when kilo-code.new.proxy is blank", () => {
+    expect(buildKiloProxyEnv({ get: () => "   " })).toEqual({})
+  })
+
+  it("exposes a proxy URL as KILO_PROXY", () => {
+    expect(buildKiloProxyEnv({ get: () => "socks5://127.0.0.1:1080" })).toEqual({
+      KILO_PROXY: "socks5://127.0.0.1:1080",
+    })
+  })
+
+  it("trims surrounding whitespace from the proxy URL", () => {
+    expect(buildKiloProxyEnv({ get: () => "  http://127.0.0.1:8118  " })).toEqual({
+      KILO_PROXY: "http://127.0.0.1:8118",
     })
   })
 })

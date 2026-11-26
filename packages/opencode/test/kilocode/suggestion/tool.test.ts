@@ -8,6 +8,7 @@ import { Tool } from "../../../src/tool/tool"
 import { Truncate } from "../../../src/tool/truncate"
 import { Agent } from "../../../src/agent/agent"
 import { SessionStatus } from "../../../src/session/status"
+import { Session } from "../../../src/session/session"
 import { testEffect } from "../../lib/effect"
 
 const cmds: Record<string, Command.Info> = {}
@@ -32,7 +33,17 @@ const status = Layer.succeed(
     set: (sessionID, value) => Effect.sync(() => statuses.push([sessionID, value])),
   }),
 )
-const it = testEffect(Layer.mergeAll(AppNodeBuilder.build(Truncate.node), AppNodeBuilder.build(Agent.node), command, status))
+const updates: Array<{ id: string; model: { providerID: string; modelID: string } }> = []
+const sessions = Layer.mock(Session.Service, {
+  updateMessage: (msg) =>
+    Effect.sync(() => {
+      if (msg.role === "user") updates.push({ id: msg.id, model: msg.model })
+      return msg
+    }),
+})
+const it = testEffect(
+  Layer.mergeAll(AppNodeBuilder.build(Truncate.node), AppNodeBuilder.build(Agent.node), command, status, sessions),
+)
 
 const init = Effect.fn("SuggestToolTest.init")(function* () {
   const info = yield* SuggestTool
@@ -69,6 +80,7 @@ describe("tool.suggest", () => {
     show = spyOn(Suggestion, "show")
     names.length = 0
     statuses.length = 0
+    updates.length = 0
     for (const name of Object.keys(cmds)) delete cmds[name]
   })
 
@@ -99,9 +111,11 @@ describe("tool.suggest", () => {
     Effect.gen(function* () {
       const tool = yield* init()
       show.mockResolvedValueOnce({
-        label: "Run checks",
-        description: "Run the project checks now",
-        prompt: "/verify",
+        action: {
+          label: "Run checks",
+          description: "Run the project checks now",
+          prompt: "/verify",
+        },
       })
       cmds["verify"] = {
         name: "verify",
@@ -135,8 +149,7 @@ describe("tool.suggest", () => {
     Effect.gen(function* () {
       const tool = yield* init()
       show.mockResolvedValueOnce({
-        label: "Run tests",
-        prompt: "Run the test suite and fix any failures",
+        action: { label: "Run tests", prompt: "Run the test suite and fix any failures" },
       })
 
       const result = yield* tool.execute(
@@ -159,8 +172,7 @@ describe("tool.suggest", () => {
     Effect.gen(function* () {
       const tool = yield* init()
       show.mockResolvedValueOnce({
-        label: "Unknown cmd",
-        prompt: "/nonexistent-command",
+        action: { label: "Unknown cmd", prompt: "/nonexistent-command" },
       })
 
       const result = yield* tool.execute(
@@ -181,8 +193,7 @@ describe("tool.suggest", () => {
     Effect.gen(function* () {
       const tool = yield* init()
       show.mockResolvedValueOnce({
-        label: "Run checks",
-        prompt: "/verify",
+        action: { label: "Run checks", prompt: "/verify" },
       })
       cmds["verify"] = {
         name: "verify",
@@ -237,9 +248,9 @@ describe("tool.suggest", () => {
   it.live("marks session idle while waiting for user response", () =>
     Effect.gen(function* () {
       const tool = yield* init()
-      let resolveShow: (action: Suggestion.Action) => void = () => {}
+      let resolveShow: (value: Suggestion.Accepted) => void = () => {}
       show.mockReturnValueOnce(
-        new Promise<Suggestion.Action>((resolve) => {
+        new Promise<Suggestion.Accepted>((resolve) => {
           resolveShow = resolve
         }),
       )
@@ -261,7 +272,7 @@ describe("tool.suggest", () => {
       expect(statuses).toContainEqual([ctx.sessionID, { type: "idle" }])
       expect(statuses).not.toContainEqual([ctx.sessionID, { type: "busy" }])
 
-      resolveShow({ label: "Start", prompt: "do it" })
+      resolveShow({ action: { label: "Start", prompt: "do it" } })
       yield* Fiber.join(pending)
     }),
   )
@@ -273,7 +284,7 @@ describe("tool.suggest", () => {
   it.live("restores busy status after accept, in order (idle then busy)", () =>
     Effect.gen(function* () {
       const tool = yield* init()
-      show.mockResolvedValueOnce({ label: "Go", prompt: "go" })
+      show.mockResolvedValueOnce({ action: { label: "Go", prompt: "go" } })
 
       yield* tool.execute(
         {
@@ -305,6 +316,77 @@ describe("tool.suggest", () => {
       )
 
       expect(statuses.map(([, value]) => value.type)).toEqual(["idle"])
+    }),
+  )
+
+  it.live("retargets the last user message model for an accepted review", () =>
+    Effect.gen(function* () {
+      const tool = yield* init()
+      show.mockResolvedValueOnce({
+        action: { label: "Review", prompt: "/review uncommitted" },
+        model: { providerID: "anthropic", modelID: "claude-sonnet-4-5" },
+      })
+      cmds["review"] = {
+        name: "review",
+        description: "review changes",
+        template: Promise.resolve("review template"),
+        hints: [],
+      }
+
+      yield* tool.execute(
+        {
+          suggest: "Review?",
+          actions: [{ label: "Review", prompt: "/review uncommitted" }],
+        },
+        ctx as any,
+      )
+
+      expect(updates).toHaveLength(1)
+      expect(updates[0]?.id).toBe("msg_user")
+      expect(updates[0]?.model).toEqual({ providerID: "anthropic", modelID: "claude-sonnet-4-5" })
+    }),
+  )
+
+  it.live("does not retarget the model when none is selected", () =>
+    Effect.gen(function* () {
+      const tool = yield* init()
+      show.mockResolvedValueOnce({ action: { label: "Review", prompt: "/review uncommitted" } })
+      cmds["review"] = {
+        name: "review",
+        description: "review changes",
+        template: Promise.resolve("review template"),
+        hints: [],
+      }
+
+      yield* tool.execute(
+        {
+          suggest: "Review?",
+          actions: [{ label: "Review", prompt: "/review uncommitted" }],
+        },
+        ctx as any,
+      )
+
+      expect(updates).toHaveLength(0)
+    }),
+  )
+
+  it.live("does not retarget the model for a non-review action", () =>
+    Effect.gen(function* () {
+      const tool = yield* init()
+      show.mockResolvedValueOnce({
+        action: { label: "Run", prompt: "run the tests" },
+        model: { providerID: "anthropic", modelID: "claude-sonnet-4-5" },
+      })
+
+      yield* tool.execute(
+        {
+          suggest: "Run?",
+          actions: [{ label: "Run", prompt: "run the tests" }],
+        },
+        ctx as any,
+      )
+
+      expect(updates).toHaveLength(0)
     }),
   )
 })

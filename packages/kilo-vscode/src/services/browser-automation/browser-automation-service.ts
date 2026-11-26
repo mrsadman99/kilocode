@@ -167,22 +167,25 @@ export class BrowserAutomationService implements vscode.Disposable {
     const client = this.getClient()
     if (!client) return
     const command = this.command()
+    const add = (directory: string, environment?: Record<string, string>) =>
+      client.mcp.add(
+        {
+          name: BrowserAutomationService.MCP_SERVER_NAME,
+          config: {
+            type: "local",
+            command,
+            ...(environment ? { environment } : {}),
+            enabled: true,
+            timeout: 60000,
+          },
+          directory,
+        },
+        { throwOnError: true },
+      )
     let failure: unknown
     for (const directory of dirs) {
       try {
-        const { data: status } = await client.mcp.add(
-          {
-            name: BrowserAutomationService.MCP_SERVER_NAME,
-            config: {
-              type: "local",
-              command,
-              enabled: true,
-              timeout: 60000,
-            },
-            directory,
-          },
-          { throwOnError: true },
-        )
+        const { data: status } = await add(directory)
         const server = status[BrowserAutomationService.MCP_SERVER_NAME]
         if (server?.status === "connected") {
           this.registered.add(directory)
@@ -190,7 +193,16 @@ export class BrowserAutomationService implements vscode.Disposable {
         }
         this.registered.delete(directory)
         if (server?.status === "failed") {
-          const detail = (server as { error?: string }).error
+          const retry = await add(directory, {
+            npm_config_registry: "https://registry.npmjs.org/",
+            "npm_config_@playwright:registry": "https://registry.npmjs.org/",
+          })
+          const again = retry.data[BrowserAutomationService.MCP_SERVER_NAME]
+          if (again?.status === "connected") {
+            this.registered.add(directory)
+            continue
+          }
+          const detail = ((again ?? server) as { error?: string }).error
           failure = new Error(`Playwright MCP failed to start${detail ? `: ${detail}` : ""}`)
         }
       } catch (error) {

@@ -27,36 +27,61 @@ export interface AutocompleteServiceSettings {
   localBaseURL?: string
   localTemplate?: string
   localEndpoint?: string
+  customModel?: string
+  customBaseURL?: string
+  customApiKey?: string
+  customProxy?: string
+  customFormat?: string
+  customTemplate?: string
   snoozeUntil?: number
 }
 
 function readSettings(): AutocompleteServiceSettings {
   const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
   const provider = config.get<string>("provider")
+  const model =
+    provider === "local"
+      ? config.get<string>("localModel")
+      : provider === "custom"
+        ? config.get<string>("customModel")
+        : config.get<string>("model")
   return {
     enableAutoTrigger: config.get<boolean>("enableAutoTrigger") ?? true,
     enableSmartInlineTaskKeybinding: config.get<boolean>("enableSmartInlineTaskKeybinding") ?? true,
     enableChatAutocomplete: config.get<boolean>("enableChatAutocomplete") ?? true,
     provider,
-    model: provider === "local" ? config.get<string>("localModel") : config.get<string>("model"),
+    model,
     localModel: config.get<string>("localModel"),
     localBaseURL: config.get<string>("localBaseURL"),
     localTemplate: config.get<string>("localTemplate"),
     localEndpoint: config.get<string>("localEndpoint"),
+    customModel: config.get<string>("customModel"),
+    customBaseURL: config.get<string>("customBaseURL"),
+    customApiKey: config.get<string>("customApiKey"),
+    customProxy: config.get<string>("customProxy"),
+    customFormat: config.get<string>("customFormat"),
+    customTemplate: config.get<string>("customTemplate"),
     snoozeUntil: config.get<number>("snoozeUntil"),
   }
 }
 
 /** Identifies the full autocomplete configuration for cache/backoff isolation. */
 function configKey(settings: AutocompleteServiceSettings | null): string {
-  return JSON.stringify([
-    settings?.provider ?? "",
-    settings?.model ?? "",
-    settings?.localModel ?? "",
-    settings?.localBaseURL ?? "",
-    settings?.localTemplate ?? "",
-    settings?.localEndpoint ?? "",
-  ])
+  const keys = [
+    "provider",
+    "model",
+    "localModel",
+    "localBaseURL",
+    "localTemplate",
+    "localEndpoint",
+    "customModel",
+    "customBaseURL",
+    "customApiKey",
+    "customProxy",
+    "customFormat",
+    "customTemplate",
+  ] as const
+  return JSON.stringify(keys.map((key) => settings?.[key] ?? ""))
 }
 
 async function writeSettings(patch: Partial<AutocompleteServiceSettings>): Promise<void> {

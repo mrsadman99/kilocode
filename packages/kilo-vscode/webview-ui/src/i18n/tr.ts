@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Seç",
   "dialog.model.expand": "Genişlet",
   "dialog.model.collapse": "Daralt",
+  "review.model.label": "İnceleme modeli",
 
   "dialog.provider.viewAll": "Daha fazla sağlayıcı göster",
 
@@ -904,17 +905,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Sohbet metin alanında otomatik tamamlama önerileri göster",
   "settings.autocomplete.modelsHint":
     "Otomatik tamamlama için kullanılacak modeli seçmek için Modeller ayarlarına bakın.",
-  "settings.autocomplete.local.model.title": "Yerel model",
-  "settings.autocomplete.local.model.description": "Yerel sunucunuzun sunduğu model adı (ör. bir Ollama etiketi)",
-  "settings.autocomplete.local.baseUrl.title": "Yerel sunucu URL'si",
-  "settings.autocomplete.local.baseUrl.description": "Modeli çalıştıran yerel sunucunun temel URL'si",
-  "settings.autocomplete.local.template.title": "FIM şablonu",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle istem biçimi; 'Otomatik' model adından algılanır",
-  "settings.autocomplete.local.endpoint.title": "API uç noktası",
-  "settings.autocomplete.local.endpoint.description":
-    "'Otomatik' şablon varsayılanını kullanır: Ollama yerel veya OpenAI uyumlu",
-  "settings.autocomplete.local.auto": "Otomatik",
+  "settings.autocomplete.custom.transport.title": "Ham istem API'si",
+  "settings.autocomplete.custom.transport.description": "Ham istemi hangi tamamlama API'si alır",
+  "settings.autocomplete.custom.mode.title": "Giriş modu",
+  "settings.autocomplete.custom.mode.description":
+    "Uç noktanın tamamlamaları nasıl beklediği: yerel prompt+suffix, şablonlu ham istem veya sohbet mesajları",
+  "settings.autocomplete.custom.mode.native": "Yerel",
+  "settings.autocomplete.custom.mode.raw": "Ham",
+  "settings.autocomplete.custom.mode.chat": "Sohbet",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM profili",
+  "settings.autocomplete.custom.profile.description":
+    "Fill-in-the-middle boşluğunun nasıl kodlanacağı; Auto onu model adından algılar",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto "{{model}}" için bir profil algılayamadı — açıkça bir profil seçin.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Sohbet modu boşluğu doldurmak için bir model gerektirir.",
+  "settings.autocomplete.custom.auto": "Otomatik",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Özel uç noktadaki model adı (örn. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Temel URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI uyumlu API tabanı; istekler prompt+suffix ile {baseURL}/completions adresine gönderilir",
+  "settings.autocomplete.custom.apiKey.title": "API anahtarı",
+  "settings.autocomplete.custom.apiKey.description":
+    "Bearer belirteci olarak gönderilir; kimlik doğrulamasız çağırmak için boş bırakın",
+  "settings.autocomplete.custom.apiKey.placeholder": "Boş = kimlik doğrulamasız",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Uç noktaya erişmek için isteğe bağlı HTTP/SOCKS proxy'si; boş bırakılırsa genel proxy kullanılır",
 
   "settings.notifications.sounds": "Sesler",
   "settings.notifications.enable.title": "Sesli bildirimleri etkinleştir",
@@ -955,6 +975,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Görüntü modeli",
   "settings.experimental.imageGenerationModel.description": "Görüntü oluşturma modeli",
   "settings.experimental.imageGenerationModel.placeholder": "Varsayılan (Auto Router)",
+  "settings.experimental.proxy.title": "Genel Proxy",
+  "settings.experimental.proxy.description":
+    "Tüm Kilo ağ isteklerini (sohbet, pazar, modeller, MCP sunucuları) bu proxy üzerinden yönlendirir. http, https ve socks5 destekler. Doğrudan bağlanmak için adresi boş bırakın. Kaydetmek Kilo arka ucunu yeniden başlatır.",
+  "settings.experimental.proxy.address.label": "Proxy adresi",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 veya socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy kaydedildi",
 
   "settings.models.speechToTextModel.customDescription":
     "Kendi transkripsiyon uç noktanıza gönderilen model kimliği, örneğin whisper-1.",
@@ -1115,6 +1141,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "1 ile 65535 arasında bir bağlantı noktası girin.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "İstemci sırrı bir istemci kimliği gerektirir.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Geçerli bir yönlendirme URI'si girin.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Bu sunucu için genel proxy'yi geçersiz kılın veya doğrudan bağlanın. Yerel sunucular ilgili proxy ortam değişkenlerini alır; bunları yok sayan sunucular etkilenmez.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Mod",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Genel proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Özel proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Doğrudan (proxy yok)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy URL'si",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Bir http, https veya socks proxy URL'si girin.",
   "settings.agentBehaviour.addMcp.command": "Komut",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argümanlar",

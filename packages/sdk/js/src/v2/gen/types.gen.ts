@@ -112,6 +112,7 @@ export type Event =
   | EventBackgroundProcessUpdated
   | EventBackgroundProcessDeleted
   | EventSandboxStatusChanged
+  | EventKiloApi
   | EventSuggestionShown
   | EventSuggestionAccepted
   | EventSuggestionDismissed
@@ -309,6 +310,21 @@ export type BackgroundProcessInfo = {
     updated: number
     ended?: number
   }
+}
+
+export type KiloApiRequest = {
+  kind: "llm" | "autocomplete"
+  provider: string
+  model: string
+  apiModel?: string
+  method: string
+  url: string
+  status?: number
+  error?: string
+  detail?: string
+  thinking?: string
+  proxy?: string
+  ms?: number
 }
 
 export type SuggestionRequest = {
@@ -1164,6 +1180,7 @@ export type GlobalEvent = {
     | EventBackgroundProcessUpdated
     | EventBackgroundProcessDeleted
     | EventSandboxStatusChanged
+    | EventKiloApi
     | EventSuggestionShown
     | EventSuggestionAccepted
     | EventSuggestionDismissed
@@ -2494,6 +2511,8 @@ export type McpLocalConfig = {
   }
   enabled?: boolean
   timeout?: number
+  proxy?: string
+  no_proxy?: boolean
 }
 
 export type McpOAuthConfig = {
@@ -2522,6 +2541,8 @@ export type McpRemoteConfig = {
    */
   oauth?: McpOAuthConfig | false
   timeout?: number
+  proxy?: string
+  no_proxy?: boolean
 }
 
 /**
@@ -2544,6 +2565,7 @@ export type Config = {
   $schema?: string
   shell?: string
   logLevel?: LogLevel
+  proxy?: string
   server?: ServerConfig
   command?: {
     [key: string]: {
@@ -5900,6 +5922,12 @@ export type EventSandboxStatusChanged = {
     reason?: string
     version: number
   }
+}
+
+export type EventKiloApi = {
+  id: string
+  type: "kilo.api"
+  properties: KiloApiRequest
 }
 
 export type EventSuggestionShown = {
@@ -17293,8 +17321,11 @@ export type KiloFimData = {
     maxTokens?: number
     temperature?: number
     baseURL?: string
-    endpoint?: "completions" | "generate"
+    endpoint?: "completions" | "generate" | "chat"
     stop?: Array<string>
+    proxy?: string
+    apiKey?: string
+    system?: string
   }
   path?: never
   query?: {
@@ -20844,6 +20875,10 @@ export type SuggestionAcceptData = {
      * Zero-based action index to accept
      */
     index: number
+    model?: {
+      providerID: string
+      modelID: string
+    }
   }
   path: {
     requestID: string

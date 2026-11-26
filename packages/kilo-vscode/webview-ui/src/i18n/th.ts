@@ -111,6 +111,7 @@ export const dict = {
   "dialog.model.select": "เลือก",
   "dialog.model.expand": "ขยาย",
   "dialog.model.collapse": "ยุบ",
+  "review.model.label": "โมเดลรีวิว",
 
   "dialog.provider.viewAll": "แสดงผู้ให้บริการเพิ่มเติม",
 
@@ -899,17 +900,35 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "เปิดใช้งานเติมอัตโนมัติแชท",
   "settings.autocomplete.chatAutocomplete.description": "แสดงข้อเสนอแนะเติมอัตโนมัติในช่องแชท",
   "settings.autocomplete.modelsHint": "เลือกโมเดลที่ใช้สำหรับการเติมอัตโนมัติได้ที่การตั้งค่าโมเดล",
-  "settings.autocomplete.local.model.title": "โมเดลในเครื่อง",
-  "settings.autocomplete.local.model.description": "ชื่อโมเดลตามที่เซิร์ฟเวอร์ในเครื่องให้บริการ (เช่น แท็ก Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL ของเซิร์ฟเวอร์ในเครื่อง",
-  "settings.autocomplete.local.baseUrl.description": "URL หลักของเซิร์ฟเวอร์ในเครื่องที่รันโมเดล",
-  "settings.autocomplete.local.template.title": "เทมเพลต FIM",
-  "settings.autocomplete.local.template.description":
-    "รูปแบบพรอมต์ fill-in-the-middle; 'อัตโนมัติ' ตรวจจับจากชื่อโมเดล",
-  "settings.autocomplete.local.endpoint.title": "จุดปลาย API",
-  "settings.autocomplete.local.endpoint.description":
-    "'อัตโนมัติ' ใช้ค่าเริ่มต้นของเทมเพลต: Ollama ดั้งเดิมหรือเข้ากันได้กับ OpenAI",
-  "settings.autocomplete.local.auto": "อัตโนมัติ",
+  "settings.autocomplete.custom.transport.title": "API พรอมต์ดิบ",
+  "settings.autocomplete.custom.transport.description": "API เติมเต็มใดที่รับพรอมต์ดิบ",
+  "settings.autocomplete.custom.mode.title": "โหมดอินพุต",
+  "settings.autocomplete.custom.mode.description":
+    "วิธีที่ปลายทางคาดหวังคำขอเติมเต็ม: prompt+suffix แบบเนทีฟ พรอมต์ดิบที่มีเทมเพลต หรือข้อความแชท",
+  "settings.autocomplete.custom.mode.native": "เนทีฟ",
+  "settings.autocomplete.custom.mode.raw": "ดิบ",
+  "settings.autocomplete.custom.mode.chat": "แชท",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "โปรไฟล์ FIM",
+  "settings.autocomplete.custom.profile.description":
+    "วิธีเข้ารหัสช่องว่าง fill-in-the-middle; Auto ตรวจจับจากชื่อโมเดล",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown": 'Auto ไม่พบโปรไฟล์สำหรับ "{{model}}" — โปรดเลือกอย่างชัดเจน',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "โหมดแชทต้องมีโมเดลเพื่อเติมช่องว่าง",
+  "settings.autocomplete.custom.auto": "อัตโนมัติ",
+  "settings.autocomplete.custom.model.title": "โมเดล",
+  "settings.autocomplete.custom.model.description": "ชื่อโมเดลบนปลายทางที่กำหนดเอง (เช่น deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL พื้นฐาน",
+  "settings.autocomplete.custom.baseUrl.description":
+    "ฐาน API ที่เข้ากันได้กับ OpenAI คำขอจะถูกส่งไปยัง {baseURL}/completions พร้อม prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "คีย์ API",
+  "settings.autocomplete.custom.apiKey.description":
+    "ส่งเป็นโทเคน Bearer เว้นว่างไว้เพื่อเรียกใช้โดยไม่มีการยืนยันตัวตน",
+  "settings.autocomplete.custom.apiKey.placeholder": "ว่าง = ไม่ยืนยันตัวตน",
+  "settings.autocomplete.custom.proxy.title": "พร็อกซี",
+  "settings.autocomplete.custom.proxy.description":
+    "พร็อกซี HTTP/SOCKS เสริมสำหรับเข้าถึงปลายทาง เว้นว่างไว้เพื่อใช้พร็อกซีส่วนกลาง",
   "settings.notifications.sounds": "เสียง",
   "settings.notifications.enable.title": "เปิดใช้การแจ้งเตือนด้วยเสียง",
   "settings.notifications.enable.description":
@@ -948,6 +967,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "โมเดลภาพ",
   "settings.experimental.imageGenerationModel.description": "โมเดลการสร้างภาพ",
   "settings.experimental.imageGenerationModel.placeholder": "ค่าเริ่มต้น (Auto Router)",
+  "settings.experimental.proxy.title": "พร็อกซีส่วนกลาง",
+  "settings.experimental.proxy.description":
+    "กำหนดเส้นทางคำขอเครือข่ายทั้งหมดของ Kilo (แชท, มาร์เก็ตเพลส, โมเดล, เซิร์ฟเวอร์ MCP) ผ่านพร็อกซีนี้ รองรับ http, https และ socks5 เว้นว่างที่อยู่ไว้เพื่อเชื่อมต่อโดยตรง การบันทึกจะรีสตาร์ทแบ็กเอนด์ Kilo",
+  "settings.experimental.proxy.address.label": "ที่อยู่พร็อกซี",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 หรือ socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "บันทึกพร็อกซีแล้ว",
 
   "settings.models.speechToTextModel.customDescription":
     "รหัสโมเดลที่ส่งไปยังปลายทางการถอดเสียงของคุณเอง เช่น whisper-1",
@@ -1105,6 +1130,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "ป้อนพอร์ตระหว่าง 1 ถึง 65535",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "ไคลเอ็นต์ซีเคร็ตต้องมีไคลเอ็นต์ไอดี",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "ป้อน URI การเปลี่ยนเส้นทางที่ถูกต้อง",
+  "settings.agentBehaviour.editMcp.proxy": "พร็อกซี",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "แทนที่พร็อกซีส่วนกลางสำหรับเซิร์ฟเวอร์นี้ หรือเชื่อมต่อโดยตรง เซิร์ฟเวอร์โลคอลจะได้รับตัวแปรสภาพแวดล้อมพร็อกซีที่เกี่ยวข้อง เซิร์ฟเวอร์ที่ไม่สนใจตัวแปรเหล่านี้จะไม่ได้รับผลกระทบ",
+  "settings.agentBehaviour.editMcp.proxy.mode": "โหมด",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "พร็อกซีส่วนกลาง",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "พร็อกซีที่กำหนดเอง",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "โดยตรง (ไม่มีพร็อกซี)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL พร็อกซี",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "ป้อน URL พร็อกซี http, https หรือ socks",
   "settings.agentBehaviour.addMcp.command": "คำสั่ง",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "อาร์กิวเมนต์",

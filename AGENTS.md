@@ -75,6 +75,24 @@ Turborepo + Bun workspaces. The packages you'll work with most:
 | `packages/util/` | `@opencode-ai/util` | Shared utilities (error, path, retry, slug, etc.) |
 | `packages/plugin/` | `@kilocode/plugin` | Plugin/tool interface definitions |
 
+## Provider & Model Catalog
+
+How model metadata and reasoning-effort options reach the UI. The CLI is the source of truth; clients render exactly what it sends.
+
+- **Catalog**: models.dev (`https://models.dev/api.json`) is fetched and cached by `packages/core/src/models-dev.ts` at `~/.cache/kilo/models.json` (5-minute freshness, hourly background refresh; a snapshot is also embedded at build time). Env overrides: `KILO_MODELS_URL`, `KILO_MODELS_PATH`, `KILO_DISABLE_MODELS_FETCH`. Per-model `reasoning_options` (`effort` values / `toggle` / `budget_tokens`) is the accurate source of reasoning controls; coverage is community-maintained and uneven.
+- **Variant computation** (`packages/opencode/src/provider/`): `fromModelsDevModel` builds `Provider.Model.variants` via `ProviderTransform.reasoningVariants` (catalog `reasoning_options`), falling back to `ProviderTransform.variants` (npm-package / model-ID heuristics). Config-defined providers are assembled in the `provider.ts` config loop; custom-provider fallback tiers live in `src/kilocode/provider/provider.ts` (`customProviderVariants`, `FALLBACK_EFFORTS`).
+- **Custom-provider catalog match**: `src/kilocode/provider/catalog-match.ts` matches a custom provider's `options.baseURL`/`api` to a catalog entry by normalized host/path (regional host labels and known vendor domain aliases removed). Matched models inherit catalog capabilities/limits and authoritative `reasoning_options`; controls the SDK cannot map yield no variants instead of heuristic tiers. A matched catalog URL never replaces the user's configured endpoint.
+- **Webview**: `ThinkingSelector` renders exactly `Object.keys(model.variants)` (`webview-ui/src/context/session-variants.ts`) and adds nothing. Fake effort tiers therefore originate in CLI fallbacks, not the UI.
+
+| Concern | File |
+|---|---|
+| Catalog fetch/cache | `packages/core/src/models-dev.ts` |
+| Model + variant assembly | `packages/opencode/src/provider/provider.ts`, `transform.ts` |
+| Custom-provider fallback + catalog match | `packages/opencode/src/kilocode/provider/provider.ts`, `catalog-match.ts` |
+| Effort selector UI | `packages/kilo-vscode/webview-ui/src/components/shared/ThinkingSelector.tsx` |
+
+Verify provider changes from `packages/opencode/`: `bun test test/kilocode/provider/ test/provider/provider.test.ts` (network-backed catalog tests may need `--timeout 30000`), `bun run typecheck`, then `bun run script/check-opencode-annotations.ts --worktree` from root.
+
 ## Commits and PR Titles
 
 Use conventional commit-style messages and PR titles: `type(scope): summary`.

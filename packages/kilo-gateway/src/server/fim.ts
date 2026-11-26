@@ -109,6 +109,10 @@ export function createFimHandler(Auth: Auth) {
       }
     }
 
+    if (target.provider === "custom") {
+      return c.json({ error: "Custom autocomplete provider is only supported by the CLI backend" }, 400)
+    }
+
     const proxy = target.provider === "kilo" ? await getProxyAuth(Auth) : undefined
     const token = target.provider === "kilo" ? proxy?.token : await getProviderKey(Auth, target.provider)
 

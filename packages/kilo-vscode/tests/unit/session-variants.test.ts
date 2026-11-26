@@ -21,7 +21,6 @@ function setup(session = "composer", configured?: string) {
     agent: () => "code",
     config: () => config,
     find: () => ({ variants: { low: {}, high: {}, max: {} } }),
-    draft: (id) => id === "composer" || /^(?:sidebar-)?pending:/.test(id),
     remember: (agent, model, variant) => remembered.push({ agent, model, variant }),
     post: (message) => {
       order.push("post")
@@ -143,7 +142,7 @@ describe("session variants", () => {
     expect(state.messages).toEqual([])
   })
 
-  it("keeps session selections local while drafts remember their effort", () => {
+  it("remembers the effort for the model from both drafts and active sessions", () => {
     const draft = setup()
     draft.variants.select("high")
     expect(draft.selections["session/composer/anthropic/claude-sonnet-4"]).toBe("high")
@@ -153,7 +152,7 @@ describe("session variants", () => {
     scoped.variants.select("low")
     expect(scoped.selections).toEqual({ "session/session-a/anthropic/claude-sonnet-4": "low" })
     expect(scoped.messages).toEqual([])
-    expect(scoped.remembered).toEqual([])
+    expect(scoped.remembered).toEqual([{ agent: "code", model, variant: "low" }])
   })
 
   it("persists an explicit default selection", () => {

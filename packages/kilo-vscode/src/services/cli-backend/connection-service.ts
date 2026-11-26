@@ -134,6 +134,7 @@ export class KiloConnectionService {
    * Used primarily for message.part.updated where only messageID may be present.
    */
   private readonly messageSessionIdsByMessageId: Map<string, string> = new Map()
+  private readonly messageIdsBySessionId: Map<string, Set<string>> = new Map()
 
   private readonly viewerId = crypto.randomUUID()
   private active = true
@@ -254,6 +255,20 @@ export class KiloConnectionService {
   }
 
   /**
+   * Restart the backend so spawn-time environment changes (e.g. the proxy
+   * setting) take effect. Kills the current server and reconnects all
+   * consumers to a fresh one. No-op when there is no directory to reconnect.
+   */
+  async restart(): Promise<void> {
+    const root = this.rootDirectory ?? this.currentDirectory ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+    if (!root) return
+    this.connectPromise = null
+    this.serverManager.dispose()
+    this.setState("connecting")
+    await this.connect(root)
+  }
+
+  /**
    * Set the remote status service. When remote is disabled, flushViewed()
    * is a no-op. When remote becomes enabled (startup refresh, user toggle,
    * or SSE event), the accumulated focused/opened state is automatically
@@ -327,7 +342,19 @@ export class KiloConnectionService {
     if (!messageId || !sessionId) {
       return
     }
+    const prev = this.messageSessionIdsByMessageId.get(messageId)
+    if (prev === sessionId) {
+      return
+    }
+    if (prev) {
+      const old = this.messageIdsBySessionId.get(prev)
+      old?.delete(messageId)
+      if (old?.size === 0) this.messageIdsBySessionId.delete(prev)
+    }
     this.messageSessionIdsByMessageId.set(messageId, sessionId)
+    const ids = this.messageIdsBySessionId.get(sessionId) ?? new Set<string>()
+    ids.add(messageId)
+    this.messageIdsBySessionId.set(sessionId, ids)
   }
 
   /**
@@ -341,8 +368,10 @@ export class KiloConnectionService {
    */
   pruneSession(sessionId: string): void {
     this.explicitAborts.remove(sessionId)
-    for (const [mid, sid] of this.messageSessionIdsByMessageId) {
-      if (sid === sessionId) this.messageSessionIdsByMessageId.delete(mid)
+    const ids = this.messageIdsBySessionId.get(sessionId)
+    if (ids) {
+      for (const mid of ids) this.messageSessionIdsByMessageId.delete(mid)
+      this.messageIdsBySessionId.delete(sessionId)
     }
     for (const [key, ids] of this.attached) {
       if (!ids.has(sessionId)) continue
@@ -843,6 +872,7 @@ export class KiloConnectionService {
     this.rootDirectory = undefined
     this.currentDirectory = undefined
     this.messageSessionIdsByMessageId.clear()
+    this.messageIdsBySessionId.clear()
     this.permissionDirectories.clear()
     this.permissionSessions.clear()
     this.permissionResponses.clear()

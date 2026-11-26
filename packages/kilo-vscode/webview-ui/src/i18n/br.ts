@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "Selecionar",
   "dialog.model.expand": "Expandir",
   "dialog.model.collapse": "Recolher",
+  "review.model.label": "Modelo de revisão",
 
   "dialog.provider.viewAll": "Ver mais provedores",
 
@@ -923,18 +924,35 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Mostrar sugestões de autocompletar no campo de chat",
   "settings.autocomplete.modelsHint":
     "Para escolher qual modelo é usado para autocompletar, veja as configurações de Modelos.",
-  "settings.autocomplete.local.model.title": "Modelo local",
-  "settings.autocomplete.local.model.description":
-    "Nome do modelo conforme servido pelo seu servidor local (ex.: uma tag do Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL do servidor local",
-  "settings.autocomplete.local.baseUrl.description": "URL base do servidor local que executa o modelo",
-  "settings.autocomplete.local.template.title": "Modelo FIM",
-  "settings.autocomplete.local.template.description":
-    "Formato de prompt fill-in-the-middle; «Auto» é detectado pelo nome do modelo",
-  "settings.autocomplete.local.endpoint.title": "Endpoint da API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Auto» usa o padrão do modelo: nativo do Ollama ou compatível com OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "API prompt kriz",
+  "settings.autocomplete.custom.transport.description": "Pe API klokaat a resev ar prompt kriz",
+  "settings.autocomplete.custom.mode.title": "Mod enkas",
+  "settings.autocomplete.custom.mode.description":
+    "Penaos e c'hortoz an dibenn rekedoù klokaat: prompt+suffix genidik, prompt kriz gant patrom pe kemennadennoù kaoz",
+  "settings.autocomplete.custom.mode.native": "Genidik",
+  "settings.autocomplete.custom.mode.raw": "Kriz",
+  "settings.autocomplete.custom.mode.chat": "Kaoz",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Penaos kodanañ toull fill-in-the-middle; Auto a zizolo anezhañ diwar anv ar model",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto n\'en deus ket kavet ur profil evit "{{model}}" — dibabit ur profil splann.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Ar mod kaoz en deus ezhomm ur model evit leuniañ an toull.",
+  "settings.autocomplete.custom.auto": "Emgefre",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Anv ar model war an dibenn personelaet (da sk. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL diazez",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Diazez API kenglotus gant OpenAI; kaset e vez ar rekedoù da {baseURL}/completions gant prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Alc'hwez API",
+  "settings.autocomplete.custom.apiKey.description": "Kaset evel token Bearer; lezel goullo evit gervel hep dilesa",
+  "settings.autocomplete.custom.apiKey.placeholder": "Goullo = hep dilesa",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Proxy HTTP/SOCKS diret evit tizhout an dibenn; goullo a implij ar proxy hollek",
   "settings.notifications.sounds": "Sons",
   "settings.notifications.enable.title": "Ativar notificações sonoras",
   "settings.notifications.enable.description":
@@ -973,6 +991,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Modelo de imagem",
   "settings.experimental.imageGenerationModel.description": "Modelo de geração de imagens",
   "settings.experimental.imageGenerationModel.placeholder": "Padrão (Auto Router)",
+  "settings.experimental.proxy.title": "Proxy hollek",
+  "settings.experimental.proxy.description":
+    "Hent holl goulennadoù rouedad Kilo (chat, marc'had, modeloù, servijerien MCP) dre ar proxy-mañ. Skoazell http, https ha socks5. Lezel ar chomlec'h goullo evit kevreañ war-eeun. Enrollañ a adloc'h backend Kilo.",
+  "settings.experimental.proxy.address.label": "Chomlec'h ar proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 pe socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy enrollet",
 
   "settings.models.speechToTextModel.customDescription":
     "ID do modelo enviado ao seu endpoint de transcrição próprio, por exemplo whisper-1.",
@@ -1134,6 +1158,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Roit ur porzh etre 1 ha 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Un arvar kliant a c'houlenn un ID kliant.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Roit un URI adkas reizh.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Tremen ar proxy hollek evit ar servijer-mañ, pe kevreañ war-eeun. Ar servijerien lec'hel a resev an newidennaoù endro proxy a glot; ar servijerien a nac'h anezho ne vezont ket touchet.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Mod",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Proxy hollek",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Proxy personelaet",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "War-eeun (proxy ebet)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL ar proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Roit un URL proxy http, https pe socks.",
   "settings.agentBehaviour.addMcp.command": "Comando",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumentos",

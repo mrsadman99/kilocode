@@ -106,6 +106,7 @@ export const dict = {
   "dialog.model.select": "Seleziona",
   "dialog.model.expand": "Espandi",
   "dialog.model.collapse": "Comprimi",
+  "review.model.label": "Modello di revisione",
   "dialog.provider.viewAll": "Mostra altri provider",
   "provider.connect.title": "Connetti {{provider}}",
   "provider.connect.selectMethod": "Seleziona metodo di accesso per {{provider}}.",
@@ -809,6 +810,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Modello di immagine",
   "settings.experimental.imageGenerationModel.description": "Modello di generazione di immagini",
   "settings.experimental.imageGenerationModel.placeholder": "Predefinito (Auto Router)",
+  "settings.experimental.proxy.title": "Proxy globale",
+  "settings.experimental.proxy.description":
+    "Instrada tutte le richieste di rete di Kilo (chat, marketplace, modelli, server MCP) attraverso questo proxy. Supporta http, https e socks5. Lascia l'indirizzo vuoto per connetterti direttamente. Il salvataggio riavvia il backend di Kilo.",
+  "settings.experimental.proxy.address.label": "Indirizzo del proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 o socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy salvato",
 
   "settings.experimental.nativeNotebookTools.title": "Strumenti nativi per notebook",
   "settings.experimental.nativeNotebookTools.description":
@@ -959,6 +966,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Inserisci una porta tra 1 e 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Un client secret richiede un ID client.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Inserisci un URI di reindirizzamento valido.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Sostituisce il proxy globale per questo server, oppure connetti direttamente. I server locali ricevono le variabili d'ambiente proxy corrispondenti; i server che le ignorano non sono interessati.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Modalità",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Proxy globale",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Proxy personalizzato",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Diretto (senza proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL del proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Inserisci un URL proxy http, https o socks.",
   "settings.agentBehaviour.addMcp.command": "Comando",
   "settings.agentBehaviour.addMcp.command.placeholder": "es. npx",
   "settings.agentBehaviour.addMcp.args": "Argomenti",
@@ -1391,18 +1407,36 @@ export const dict = {
   // Autocomplete hint
   "settings.autocomplete.modelsHint":
     "Per scegliere quale modello usare per l'autocompletamento, vedi le impostazioni Modelli.",
-  "settings.autocomplete.local.model.title": "Modello locale",
-  "settings.autocomplete.local.model.description":
-    "Nome del modello come fornito dal server locale (es. un tag Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL del server locale",
-  "settings.autocomplete.local.baseUrl.description": "URL base del server locale che esegue il modello",
-  "settings.autocomplete.local.template.title": "Template FIM",
-  "settings.autocomplete.local.template.description":
-    "Formato del prompt fill-in-the-middle; «Auto» viene rilevato dal nome del modello",
-  "settings.autocomplete.local.endpoint.title": "Endpoint API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Auto» usa il valore predefinito del template: nativo Ollama o compatibile OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "API prompt raw",
+  "settings.autocomplete.custom.transport.description": "Quale API di completamento riceve il prompt raw",
+  "settings.autocomplete.custom.mode.title": "Modalità di input",
+  "settings.autocomplete.custom.mode.description":
+    "Come l'endpoint si aspetta le completazioni: prompt+suffix nativi, prompt raw con template o messaggi di chat",
+  "settings.autocomplete.custom.mode.native": "Nativo",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profilo FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Come codificare il buco fill-in-the-middle; Auto lo rileva dal nome del modello",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto non ha rilevato un profilo per "{{model}}": scegli un profilo esplicito.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "La modalità chat richiede un modello per riempire il buco.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Modello",
+  "settings.autocomplete.custom.model.description": "Nome del modello sull'endpoint personalizzato (es. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL base",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Base API compatibile OpenAI; le richieste vanno a {baseURL}/completions con prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Chiave API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Inviata come token Bearer; lasciare vuoto per chiamare senza autenticazione",
+  "settings.autocomplete.custom.apiKey.placeholder": "Vuoto = senza autenticazione",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Proxy HTTP/SOCKS facoltativo per raggiungere l'endpoint; vuoto usa il proxy globale",
 
   // Indexing
   "settings.indexing.globalEnable.title": "Abilita globalmente",

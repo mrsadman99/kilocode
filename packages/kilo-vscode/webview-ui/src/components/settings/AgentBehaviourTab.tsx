@@ -557,8 +557,8 @@ const AgentBehaviourTab: Component<Props> = (props) => {
                               "font-size": "var(--kilo-font-size-10)",
                               padding: "1px 5px",
                               "border-radius": "3px",
-                              background: "var(--vscode-errorForeground, #f44)",
-                              color: "var(--vscode-errorForeground-foreground, #fff)",
+                              background: "var(--vscode-errorForeground, #f14c4c)",
+                              color: "var(--vscode-button-foreground, #fff)",
                             }}
                           >
                             {language.t("settings.agentBehaviour.badge.disabled")}
@@ -683,10 +683,10 @@ const AgentBehaviourTab: Component<Props> = (props) => {
 
     const statusColor = (name: string) => {
       const s = session.mcpStatus()[name]?.status
-      if (s === "connected") return "var(--vscode-testing-iconPassed, #4caf50)"
-      if (s === "failed") return "var(--vscode-testing-iconFailed, #f44336)"
+      if (s === "connected") return "var(--vscode-testing-iconPassed, #73c991)"
+      if (s === "failed") return "var(--vscode-testing-iconFailed, #f14c4c)"
       if (s === "needs_auth" || s === "needs_client_registration")
-        return "var(--vscode-editorWarning-foreground, #ff9800)"
+        return "var(--vscode-editorWarning-foreground, #cca700)"
       if (s === "disabled") return "var(--vscode-disabledForeground, #888)"
       return "var(--vscode-disabledForeground, #888)"
     }

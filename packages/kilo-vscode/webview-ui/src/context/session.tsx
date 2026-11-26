@@ -83,6 +83,7 @@ import {
 import { Identifier } from "../utils/id"
 import { resolveModelSelection } from "./model-selection"
 import { COMPOSER, getAgentModel, getSelected } from "./session-model-store"
+import { createReviewModel } from "./session-review-model"
 import { isModelValid } from "./provider-utils"
 import { createSessionRecovery } from "./session-recovery"
 import { errorIDs, preserveSessionErrors, withoutResolvedSessionErrors } from "./session-errors"
@@ -410,8 +411,7 @@ export const SessionProvider: ParentComponent = (props) => {
       fallback: defaultAgent(),
     })
   }
-  // Draft scopes keep per-agent picks that transfer on promotion and remember effort.
-  const isDraftScope = (id: string) => id === COMPOSER || /^(?:sidebar-)?pending:/.test(id)
+  // Draft scopes keep per-agent picks that transfer on promotion.
   const agentDrafts = createDraftAgentSeed({
     selections: () => store.agentSelections,
     pending: pendingAgentSelection,
@@ -550,7 +550,6 @@ export const SessionProvider: ParentComponent = (props) => {
     find: provider.findModel,
     post: vscode.postMessage,
     listen: vscode.onMessage,
-    draft: isDraftScope,
     remember: rememberEffort,
   })
   const { carry: carryVariant, list: variantList, agent: variantForAgent, current: currentVariant } = variants
@@ -569,13 +568,11 @@ export const SessionProvider: ParentComponent = (props) => {
     const id = sessionID ?? currentSessionID() ?? COMPOSER
     batch(() => {
       models.select(providerID, modelID, id)
-      if (isDraftScope(id)) {
-        const model = { providerID, modelID }
-        const agent = agentForScope(id)
-        const value = store.variantSelections[variantKey(model, agent, id)] ?? variantForAgent(agent, model)
-        const list = Object.keys(provider.findModel(model)?.variants ?? {})
-        rememberEffort(agent, model, value === "" ? "" : (preserveVariant(value, list) ?? ""))
-      }
+      const model = { providerID, modelID }
+      const agent = agentForScope(id)
+      const value = store.variantSelections[variantKey(model, agent, id)] ?? variantForAgent(agent, model)
+      const list = Object.keys(provider.findModel(model)?.variants ?? {})
+      rememberEffort(agent, model, value === "" ? "" : (preserveVariant(value, list) ?? ""))
     })
   }
 
@@ -780,6 +777,7 @@ export const SessionProvider: ParentComponent = (props) => {
   })
   vscode.postMessage({ type: "requestFavorites" })
   onCleanup(unsubFavorites)
+  const reviewModel = createReviewModel({ post: (m) => vscode.postMessage(m), listen: (h) => vscode.onMessage(h) })
 
   function handleError(message: Extract<ExtensionMessage, { type: "error" }>) {
     if (!message.sessionID || message.sessionID === currentSessionID()) setLoading(false)
@@ -2522,7 +2520,7 @@ export const SessionProvider: ParentComponent = (props) => {
     })
   }
 
-  function acceptSuggestion(requestID: string, index: number) {
+  function acceptSuggestion(requestID: string, index: number, model?: ModelSelection | null) {
     clearSuggestionError(requestID)
     setRespondingSuggestions((prev) => new Set(prev).add(requestID))
     const sid = suggestions().find((s) => s.id === requestID)?.sessionID ?? currentSessionID() ?? ""
@@ -2531,6 +2529,7 @@ export const SessionProvider: ParentComponent = (props) => {
       requestID,
       sessionID: sid,
       index,
+      ...(model ? { model } : {}),
     })
   }
 
@@ -2551,9 +2550,11 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    // Clear the pending agent so the picker shows the default and send omits it
+    // Continue in the mode the current dialog uses; only fall back to the default
+    // (omitted on send) when the current mode is already the default.
+    const agent = agentForScope()
     agentDrafts.prune(draftSessionID())
-    setPendingAgentSelection(null)
+    setPendingAgentSelection(agent === defaultAgent() ? null : agent)
     memory.forget(COMPOSER)
     vscode.postMessage({ type: "createSession" })
   }
@@ -3028,6 +3029,7 @@ export const SessionProvider: ParentComponent = (props) => {
     recentModels: () => store.recentModels,
     modelUsageHistory: () => store.modelUsageHistory,
     favoriteModels: () => store.favoriteModels,
+    reviewModel,
     toggleFavorite,
     variantList,
     currentVariant,

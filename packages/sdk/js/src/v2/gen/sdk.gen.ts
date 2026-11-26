@@ -7306,8 +7306,11 @@ export class Kilo extends HeyApiClient {
       maxTokens?: number
       temperature?: number
       baseURL?: string
-      endpoint?: "completions" | "generate"
+      endpoint?: "completions" | "generate" | "chat"
       stop?: Array<string>
+      proxy?: string
+      apiKey?: string
+      system?: string
     },
     options?: Options<never, ThrowOnError, KiloFimResponse>,
   ) {
@@ -7327,6 +7330,9 @@ export class Kilo extends HeyApiClient {
             { in: "body", key: "baseURL" },
             { in: "body", key: "endpoint" },
             { in: "body", key: "stop" },
+            { in: "body", key: "proxy" },
+            { in: "body", key: "apiKey" },
+            { in: "body", key: "system" },
           ],
         },
       ],
@@ -10425,6 +10431,10 @@ export class Suggestion extends HeyApiClient {
       directory?: string
       workspace?: string
       index: number
+      model?: {
+        providerID: string
+        modelID: string
+      }
     },
     options?: Options<never, ThrowOnError>,
   ) {
@@ -10437,6 +10447,7 @@ export class Suggestion extends HeyApiClient {
             { in: "query", key: "directory" },
             { in: "query", key: "workspace" },
             { in: "body", key: "index" },
+            { in: "body", key: "model" },
           ],
         },
       ],

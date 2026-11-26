@@ -94,6 +94,11 @@ export namespace KiloCli {
       ? await runtime.KiloCliBootstrapRuntime.getGlobal()
       : await app!.AppRuntime.runPromise((await import("@/config/config")).Config.Service.use((c) => c.getGlobal()))
 
+    // Install the global outbound proxy (env KILO_PROXY or config `proxy`) before
+    // any module that captures fetch at import time is loaded below (e.g. PostHog).
+    const { install: installProxy, resolve: resolveProxy } = await import("@/kilocode/proxy")
+    installProxy(resolveProxy(cfg.proxy))
+
     const { Global } = await import("@opencode-ai/core/global")
     const { Telemetry } = await import("@kilocode/kilo-telemetry")
     await Telemetry.init({

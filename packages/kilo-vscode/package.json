@@ -1028,12 +1028,14 @@
           "enum": [
             "kilo",
             "mistral",
-            "local"
+            "local",
+            "custom"
           ],
           "enumDescriptions": [
             "Use autocomplete models through Kilo Gateway",
             "Use autocomplete models through your connected Mistral provider API key",
-            "Use a local FIM model (Ollama, llama.cpp, LM Studio) via a local server"
+            "Use a local FIM model (Ollama, llama.cpp, LM Studio) via a local server",
+            "Use any OpenAI-compatible FIM endpoint (/completions with prompt+suffix), e.g. DeepSeek, vLLM, Together"
           ],
           "description": "Provider to use for inline autocomplete suggestions. If unset, Kilo Gateway is used."
         },
@@ -1046,6 +1048,11 @@
           "type": "string",
           "default": "http://127.0.0.1:11434",
           "description": "Base URL of the local server used for autocomplete when the provider is 'local'."
+        },
+        "kilo-code.new.autocomplete.localProxy": {
+          "type": "string",
+          "default": "",
+          "description": "Optional HTTP/SOCKS proxy URL used to reach the local autocomplete server (e.g. http://127.0.0.1:8080 or socks5://127.0.0.1:1080). Leave empty to connect directly."
         },
         "kilo-code.new.autocomplete.localTemplate": {
           "type": "string",
@@ -1078,6 +1085,74 @@
           ],
           "default": "auto",
           "description": "Local server API endpoint used for autocomplete when the provider is 'local'."
+        },
+        "kilo-code.new.autocomplete.customModel": {
+          "type": "string",
+          "default": "",
+          "description": "Model name for autocomplete on the custom OpenAI-compatible FIM endpoint (e.g. deepseek-chat). Used when the autocomplete provider is 'custom'."
+        },
+        "kilo-code.new.autocomplete.customBaseURL": {
+          "type": "string",
+          "default": "",
+          "description": "Base URL of the custom autocomplete endpoint (e.g. https://api.deepseek.com/beta). The request path depends on the selected input format (native FIM, raw prompt, or chat)."
+        },
+        "kilo-code.new.autocomplete.customApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the custom autocomplete endpoint, sent as a Bearer token. Leave empty to send requests without an Authorization header."
+        },
+        "kilo-code.new.autocomplete.customProxy": {
+          "type": "string",
+          "default": "",
+          "description": "Optional HTTP/SOCKS proxy URL used to reach the custom autocomplete endpoint (e.g. http://127.0.0.1:8080 or socks5://127.0.0.1:1080). Leave empty to use the global proxy settings."
+        },
+        "kilo-code.new.autocomplete.customFormat": {
+          "type": "string",
+          "enum": [
+            "openai",
+            "completions",
+            "generate",
+            "chat"
+          ],
+          "enumDescriptions": [
+            "Native FIM: POST {baseURL}/completions with separate prompt+suffix; the server encodes the hole (e.g. DeepSeek beta API)",
+            "Raw prompt: OpenAI-compatible /v1/completions with a client-side FIM profile (llama.cpp, LM Studio, vLLM, Ollama)",
+            "Raw prompt: Ollama-native /api/generate with a client-side FIM profile",
+            "Chat messages: POST {baseURL}/chat/completions with the rendered FIM content in a user message (e.g. Qwen3-Coder-Next)"
+          ],
+          "default": "openai",
+          "description": "Input the custom autocomplete server accepts. Native FIM sends prompt+suffix untouched; raw and chat formats encode the hole with the selected model profile. The API key and proxy apply to every format."
+        },
+        "kilo-code.new.autocomplete.customTemplate": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "qwen",
+            "qwen3",
+            "codegemma",
+            "starcoder",
+            "santacoder",
+            "deepseek",
+            "mellum",
+            "seed",
+            "codellama",
+            "codegeex"
+          ],
+          "enumDescriptions": [
+            "Match the profile to the model name; unknown names require an explicit choice",
+            "Qwen2.5-Coder Base: <|fim_prefix|>/<|fim_suffix|>/<|fim_middle|>",
+            "Qwen3-Coder / Next: Qwen markers, plus a system instruction in chat mode",
+            "CodeGemma pretrained: Qwen-style markers with Gemma stop tokens",
+            "StarCoder / StarCoder2 / Stable Code: <fim_prefix>/<fim_suffix>/<fim_middle>",
+            "SantaCoder: hyphenated <fim-prefix>/<fim-suffix>/<fim-middle>",
+            "DeepSeek-Coder Base: <｜fim▁begin｜>/<｜fim▁hole｜>/<｜fim▁end｜>",
+            "JetBrains Mellum: suffix-first <fim_suffix>/<fim_prefix>/<fim_middle>, optional filename",
+            "Seed-Coder: suffix-first <[fim-suffix]>/<[fim-prefix]>/<[fim-middle]>",
+            "CodeLlama: <PRE>/<SUF>/<MID>",
+            "CodeGeeX4: role-wrapped, suffix-first <|code_suffix|>/<|code_prefix|>/<|code_middle|> (raw only)"
+          ],
+          "default": "auto",
+          "description": "Model profile used to encode the FIM hole for the raw and chat formats. Not used by native FIM."
         },
         "kilo-code.new.autocomplete.enableAutoTrigger": {
           "type": "boolean",
@@ -1165,6 +1240,11 @@
           "type": "string",
           "default": "",
           "description": "Absolute path to a PEM file containing extra CA certificates to trust when the Kilo backend makes HTTPS requests (sets NODE_EXTRA_CA_CERTS on the CLI process). Use this if you're behind a corporate proxy that performs SSL inspection. Leave empty to rely on the OS trust store."
+        },
+        "kilo-code.new.proxy": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Outbound proxy used for all Kilo network requests (LLM chat, marketplace, models list, MCP servers, telemetry). Supports `http://`, `https://`, `socks4://`, and `socks5://` URLs, for example `http://127.0.0.1:8118` or `socks5://127.0.0.1:1080`. Leave empty to disable (falls back to VS Code's `http.proxy` setting). Changing this restarts the Kilo backend."
         },
         "kilo-code.new.autoApprove.enabled": {
           "type": "boolean",

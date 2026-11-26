@@ -116,6 +116,7 @@ export const dict = {
   "dialog.model.select": "선택",
   "dialog.model.expand": "펼치기",
   "dialog.model.collapse": "접기",
+  "review.model.label": "리뷰 모델",
 
   "dialog.provider.viewAll": "더 많은 공급자 보기",
 
@@ -904,16 +905,35 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "채팅 텍스트 영역 자동완성 활성화",
   "settings.autocomplete.chatAutocomplete.description": "채팅 텍스트 영역에서 자동완성 제안 표시",
   "settings.autocomplete.modelsHint": "자동 완성에 사용되는 모델을 선택하려면 모델 설정을 참조하세요.",
-  "settings.autocomplete.local.model.title": "로컬 모델",
-  "settings.autocomplete.local.model.description": "로컬 서버에서 제공하는 모델 이름 (예: Ollama 태그)",
-  "settings.autocomplete.local.baseUrl.title": "로컬 서버 URL",
-  "settings.autocomplete.local.baseUrl.description": "모델을 실행하는 로컬 서버의 기본 URL",
-  "settings.autocomplete.local.template.title": "FIM 템플릿",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle 프롬프트 형식; '자동'은 모델 이름에서 감지합니다",
-  "settings.autocomplete.local.endpoint.title": "API 엔드포인트",
-  "settings.autocomplete.local.endpoint.description": "'자동'은 템플릿 기본값을 사용: Ollama 네이티브 또는 OpenAI 호환",
-  "settings.autocomplete.local.auto": "자동",
+  "settings.autocomplete.custom.transport.title": "Raw 프롬프트 API",
+  "settings.autocomplete.custom.transport.description": "Raw 프롬프트를 받을 completions API",
+  "settings.autocomplete.custom.mode.title": "입력 모드",
+  "settings.autocomplete.custom.mode.description":
+    "엔드포인트가 완성을 요청하는 방식: 네이티브 prompt+suffix, 템플릿화된 raw 프롬프트, 또는 채팅 메시지",
+  "settings.autocomplete.custom.mode.native": "네이티브",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "채팅",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM 프로필",
+  "settings.autocomplete.custom.profile.description":
+    "fill-in-the-middle 구멍을 인코딩하는 방법; Auto가 모델 이름에서 감지합니다",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto가 "{{model}}"의 프로필을 감지하지 못했습니다. 명시적으로 선택하세요.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "채팅 모드에는 구멍을 채울 모델이 필요합니다.",
+  "settings.autocomplete.custom.auto": "자동",
+  "settings.autocomplete.custom.model.title": "모델",
+  "settings.autocomplete.custom.model.description": "사용자 지정 엔드포인트의 모델 이름 (예: deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "기본 URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI 호환 API 베이스; 요청은 prompt+suffix와 함께 {baseURL}/completions로 전송됩니다",
+  "settings.autocomplete.custom.apiKey.title": "API 키",
+  "settings.autocomplete.custom.apiKey.description": "Bearer 토큰으로 전송됩니다. 비워 두면 인증 없이 호출합니다",
+  "settings.autocomplete.custom.apiKey.placeholder": "비움 = 인증 없음",
+  "settings.autocomplete.custom.proxy.title": "프록시",
+  "settings.autocomplete.custom.proxy.description":
+    "엔드포인트 연결에 사용할 선택적 HTTP/SOCKS 프록시; 비워 두면 전역 프록시 사용",
   "settings.notifications.sounds": "소리",
   "settings.notifications.enable.title": "소리 알림 활성화",
   "settings.notifications.enable.description":
@@ -952,6 +972,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "이미지 모델",
   "settings.experimental.imageGenerationModel.description": "이미지 생성 모델",
   "settings.experimental.imageGenerationModel.placeholder": "기본값 (Auto Router)",
+  "settings.experimental.proxy.title": "전역 프록시",
+  "settings.experimental.proxy.description":
+    "모든 Kilo 네트워크 요청(채팅, 마켓플레이스, 모델, MCP 서버)을 이 프록시로 라우팅합니다. http, https, socks5를 지원합니다. 주소를 비워 두면 직접 연결합니다. 저장하면 Kilo 백엔드가 다시 시작됩니다.",
+  "settings.experimental.proxy.address.label": "프록시 주소",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 또는 socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "프록시 저장됨",
 
   "settings.models.speechToTextModel.customDescription":
     "사용자 지정 변환 엔드포인트로 전송되는 모델 ID입니다. 예: whisper-1.",
@@ -1108,6 +1134,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "1에서 65535 사이의 포트를 입력하세요.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "클라이언트 시크릿에는 클라이언트 ID가 필요합니다.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "유효한 리디렉션 URI를 입력하세요.",
+  "settings.agentBehaviour.editMcp.proxy": "프록시",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "이 서버의 전역 프록시를 재정의하거나 직접 연결합니다. 로컬 서버에는 해당 프록시 환경 변수가 전달되며, 이를 무시하는 서버에는 영향을 주지 않습니다.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "모드",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "전역 프록시",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "사용자 지정 프록시",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "직연결(프록시 없음)",
+  "settings.agentBehaviour.editMcp.proxy.url": "프록시 URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "http, https 또는 socks 프록시 URL을 입력하세요.",
   "settings.agentBehaviour.addMcp.command": "명령어",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "인수",

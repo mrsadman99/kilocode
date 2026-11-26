@@ -1,5 +1,6 @@
 export class PrecalculatedLruCache<V> {
   private items: [string, V][] = []
+  private pending = new Map<string, Promise<void>>()
   constructor(
     private readonly calculateValue: (key: string) => Promise<V | null>,
     private readonly N: number,
@@ -9,8 +10,18 @@ export class PrecalculatedLruCache<V> {
     // Maintain LRU
     const index = this.items.findIndex((item) => item[0] === key)
 
-    if (index < 0) {
-      // Calculate info for new file
+    if (index >= 0) {
+      // Move to end of array, since it was recently used
+      const [item] = this.items.splice(index, 1)
+      this.items.push(item)
+      return
+    }
+
+    // Concurrent warms (tab-switch preload + request path) share one calculation.
+    const existing = this.pending.get(key)
+    if (existing) return existing
+
+    const task = (async () => {
       const value: V | null = await this.calculateValue(key)
 
       if (value === null) {
@@ -21,11 +32,11 @@ export class PrecalculatedLruCache<V> {
       if (this.items.length > this.N) {
         this.items.shift()
       }
-    } else {
-      // Move to end of array, since it was recently used
-      const [item] = this.items.splice(index, 1)
-      this.items.push(item)
-    }
+    })().finally(() => {
+      this.pending.delete(key)
+    })
+    this.pending.set(key, task)
+    return task
   }
 
   get(key: string): V | undefined {

@@ -113,6 +113,8 @@ export const dict = {
   "dialog.model.expand": "Развернуть",
   "dialog.model.collapse": "Свернуть",
 
+  "review.model.label": "Модель для ревью",
+
   "dialog.provider.viewAll": "Показать больше провайдеров",
 
   "provider.connect.title": "Подключить {{provider}}",
@@ -912,17 +914,37 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Включить автодополнение чата",
   "settings.autocomplete.chatAutocomplete.description": "Показывать предложения автодополнения в поле чата",
   "settings.autocomplete.modelsHint": "Чтобы выбрать модель для автодополнения, см. настройки Моделей.",
-  "settings.autocomplete.local.model.title": "Локальная модель",
-  "settings.autocomplete.local.model.description": "Имя модели на вашем локальном сервере (например, тег Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
-  "settings.autocomplete.local.baseUrl.description": "Базовый URL локального сервера, на котором запущена модель",
-  "settings.autocomplete.local.template.title": "Шаблон FIM",
-  "settings.autocomplete.local.template.description":
-    "Формат fill-in-the-middle промпта; «Авто» определяется по имени модели",
-  "settings.autocomplete.local.endpoint.title": "Эндпоинт API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Авто» использует значение по умолчанию для шаблона: Ollama или OpenAI-совместимый",
-  "settings.autocomplete.local.auto": "Авто",
+  "settings.autocomplete.custom.transport.title": "API сырого промпта",
+  "settings.autocomplete.custom.transport.description": "Какой completions-API получает сырой промпт",
+  "settings.autocomplete.custom.mode.title": "Режим ввода",
+  "settings.autocomplete.custom.mode.description":
+    "Как эндпойнт ожидает запросы дополнения: нативные prompt+suffix, шаблонный сырой промпт или сообщения чата",
+  "settings.autocomplete.custom.mode.native": "Нативный",
+  "settings.autocomplete.custom.mode.raw": "Сырой",
+  "settings.autocomplete.custom.mode.chat": "Чат",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-профиль",
+  "settings.autocomplete.custom.profile.description":
+    "Как кодируется пропуск fill-in-the-middle; Auto определяет по имени модели",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto не удалось определить профиль для "{{model}}" — выберите профиль явно.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Для режима чата нужна модель, чтобы заполнить пропуск.",
+  "settings.autocomplete.custom.auto": "Авто",
+  "settings.autocomplete.custom.model.title": "Модель",
+  "settings.autocomplete.custom.model.description":
+    "Имя модели на пользовательском эндпойнте (например, deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Базовый URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "База OpenAI-совместимого API; запросы отправляются на {baseURL}/completions с prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API-ключ",
+  "settings.autocomplete.custom.apiKey.description":
+    "Отправляется как Bearer-токен; оставьте пустым, чтобы обращаться без аутентификации",
+  "settings.autocomplete.custom.apiKey.placeholder": "Пусто = без аутентификации",
+  "settings.autocomplete.custom.proxy.title": "Прокси",
+  "settings.autocomplete.custom.proxy.description":
+    "Необязательный HTTP/SOCKS-прокси для доступа к эндпойнту; пусто — используется глобальный прокси",
   "settings.notifications.sounds": "Звуки",
   "settings.notifications.enable.title": "Включить звуковые уведомления",
   "settings.notifications.enable.description":
@@ -961,6 +983,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Модель изображений",
   "settings.experimental.imageGenerationModel.description": "Модель генерации изображений",
   "settings.experimental.imageGenerationModel.placeholder": "По умолчанию (Auto Router)",
+  "settings.experimental.proxy.title": "Глобальный прокси",
+  "settings.experimental.proxy.description":
+    "Направлять все сетевые запросы Kilo (чат, маркетплейс, модели, MCP-серверы) через этот прокси. Поддерживаются http, https и socks5. Оставьте адрес пустым для прямого подключения. Сохранение перезапускает бэкенд Kilo.",
+  "settings.experimental.proxy.address.label": "Адрес прокси",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 или socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Прокси сохранён",
 
   "settings.models.speechToTextModel.customDescription":
     "Идентификатор модели, отправляемый в ваш собственный эндпоинт транскрипции, например whisper-1.",
@@ -1120,6 +1148,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Введите порт от 1 до 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Для секрета клиента требуется ID клиента.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Введите корректный URI перенаправления.",
+  "settings.agentBehaviour.editMcp.proxy": "Прокси",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Переопределите глобальный прокси для этого сервера или подключайтесь напрямую. Локальные серверы получают соответствующие переменные окружения прокси; серверы, игнорирующие их, не затрагиваются.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Режим",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Глобальный прокси",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Свой прокси",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Напрямую (без прокси)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL прокси",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Введите URL прокси http, https или socks.",
   "settings.agentBehaviour.addMcp.command": "Команда",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Аргументы",

@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Selecteren",
   "dialog.model.expand": "Uitvouwen",
   "dialog.model.collapse": "Samenvouwen",
+  "review.model.label": "Reviewmodel",
 
   "dialog.provider.viewAll": "Meer providers tonen",
 
@@ -909,18 +910,36 @@ export const dict = {
     "Toon suggesties voor automatisch aanvullen in het chat tekstveld",
   "settings.autocomplete.modelsHint":
     "Om te kiezen welk model wordt gebruikt voor automatisch aanvullen, zie de Modellen-instellingen.",
-  "settings.autocomplete.local.model.title": "Lokaal model",
-  "settings.autocomplete.local.model.description":
-    "Modelnaam zoals aangeboden door je lokale server (bijv. een Ollama-tag)",
-  "settings.autocomplete.local.baseUrl.title": "URL van lokale server",
-  "settings.autocomplete.local.baseUrl.description": "Basis-URL van de lokale server waarop het model draait",
-  "settings.autocomplete.local.template.title": "FIM-sjabloon",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle-promptformaat; 'Auto' wordt afgeleid uit de modelnaam",
-  "settings.autocomplete.local.endpoint.title": "API-eindpunt",
-  "settings.autocomplete.local.endpoint.description":
-    "'Auto' gebruikt de standaard van het sjabloon: Ollama-native of OpenAI-compatibel",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "Raw-prompt-API",
+  "settings.autocomplete.custom.transport.description": "Welke completions-API de raw-prompt ontvangt",
+  "settings.autocomplete.custom.mode.title": "Invoermodus",
+  "settings.autocomplete.custom.mode.description":
+    "Hoe het eindpunt completions verwacht: native prompt+suffix, een getemplateerde raw-prompt of chatberichten",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-profiel",
+  "settings.autocomplete.custom.profile.description":
+    "Hoe het fill-in-the-middle-gat wordt gecodeerd; Auto detecteert het op modelnaam",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto kon geen profiel detecteren voor "{{model}}" — kies expliciet een profiel.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chatmodus heeft een model nodig om het gat te vullen.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Modelnaam op het aangepaste eindpunt (bijv. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Basis-URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "OpenAI-compatibele API-basis; verzoeken gaan naar {baseURL}/completions met prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "API-sleutel",
+  "settings.autocomplete.custom.apiKey.description":
+    "Verzonden als Bearer-token; leeg laten om zonder authenticatie aan te roepen",
+  "settings.autocomplete.custom.apiKey.placeholder": "Leeg = zonder authenticatie",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Optionele HTTP/SOCKS-proxy voor het eindpunt; leeg gebruikt de globale proxy",
 
   "settings.notifications.sounds": "Geluiden",
   "settings.notifications.enable.title": "Geluidsmeldingen inschakelen",
@@ -961,6 +980,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Afbeeldingsmodel",
   "settings.experimental.imageGenerationModel.description": "Afbeeldingsgeneratiemodel",
   "settings.experimental.imageGenerationModel.placeholder": "Standaard (Auto Router)",
+  "settings.experimental.proxy.title": "Globale proxy",
+  "settings.experimental.proxy.description":
+    "Routeert alle Kilo-netwerkverzoeken (chat, marktplaats, modellen, MCP-servers) via deze proxy. Ondersteunt http, https en socks5. Laat het adres leeg om direct te verbinden. Opslaan herstart de Kilo-backend.",
+  "settings.experimental.proxy.address.label": "Proxy-adres",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 of socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy opgeslagen",
 
   "settings.models.speechToTextModel.customDescription":
     "Model-ID die naar uw eigen transcriptie-eindpunt wordt gestuurd, bijvoorbeeld whisper-1.",
@@ -1122,6 +1147,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Voer een poort tussen 1 en 65535 in.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Een clientgeheim vereist een client-ID.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Voer een geldige omleidings-URI in.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Overschrijft de globale proxy voor deze server, of maak direct verbinding. Lokale servers ontvangen de bijbehorende proxy-omgevingsvariabelen; servers die deze negeren worden niet beïnvloed.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Modus",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Globale proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Aangepaste proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direct (geen proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy-URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Voer een http-, https- of socks-proxy-URL in.",
   "settings.agentBehaviour.addMcp.command": "Opdracht",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumenten",

@@ -14,6 +14,7 @@ const OPAQUE_TOKENS = Token.estimate(OPAQUE)
 type Payload = {
   messages: ModelMessage[]
   tools: Record<string, { description?: string; inputSchema?: unknown }>
+  model?: Provider.Model
 }
 
 function continued(messages: ModelMessage[]) {
@@ -68,6 +69,53 @@ export namespace KiloSessionOverflow {
     }
   }
 
+  // Self-calibrating estimate factor. FACTOR is a generic heuristic; provider-reported
+  // prompt usage lets us adapt it per model (code/JSON tokenizes differently across
+  // tokenizers). Adaptation is slow and tightly clamped, and skips payloads whose
+  // provider count diverges for reasons a text factor cannot capture (media, opaque
+  // reasoning), so a noisy sample cannot destabilize compaction or the output cap.
+  const MIN_FACTOR = 1.0
+  const MAX_FACTOR = 2.0
+  const ALPHA = 0.2
+  const factors = new Map<string, number>()
+  const estimates = new Map<string, { normalized: number; raw: number }>()
+
+  function key(model: Provider.Model) {
+    return `${model.providerID}/${model.id}`
+  }
+
+  export function factor(model?: Provider.Model) {
+    if (!model) return FACTOR
+    return factors.get(key(model)) ?? FACTOR
+  }
+
+  /** Record the outgoing estimate for a session so the next provider report can calibrate it. */
+  export function remember(input: { sessionID: string; normalized: number; raw: number }) {
+    if (estimates.size >= 64 && !estimates.has(input.sessionID)) {
+      const oldest = estimates.keys().next()
+      if (!oldest.done) estimates.delete(oldest.value)
+    }
+    estimates.set(input.sessionID, { normalized: input.normalized, raw: input.raw })
+  }
+
+  /** Fold a provider-reported prompt token count into the model's estimate factor. */
+  export function calibrate(input: { model: Provider.Model; sessionID: string; prompt: number }) {
+    const rec = estimates.get(input.sessionID)
+    estimates.delete(input.sessionID)
+    if (!rec || rec.raw > rec.normalized || rec.normalized <= 0 || input.prompt <= 0) return
+    const ratio = input.prompt / rec.normalized
+    if (ratio < 0.5 || ratio > 2) return
+    const target = Math.min(MAX_FACTOR, Math.max(MIN_FACTOR, FACTOR * ratio))
+    const current = factors.get(key(input.model)) ?? FACTOR
+    factors.set(key(input.model), Math.min(MAX_FACTOR, Math.max(MIN_FACTOR, current + ALPHA * (target - current))))
+  }
+
+  /** Test hook: drop all learned factors and pending estimates. */
+  export function reset() {
+    factors.clear()
+    estimates.clear()
+  }
+
   export function count(tokens: MessageV2.Assistant["tokens"]) {
     const total = tokens.input + tokens.output + tokens.reasoning + tokens.cache.read + tokens.cache.write
     return total || tokens.total || 0
@@ -98,6 +146,7 @@ export namespace KiloSessionOverflow {
   }
 
   export function measure(input: Payload) {
+    const f = factor(input.model)
     const full = size(input.messages)
     const tools = Token.estimate(
       JSON.stringify(
@@ -110,15 +159,15 @@ export namespace KiloSessionOverflow {
     )
     const lead = leading(input.messages)
     return {
-      normalized: Math.ceil((full.chars + tools) * FACTOR),
-      raw: Math.ceil((full.chars + full.extra + tools) * FACTOR),
+      normalized: Math.ceil((full.chars + tools) * f),
+      raw: Math.ceil((full.chars + full.extra + tools) * f),
       // New messages only; the report already covers the rest of the previous
       // request. New media is priced as its placeholder, not its bytes.
-      tail: Math.ceil(size(pending(input.messages)).chars * FACTOR),
+      tail: Math.ceil(size(pending(input.messages)).chars * f),
       // System content and tool schemas are re-sent every request. The report already
       // includes the previous copies, so this only replaces the baseline when it is
       // larger. Request prep delivers system content as leading messages.
-      overhead: Math.ceil((tools + lead) * FACTOR),
+      overhead: Math.ceil((tools + lead) * f),
       continuation: continued(input.messages),
     }
   }

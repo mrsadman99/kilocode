@@ -109,6 +109,8 @@ export const dict = {
   "dialog.model.expand": "Expand",
   "dialog.model.collapse": "Collapse",
 
+  "review.model.label": "Review model",
+
   "dialog.provider.viewAll": "Show more providers",
 
   "provider.connect.title": "Connect {{provider}}",
@@ -888,17 +890,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Enable chat textarea autocomplete",
   "settings.autocomplete.chatAutocomplete.description": "Show autocomplete suggestions in the chat textarea",
   "settings.autocomplete.modelsHint": "To choose which model is used for autocompletions, see the Models settings.",
-  "settings.autocomplete.local.model.title": "Local model",
-  "settings.autocomplete.local.model.description": "Model name as served by your local server (e.g. an Ollama tag)",
-  "settings.autocomplete.local.baseUrl.title": "Local server URL",
-  "settings.autocomplete.local.baseUrl.description": "Base URL of the local server running the model",
-  "settings.autocomplete.local.template.title": "FIM template",
-  "settings.autocomplete.local.template.description":
-    "Fill-in-the-middle prompt format; Auto detects it from the model name",
-  "settings.autocomplete.local.endpoint.title": "API endpoint",
-  "settings.autocomplete.local.endpoint.description":
-    "Auto uses the template default: Ollama native or OpenAI-compatible",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.mode.title": "Input mode",
+  "settings.autocomplete.custom.mode.description":
+    "How the endpoint expects completion requests: native prompt+suffix, a templated raw prompt, or chat messages",
+  "settings.autocomplete.custom.mode.native": "Native",
+  "settings.autocomplete.custom.mode.raw": "Raw",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.title": "Raw prompt API",
+  "settings.autocomplete.custom.transport.description": "Which completions API receives the raw prompt",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM profile",
+  "settings.autocomplete.custom.profile.description":
+    "How to encode the fill-in-the-middle hole; Auto detects it from the model name",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto couldn\'t detect a profile for "{{model}}" — choose an explicit profile.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Chat mode needs a model to fill in the middle.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Model",
+  "settings.autocomplete.custom.model.description": "Model name on the custom endpoint (e.g. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Base URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Base URL of the custom autocomplete endpoint; the request path depends on the input mode",
+  "settings.autocomplete.custom.apiKey.title": "API key",
+  "settings.autocomplete.custom.apiKey.description":
+    "Sent as a Bearer token; leave empty to call the endpoint without authentication",
+  "settings.autocomplete.custom.apiKey.placeholder": "Leave empty for no auth",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Optional HTTP/SOCKS proxy for reaching the endpoint; empty uses the global proxy",
 
   "settings.notifications.sounds": "Sounds",
   "settings.notifications.enable.title": "Enable Sound Notifications",
@@ -939,6 +960,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Image Model",
   "settings.experimental.imageGenerationModel.description": "Image Generation Model",
   "settings.experimental.imageGenerationModel.placeholder": "Default (Auto Router)",
+  "settings.experimental.proxy.title": "Global Proxy",
+  "settings.experimental.proxy.description":
+    "Route all Kilo network requests (chat, marketplace, models, MCP servers) through this proxy. Supports http, https, and socks5. Leave the address empty to connect directly. Saving restarts the Kilo backend.",
+  "settings.experimental.proxy.address.label": "Proxy address",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 or socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy saved",
 
   "settings.models.speechToText.disabledDescription":
     "Kilo Gateway is selected. Enable and sign in to the Kilo provider to choose a supported model, or enter a custom transcription base URL above.",
@@ -1102,6 +1129,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Enter a port between 1 and 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "A client secret requires a client ID.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Enter a valid redirect URI.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Override the global proxy for this server, or connect directly. Local servers receive matching proxy environment variables; servers that ignore them are unaffected.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Mode",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Global proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Custom proxy",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direct (no proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "Proxy URL",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Enter an http, https, or socks proxy URL.",
   "settings.agentBehaviour.addMcp.command": "Command",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Arguments",

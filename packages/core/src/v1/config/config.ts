@@ -63,6 +63,12 @@ export const Info = Schema.Struct({
   }),
   shell: Schema.optional(Schema.String).annotate({ description: "Default shell to use for terminal and bash tool" }),
   logLevel: Schema.optional(LogLevelRef).annotate({ description: "Log level" }),
+  // kilocode_change start - global outbound proxy for all network requests
+  proxy: Schema.optional(Schema.String).annotate({
+    description:
+      "Outbound HTTP/HTTPS/SOCKS5 proxy used for all network requests (for example http://127.0.0.1:8118 or socks5://127.0.0.1:1080). A provider's own options.proxy takes precedence over this value.",
+  }),
+  // kilocode_change end
   server: Schema.optional(ConfigServerV1.Server).annotate({
     description: "Server configuration for the kilo serve command", // kilocode_change
   }),

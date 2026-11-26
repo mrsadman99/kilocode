@@ -74,6 +74,7 @@ import { handleFileSearch, type SearchRoot } from "./kilo-provider/file-search"
 import { handleSessionSearch } from "./kilo-provider/session-search"
 import { handleFilePicker } from "./kilo-provider/file-picker"
 import { watchFontSizeConfig } from "./kilo-provider/font-size"
+import { watchPromptTimeline } from "./prompt-timeline/message"
 import { getTerminalContents } from "./services/terminal/context"
 import { disposeGitChangesTarget } from "./kilo-provider/git-changes-target"
 import { interceptMessage } from "./kilo-provider/git-changes-request"
@@ -115,6 +116,7 @@ import { mcpRemoval } from "./services/mcp-removal"
 import { marketplaceBundles } from "./services/marketplace/bundles"
 import { retryable, backoff, MAX_RETRIES } from "./util/retry"
 import { hasGit } from "./kilo-provider/git-status"
+import { createGitRefresh } from "./kilo-provider/git-refresh"
 import {
   handleRequestMigrationData,
   handleStartMigration,
@@ -160,6 +162,7 @@ import {
   fetchProviderData,
   validateRecents,
   validateFavorites,
+  validateReviewModel,
   connectProvider as connectProviderAction,
   authorizeProviderOAuth as authorizeOAuthAction,
   completeProviderOAuth as completeOAuthAction,
@@ -520,6 +523,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   private lastReconciledAt = new Map<string, number>() // Per-session focus-mode reconcile timestamp.
   private pendingSessionRefresh = false // Refresh requested before the client is ready.
   private readonly streams = new SessionStreamScheduler((msg) => this.postMessage(msg))
+  private readonly gitRefresh = createGitRefresh((parts, sid) => void this.refreshGitStatusFromParts(parts, sid))
   private readonly inputs = new ToolInputStream((msg) => this.streams.push(msg))
   private readonly visibleTaskStreams = new VisibleTaskStreams((id, visible) => this.streams.setVisible(id, visible))
   private readonly confirmations = new MessageConfirmation()
@@ -605,6 +609,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   private diffVirtualProvider: import("./DiffVirtualProvider").DiffVirtualProvider | undefined
   private diffViewerProvider: import("./diff/DiffViewerProvider").DiffViewerProvider | undefined
   private documentViewerProvider: import("./DocumentViewerProvider").DocumentViewerProvider | undefined
+  private promptTimelineProvider: import("./PromptTimelineProvider").PromptTimelineProvider | undefined
   private remoteService: RemoteStatusService | null = null
   private unsubscribeRemote: (() => void) | null = null
 
@@ -764,6 +769,15 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.documentViewerProvider = provider
   }
 
+  public setPromptTimelineProvider(provider: import("./PromptTimelineProvider").PromptTimelineProvider): void {
+    this.promptTimelineProvider = provider
+  }
+
+  private openPromptTimeline(sessionID?: string): void {
+    const id = sessionID ?? this.currentSession?.id
+    if (id) this.promptTimelineProvider?.open(id, this.getSessionGitDirectory(id))
+  }
+
   getTelemetryProperties(): Record<string, unknown> {
     return {
       appName: "kilo-code",
@@ -830,7 +844,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       register: (session: Session) => this.registerSession(session),
       forked: (session: Session, sourceID: string) =>
         this.postMessage({ type: "sessionForked", sessionID: session.id, forkedFromID: sourceID }),
-      status: (sessionID: string) => this.sessionStatusMap.get(sessionID),
       directory: (sessionID: string) => this.getWorkspaceDirectory(sessionID),
     }
   }
@@ -936,7 +949,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     }
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, true)
-    this.setupWebviewMessageHandler(webviewView.webview)
+    this.setupMessages(webviewView.webview)
 
     this.setSidebarVisible(webviewView.visible)
     this.visibilityDisposable?.dispose()
@@ -972,7 +985,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
     panel.webview.html = this._getHtmlForWebview(panel.webview)
 
-    this.setupWebviewMessageHandler(panel.webview)
+    this.setupMessages(panel.webview)
     this.viewStateDisposable?.dispose()
     this.viewStateDisposable = this.visibleTaskStreams.bindPanel(panel, () => {
       this.setStatsVisible(panel.visible)
@@ -1232,7 +1245,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.isWebviewReady = false
     this.webview = webview
     if (!this.autoApproveBridge) this.onBeforeMessage = options?.onBeforeMessage ?? null
-    this.setupWebviewMessageHandler(webview)
+    this.setupMessages(webview)
     this.initializeConnection()
   }
 
@@ -1743,6 +1756,11 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           this.postMessage({ type: "favoritesLoaded", favorites })
           break
         }
+        case "requestReviewModel": {
+          const model = validateReviewModel(this.extensionContext?.globalState.get("reviewModel"))
+          this.postMessage({ type: "reviewModelLoaded", model })
+          break
+        }
         case "enhancePrompt": {
           const sdkClient = this.client
           if (!sdkClient) {
@@ -1775,6 +1793,18 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     })
     this.webviewMessageDisposable = watchFontSizeConfig((msg) => this.postMessage(msg), this.webviewMessageDisposable)
     this.webviewMessageDisposable = watchWorkStyleConfig((msg) => this.postMessage(msg), this.webviewMessageDisposable)
+  }
+
+  /**
+   * Production entry point: the main message handler plus the dedicated
+   * Prompt Timeline listener. Tests drive setupWebviewMessageHandler directly
+   * with a single-handler mock, so the extra listener stays out of it.
+   */
+  private setupMessages(webview: vscode.Webview): void {
+    this.setupWebviewMessageHandler(webview)
+    const timeline = watchPromptTimeline(webview, (id) => this.openPromptTimeline(id))
+    const main = this.webviewMessageDisposable
+    this.webviewMessageDisposable = main ? vscode.Disposable.from(main, timeline) : timeline
   }
 
   private async sendWebviewMessage(message: SendWebviewMessage): Promise<void> {
@@ -5108,6 +5138,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       getQuestionRevision: () => this.connectionService.getQuestionRevision(),
       pruneQuestionDirectories: (active: Set<string>, dirs: Set<string>) =>
         this.connectionService.pruneQuestionDirectories(active, dirs),
+      persistReviewModel: async (model: { providerID: string; modelID: string }) => {
+        await this.extensionContext?.globalState.update("reviewModel", model)
+      },
     }
   }
 
@@ -6087,7 +6120,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     event: Extract<ProviderEvent, { type: "message.part.updated" }>,
     sessionID?: string,
   ) {
-    void this.refreshGitStatusFromParts([event.properties.part], sessionID)
+    this.gitRefresh.push([event.properties.part], sessionID)
   }
 
   private async refreshGitStatusFromParts(parts: unknown[], sessionID?: string, recover = false): Promise<boolean> {
@@ -6377,6 +6410,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.visibleTaskStreams.clear()
     this.inputs.dispose()
     this.streams.dispose()
+    this.gitRefresh.dispose()
     this.isWebviewReady = false
     this.webview = null
     // Release any waitForReady() awaiters so their callers don't hang after disposal.

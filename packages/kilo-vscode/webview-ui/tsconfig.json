@@ -18,6 +18,7 @@
     "agent-manager/**/*",
     "marketplace/**/*",
     "diff-viewer/**/*",
-    "diff-virtual/**/*"
+    "diff-virtual/**/*",
+    "prompt-timeline/**/*"
   ]
 }

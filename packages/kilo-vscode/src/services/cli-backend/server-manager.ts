@@ -139,6 +139,7 @@ export class ServerManager {
           // HTTP_PROXY / HTTPS_PROXY / NO_PROXY env vars that Bun's fetch and
           // most HTTP clients already respect.
           ...buildProxyEnv(),
+          ...buildKiloProxyEnv(cfg),
           // Force mimalloc (the allocator Bun ships with) to return freed pages
           // to the OS immediately instead of retaining them in its arenas.
           // Without this, Bun.spawn's piped stdio accumulates ~2 MB of native
@@ -152,6 +153,8 @@ export class ServerManager {
           KILO_PARENT_PID: String(process.pid),
           KILO_CLIENT: "vscode",
           KILO_ENABLE_QUESTION_TOOL: "true",
+          // Surface outbound LLM / autocomplete API requests in the "kilo API" output channel.
+          KILO_API_LOG: "1",
           KILOCODE_FEATURE: "vscode-extension",
           ...indexingEnv,
           KILO_TELEMETRY_LEVEL: vscode.env.isTelemetryEnabled ? "all" : "off",
@@ -313,6 +316,19 @@ export class ServerStartupError extends Error {
 
 function stripAnsi(str: string): string {
   return str.replace(/\x1b\[[0-9;]*m/g, "")
+}
+
+type ProxySettingSource = { get: (key: string, fallback: string) => string | undefined }
+
+/**
+ * Read `kilo-code.new.proxy` and expose it to the spawned backend as KILO_PROXY.
+ * Returns an empty object when unset/blank so callers can spread unconditionally.
+ * The CLI resolves KILO_PROXY ahead of VS Code's http.proxy env vars, and a
+ * provider's own options.proxy wins over it.
+ */
+export function buildKiloProxyEnv(cfg: ProxySettingSource): Record<string, string> {
+  const proxy = (cfg.get("proxy", "") ?? "").trim()
+  return proxy ? { KILO_PROXY: proxy } : {}
 }
 
 /**

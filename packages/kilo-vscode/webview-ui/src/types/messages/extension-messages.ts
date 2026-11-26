@@ -528,6 +528,7 @@ export interface ChatSettingsLoadedMessage {
     browserAutomation: boolean
     agentManagerBrowserOpenLinksIn: "external" | "integrated"
     workspaceTrusted: boolean
+    proxy: string
   }
 }
 
@@ -596,8 +597,16 @@ export interface AutocompleteSettingsLoadedMessage {
     /** Local provider settings; `null` means "no explicit setting — use the default." */
     localModel: string | null
     localBaseURL: string | null
+    localProxy: string | null
     localTemplate: string | null
     localEndpoint: string | null
+    /** Custom OpenAI-compatible FIM provider settings; `null` means unset. */
+    customModel: string | null
+    customBaseURL: string | null
+    customApiKey: string | null
+    customProxy: string | null
+    customFormat: string | null
+    customTemplate: string | null
   }
 }
 
@@ -1199,6 +1208,11 @@ export interface VariantsLoadedMessage {
 export interface RecentsLoadedMessage {
   type: "recentsLoaded"
   recents: ModelSelection[]
+}
+
+export interface ReviewModelLoadedMessage {
+  type: "reviewModelLoaded"
+  model: ModelSelection | null
 }
 
 export interface ModelUsageLoadedMessage {
@@ -2016,6 +2030,7 @@ export type ExtensionMessage =
   | AnacondaDesktopExtensionMessage
   | CustomProviderModelsFetchedMessage
   | RecentsLoadedMessage
+  | ReviewModelLoadedMessage
   | ModelSelectorExpandedLoadedMessage
   | FavoritesLoadedMessage
   | LanguageChangedMessage

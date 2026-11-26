@@ -21,6 +21,14 @@ import {
 } from "../speech-to-text/availability"
 import { speechToTextModelOptions } from "../speech-to-text/model-selector"
 import { AUTOCOMPLETE_SELECTOR_MODELS, getAutocompleteSelection } from "./autocomplete-model-selector"
+import {
+  formatForMode,
+  modeFromFormat,
+  profileOptions,
+  resolveAutoProfile,
+  transportFromFormat,
+  type CustomInputMode,
+} from "./custom-fim-mode"
 import { preserveVariant } from "../../context/session-variant-store"
 
 const ModelsTab: Component = () => {
@@ -123,10 +131,10 @@ const ModelsTab: Component = () => {
       updateSetting("autocomplete.model", null)
       return
     }
-    if (providerID === "local") {
-      // The local model name lives in its own free-form setting, not the
+    if (providerID === "custom") {
+      // The custom model name lives in its own free-form setting, not the
       // whitelisted `model` enum.
-      updateSetting("autocomplete.provider", "local")
+      updateSetting("autocomplete.provider", "custom")
       updateSetting("autocomplete.model", null)
       return
     }
@@ -134,33 +142,65 @@ const ModelsTab: Component = () => {
     updateSetting("autocomplete.model", modelID)
   }
 
-  const localModel = () => {
-    const v = settings()["autocomplete.localModel"]
+  const customModel = () => {
+    const v = settings()["autocomplete.customModel"]
     return typeof v === "string" ? v : ""
   }
-  const localBaseURL = () => {
-    const v = settings()["autocomplete.localBaseURL"]
+  const customBaseURL = () => {
+    const v = settings()["autocomplete.customBaseURL"]
     return typeof v === "string" ? v : ""
   }
-  const localTemplate = () => {
-    const v = settings()["autocomplete.localTemplate"]
+  const customApiKey = () => {
+    const v = settings()["autocomplete.customApiKey"]
+    return typeof v === "string" ? v : ""
+  }
+  const customProxy = () => {
+    const v = settings()["autocomplete.customProxy"]
+    return typeof v === "string" ? v : ""
+  }
+  const customFormat = () => {
+    const v = settings()["autocomplete.customFormat"]
+    return v === "completions" || v === "generate" || v === "chat" ? v : "openai"
+  }
+  const customTemplate = () => {
+    const v = settings()["autocomplete.customTemplate"]
     return typeof v === "string" ? v : "auto"
   }
-  const localEndpoint = () => {
-    const v = settings()["autocomplete.localEndpoint"]
-    return typeof v === "string" ? v : "auto"
+  const inputMode = createMemo(() => modeFromFormat(customFormat()))
+  const transport = createMemo(() => transportFromFormat(customFormat()))
+  const modeOptions = createMemo(() => [
+    { value: "native", label: language.t("settings.autocomplete.custom.mode.native") },
+    { value: "raw", label: language.t("settings.autocomplete.custom.mode.raw") },
+    { value: "chat", label: language.t("settings.autocomplete.custom.mode.chat") },
+  ])
+  const transportOptions = createMemo(() => [
+    { value: "completions", label: language.t("settings.autocomplete.custom.transport.completions") },
+    { value: "generate", label: language.t("settings.autocomplete.custom.transport.generate") },
+  ])
+  const profileOpts = createMemo(() =>
+    profileOptions(language.t("settings.autocomplete.custom.auto"), inputMode() === "chat"),
+  )
+  const profileOption = () => profileOpts().find((item) => item.value === customTemplate())
+  const autoResolution = createMemo(() => resolveAutoProfile(customTemplate(), customModel(), inputMode() === "chat"))
+  const profileFeedback = createMemo(() => {
+    const res = autoResolution()
+    if (res.kind === "resolved")
+      return language.t("settings.autocomplete.custom.profile.autoResolved", { label: res.label })
+    if (res.kind === "unknown")
+      return language.t("settings.autocomplete.custom.profile.autoUnknown", { model: res.model })
+    if (res.kind === "unconfigured") return language.t("settings.autocomplete.custom.profile.chatUnconfigured")
+    return undefined
+  })
+  function selectMode(value?: string) {
+    const mode: CustomInputMode = value === "chat" ? "chat" : value === "raw" ? "raw" : "native"
+    updateSetting("autocomplete.customFormat", formatForMode(mode, transport()))
   }
-  const templateOptions = [
-    { value: "auto", label: language.t("settings.autocomplete.local.auto") },
-    { value: "starcoder", label: "StarCoder" },
-    { value: "qwen", label: "Qwen" },
-    { value: "codellama", label: "CodeLlama" },
-  ]
-  const endpointOptions = [
-    { value: "auto", label: language.t("settings.autocomplete.local.auto") },
-    { value: "completions", label: "/v1/completions (OpenAI-compatible)" },
-    { value: "generate", label: "/api/generate (Ollama)" },
-  ]
+  function selectTransport(value?: string) {
+    updateSetting("autocomplete.customFormat", value === "generate" ? "generate" : "completions")
+  }
+  function selectProfile(value?: string) {
+    updateSetting("autocomplete.customTemplate", value ?? "auto")
+  }
 
   return (
     <div>
@@ -256,63 +296,123 @@ const ModelsTab: Component = () => {
             description={language.t("settings.autocomplete.model.description")}
           />
         </SettingsRow>
-        <Show when={autocompleteProvider() === "local"}>
+        <Show when={autocompleteProvider() === "custom" || autocompleteProvider() === "local"}>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.model.title")}
-            description={language.t("settings.autocomplete.local.model.description")}
+            title={language.t("settings.autocomplete.custom.model.title")}
+            description={language.t("settings.autocomplete.custom.model.description")}
           >
             <TextField
-              value={localModel()}
-              placeholder="qwen2.5-coder:7b"
-              onChange={(value: string) => updateSetting("autocomplete.localModel", value.trim() || null)}
+              value={customModel()}
+              placeholder="deepseek-chat"
+              onChange={(value: string) => updateSetting("autocomplete.customModel", value.trim() || null)}
             />
           </SettingsRow>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.baseUrl.title")}
-            description={language.t("settings.autocomplete.local.baseUrl.description")}
+            title={language.t("settings.autocomplete.custom.baseUrl.title")}
+            description={language.t("settings.autocomplete.custom.baseUrl.description")}
           >
             <TextField
-              value={localBaseURL()}
-              placeholder="http://127.0.0.1:11434"
-              onChange={(value: string) => updateSetting("autocomplete.localBaseURL", value.trim() || null)}
+              value={customBaseURL()}
+              placeholder="https://api.deepseek.com/beta"
+              onChange={(value: string) => updateSetting("autocomplete.customBaseURL", value.trim() || null)}
             />
           </SettingsRow>
           <SettingsRow
-            title={language.t("settings.autocomplete.local.template.title")}
-            description={language.t("settings.autocomplete.local.template.description")}
+            title={language.t("settings.autocomplete.custom.apiKey.title")}
+            description={language.t("settings.autocomplete.custom.apiKey.description")}
+          >
+            <TextField
+              type="password"
+              autocomplete="off"
+              value={customApiKey()}
+              placeholder={language.t("settings.autocomplete.custom.apiKey.placeholder")}
+              onChange={(value: string) => updateSetting("autocomplete.customApiKey", value.trim() || null)}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.custom.proxy.title")}
+            description={language.t("settings.autocomplete.custom.proxy.description")}
+          >
+            <TextField
+              value={customProxy()}
+              placeholder="http://127.0.0.1:8080"
+              onChange={(value: string) => updateSetting("autocomplete.customProxy", value.trim() || null)}
+            />
+          </SettingsRow>
+          <SettingsRow
+            title={language.t("settings.autocomplete.custom.mode.title")}
+            description={language.t("settings.autocomplete.custom.mode.description")}
           >
             <Select
-              options={templateOptions}
-              current={templateOptions.find((item) => item.value === localTemplate())}
+              options={modeOptions()}
+              current={modeOptions().find((item) => item.value === inputMode())}
               value={(item) => item.value}
               label={(item) => item.label}
-              onSelect={(item) => updateSetting("autocomplete.localTemplate", item?.value ?? "auto")}
+              onSelect={(item) => selectMode(item?.value)}
               variant="secondary"
               size="small"
               triggerVariant="settings"
               triggerProps={{
-                "aria-label": `${language.t("settings.autocomplete.local.template.title")}: ${localTemplate()}`,
+                "aria-label": `${language.t("settings.autocomplete.custom.mode.title")}: ${inputMode()}`,
               }}
             />
           </SettingsRow>
-          <SettingsRow
-            title={language.t("settings.autocomplete.local.endpoint.title")}
-            description={language.t("settings.autocomplete.local.endpoint.description")}
-          >
-            <Select
-              options={endpointOptions}
-              current={endpointOptions.find((item) => item.value === localEndpoint())}
-              value={(item) => item.value}
-              label={(item) => item.label}
-              onSelect={(item) => updateSetting("autocomplete.localEndpoint", item?.value ?? "auto")}
-              variant="secondary"
-              size="small"
-              triggerVariant="settings"
-              triggerProps={{
-                "aria-label": `${language.t("settings.autocomplete.local.endpoint.title")}: ${localEndpoint()}`,
-              }}
-            />
-          </SettingsRow>
+          <Show when={inputMode() === "raw"}>
+            <SettingsRow
+              title={language.t("settings.autocomplete.custom.transport.title")}
+              description={language.t("settings.autocomplete.custom.transport.description")}
+            >
+              <Select
+                options={transportOptions()}
+                current={transportOptions().find((item) => item.value === transport())}
+                value={(item) => item.value}
+                label={(item) => item.label}
+                onSelect={(item) => selectTransport(item?.value)}
+                variant="secondary"
+                size="small"
+                triggerVariant="settings"
+                triggerProps={{
+                  "aria-label": `${language.t("settings.autocomplete.custom.transport.title")}: ${transport()}`,
+                }}
+              />
+            </SettingsRow>
+          </Show>
+          <Show when={inputMode() !== "native"}>
+            <SettingsRow
+              title={language.t("settings.autocomplete.custom.profile.title")}
+              description={language.t("settings.autocomplete.custom.profile.description")}
+            >
+              <div style={{ display: "flex", "flex-direction": "column", "align-items": "flex-end", gap: "6px" }}>
+                <Select
+                  options={profileOpts()}
+                  current={profileOption()}
+                  value={(item) => item.value}
+                  label={(item) => item.label}
+                  onSelect={(item) => selectProfile(item?.value)}
+                  variant="secondary"
+                  size="small"
+                  triggerVariant="settings"
+                  triggerProps={{
+                    "aria-label": `${language.t("settings.autocomplete.custom.profile.title")}: ${customTemplate()}`,
+                  }}
+                />
+                <Show when={profileFeedback()}>
+                  {(text) => (
+                    <div
+                      style={{
+                        "font-size": "var(--font-size-small)",
+                        color: "var(--vscode-inputValidation-warningForeground, var(--vscode-descriptionForeground))",
+                        "text-align": "right",
+                        "max-width": "160px",
+                      }}
+                    >
+                      {text()}
+                    </div>
+                  )}
+                </Show>
+              </div>
+            </SettingsRow>
+          </Show>
         </Show>
         <SettingsRow
           title={language.t("settings.models.speechToTextBaseUrl.title")}

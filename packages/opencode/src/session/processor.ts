@@ -524,6 +524,7 @@ const layer = Layer.effect(
             }
 
             const agent = yield* agents.get(ctx.assistantMessage.agent)
+            KiloSessionProcessor.doomHint.mark(ctx.assistantMessage.sessionID, value.name) // kilocode_change - nudge the model to break the loop
             yield* permission.ask({
               permission: "doom_loop",
               patterns: [value.name],
@@ -686,6 +687,13 @@ const layer = Layer.effect(
               metadata: value.providerMetadata,
             })
             // kilocode_change start
+            // Calibrate the per-model token estimate from the provider's prompt-side count.
+            if (!ctx.assistantMessage.summary)
+              KiloSessionOverflow.calibrate({
+                model: ctx.model,
+                sessionID: ctx.sessionID,
+                prompt: usage.tokens.input + usage.tokens.cache.read + usage.tokens.cache.write,
+              })
             const model = KiloRoutedModel.readAuto(value.providerMetadata, {
               providerID: ctx.model.providerID,
               modelID: ctx.model.id,

@@ -10,6 +10,7 @@ import { useImageModels } from "../../context/image-models"
 import type { ExtensionMessage } from "../../types/messages"
 import SettingsRow from "./SettingsRow"
 import PatternList from "./PatternList"
+import GlobalProxySettings from "./GlobalProxySettings"
 
 interface ShareOption {
   value: string
@@ -333,6 +334,10 @@ const ExperimentalTab: Component = () => {
           />
         </SettingsRow>
       </Card>
+
+      <div style={{ "margin-top": "16px" }}>
+        <GlobalProxySettings />
+      </div>
 
       <h4
         style={{ "margin-top": "16px", "margin-bottom": "8px" }}

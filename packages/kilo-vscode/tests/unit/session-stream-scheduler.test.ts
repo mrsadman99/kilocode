@@ -64,6 +64,34 @@ describe("SessionStreamScheduler / coalescing", () => {
     expect(partText(sent[0]!)).toBe("new")
   })
 
+  it("drops an empty text delta so it cannot wipe the part", () => {
+    // An empty delta carries a stub part (text:""). If emitted, the webview would
+    // replace the accumulated part with the empty stub. It must be dropped.
+    const sent = flushSync(update("", ""))
+    expect(sent).toHaveLength(0)
+  })
+
+  it("empty delta leaves a buffered delta intact", () => {
+    const sent = items(flushSync(update("a", "a"), update("", "")))
+    expect(sent).toHaveLength(1)
+    expect(partText(sent[0]!)).toBe("a")
+    expect(sent[0]!.delta?.textDelta).toBe("a")
+  })
+
+  it("empty delta between real deltas does not break accumulation", () => {
+    const sent = items(flushSync(update("a", "a"), update("", ""), update("b", "b")))
+    expect(sent).toHaveLength(1)
+    expect(partText(sent[0]!)).toBe("ab")
+    expect(sent[0]!.delta?.textDelta).toBe("ab")
+  })
+
+  it("empty delta after a full part keeps the full part", () => {
+    const sent = items(flushSync(update("hello"), update("", "")))
+    expect(sent).toHaveLength(1)
+    expect(partText(sent[0]!)).toBe("hello")
+    expect(sent[0]!.delta).toBeUndefined()
+  })
+
   it("flushes deltas before later full updates", () => {
     const sent: Sent[] = []
     const queue = new SessionStreamScheduler((msg) => sent.push(msg))

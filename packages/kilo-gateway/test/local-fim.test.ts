@@ -164,4 +164,64 @@ describe("requestLocalFim", () => {
       server.stop(true)
     }
   })
+
+  test("uses the supplied transport and normalizes its stream", async () => {
+    const seen: { url: string; init: RequestInit }[] = []
+    const target = { ...generate, url: "http://localhost/api/generate" }
+    const response = await requestLocalFim(target, { prefix: "prompt" }, AbortSignal.timeout(5000), (url, init) => {
+      seen.push({ url, init })
+      return Promise.resolve(
+        new Response('{"response":"ok","done":false}\n{"response":"","done":true,"eval_count":1}\n', {
+          headers: { "Content-Type": "application/x-ndjson" },
+        }),
+      )
+    })
+    expect(seen.length).toBe(1)
+    expect(seen[0]?.url).toBe(target.url)
+    expect(seen[0]?.init.method).toBe("POST")
+    expect(response.headers.get("Content-Type")).toBe("text/event-stream")
+    expect(await response.text()).toBe(
+      'data: {"choices":[{"text":"ok"}]}\n\ndata: {"choices":[{"text":""}],"usage":{"prompt_tokens":0,"completion_tokens":1}}\n\n',
+    )
+  })
+
+  test("sends Bearer auth when a key is configured", async () => {
+    const seen: (string | null)[] = []
+    const server = Bun.serve({
+      port: 0,
+      fetch(req) {
+        seen.push(req.headers.get("authorization"))
+        return new Response('{"response":"ok","done":true,"eval_count":1}\n', {
+          headers: { "Content-Type": "application/x-ndjson" },
+        })
+      },
+    })
+    try {
+      const target = { ...generate, url: `${server.url}api/generate`, apiKey: "sk-test" }
+      await requestLocalFim(target, { prefix: "prompt" }, AbortSignal.timeout(5000))
+      expect(seen).toEqual(["Bearer sk-test"])
+    } finally {
+      server.stop(true)
+    }
+  })
+
+  test("omits Authorization entirely when no key is configured", async () => {
+    const seen: (string | null)[] = []
+    const server = Bun.serve({
+      port: 0,
+      fetch(req) {
+        seen.push(req.headers.get("authorization"))
+        return new Response('{"response":"ok","done":true,"eval_count":1}\n', {
+          headers: { "Content-Type": "application/x-ndjson" },
+        })
+      },
+    })
+    try {
+      const target = { ...generate, url: `${server.url}api/generate` }
+      await requestLocalFim(target, { prefix: "prompt" }, AbortSignal.timeout(5000))
+      expect(seen).toEqual([null])
+    } finally {
+      server.stop(true)
+    }
+  })
 })

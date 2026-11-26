@@ -1,3 +1,4 @@
+import net from "node:net"
 import tls from "node:tls"
 import { SocksClient } from "socks"
 import { tunnelRequest } from "@kilocode/kilo-gateway/proxy-tunnel"
@@ -23,6 +24,26 @@ export function proxiedFetch(proxy: string | undefined): FetchFn {
 
 function socksType(proxy: string): 4 | 5 {
   return /^socks4/i.test(proxy) ? 4 : 5
+}
+
+/**
+ * Perform a fetch directly to the target, ignoring proxy environment
+ * variables. Bun's native fetch honors lowercase `http_proxy`/`all_proxy`, so
+ * unwrapping the global fetch alone is not enough for a true direct call; this
+ * dials the target over a plain TCP/TLS socket instead. Returns a standard
+ * streaming Response so SSE consumers keep working.
+ */
+export async function directFetch(input: unknown, init?: RequestInit): Promise<Response> {
+  const target = new URL(input instanceof Request ? input.url : String(input))
+  const secure = target.protocol === "https:"
+  const port = Number(target.port) || (secure ? 443 : 80)
+  const conn = secure
+    ? tls.connect({ host: target.hostname, port, servername: target.hostname })
+    : net.connect({ host: target.hostname, port })
+  const method = init?.method ?? (input instanceof Request ? input.method : "GET")
+  const body = init?.body ?? (input instanceof Request ? input.body : undefined)
+  const headers = init?.headers ?? (input instanceof Request ? input.headers : undefined)
+  return tunnelRequest(conn, secure, target, port, { ...init, method, body, headers })
 }
 
 /**

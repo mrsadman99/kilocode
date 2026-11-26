@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "Seleccionar",
   "dialog.model.expand": "Expandir",
   "dialog.model.collapse": "Contraer",
+  "review.model.label": "Modelo de revisión",
 
   "dialog.provider.viewAll": "Ver más proveedores",
 
@@ -925,18 +926,37 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Mostrar sugerencias de autocompletado en el chat",
   "settings.autocomplete.modelsHint":
     "Para elegir qué modelo se usa para el autocompletado, consulta la configuración de Modelos.",
-  "settings.autocomplete.local.model.title": "Modelo local",
-  "settings.autocomplete.local.model.description":
-    "Nombre del modelo tal como lo sirve tu servidor local (p. ej., una etiqueta de Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL del servidor local",
-  "settings.autocomplete.local.baseUrl.description": "URL base del servidor local que ejecuta el modelo",
-  "settings.autocomplete.local.template.title": "Plantilla FIM",
-  "settings.autocomplete.local.template.description":
-    "Formato de prompt fill-in-the-middle; «Auto» se detecta por el nombre del modelo",
-  "settings.autocomplete.local.endpoint.title": "Endpoint de API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Auto» usa el valor predeterminado de la plantilla: nativo de Ollama o compatible con OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "API de prompt sin formato",
+  "settings.autocomplete.custom.transport.description": "Qué API de completado recibe el prompt sin formato",
+  "settings.autocomplete.custom.mode.title": "Modo de entrada",
+  "settings.autocomplete.custom.mode.description":
+    "Cómo espera el endpoint las completaciones: prompt+suffix nativos, prompt sin formato con plantilla o mensajes de chat",
+  "settings.autocomplete.custom.mode.native": "Nativo",
+  "settings.autocomplete.custom.mode.raw": "Sin formato",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Perfil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Cómo codificar el hueco fill-in-the-middle; Auto lo detecta por el nombre del modelo",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto no detectó un perfil para "{{model}}": elija un perfil explícito.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "El modo chat necesita un modelo para rellenar el hueco.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Modelo",
+  "settings.autocomplete.custom.model.description":
+    "Nombre del modelo en el endpoint personalizado (p. ej., deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL base",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Base de API compatible con OpenAI; las solicitudes van a {baseURL}/completions con prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Clave API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Se envía como token Bearer; déjela vacía para llamar sin autenticación",
+  "settings.autocomplete.custom.apiKey.placeholder": "Vacío = sin autenticación",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Proxy HTTP/SOCKS opcional para acceder al endpoint; vacío usa el proxy global",
   "settings.notifications.sounds": "Sonidos",
   "settings.notifications.enable.title": "Activar las notificaciones sonoras",
   "settings.notifications.enable.description":
@@ -975,6 +995,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Modelo de imagen",
   "settings.experimental.imageGenerationModel.description": "Modelo de generación de imágenes",
   "settings.experimental.imageGenerationModel.placeholder": "Predeterminado (Auto Router)",
+  "settings.experimental.proxy.title": "Proxy global",
+  "settings.experimental.proxy.description":
+    "Enruta todas las solicitudes de red de Kilo (chat, marketplace, modelos, servidores MCP) a través de este proxy. Admite http, https y socks5. Deje la dirección vacía para conectar directamente. Guardar reinicia el backend de Kilo.",
+  "settings.experimental.proxy.address.label": "Dirección del proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 o socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy guardado",
 
   "settings.models.speechToTextModel.customDescription":
     "ID del modelo que se envía a tu endpoint de transcripción propio, por ejemplo whisper-1.",
@@ -1137,6 +1163,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Ingrese un puerto entre 1 y 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Un secreto de cliente requiere un ID de cliente.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Ingrese un URI de redirección válido.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Anula el proxy global para este servidor o conecta directamente. Los servidores locales reciben las variables de entorno de proxy correspondientes; los servidores que las ignoran no se ven afectados.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Modo",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Proxy global",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Proxy personalizado",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Directo (sin proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL del proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Introduzca una URL de proxy http, https o socks.",
   "settings.agentBehaviour.addMcp.command": "Comando",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Argumentos",

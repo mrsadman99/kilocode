@@ -6,6 +6,7 @@ import { AgentManagerProvider } from "./agent-manager/AgentManagerProvider"
 import { VscodeHost } from "./agent-manager/vscode-host"
 import { DiffViewerProvider } from "./diff/DiffViewerProvider"
 import { DocumentViewerProvider } from "./DocumentViewerProvider"
+import { PromptTimelineProvider } from "./PromptTimelineProvider"
 import { DiffSourceCatalog } from "./diff/sources/catalog"
 import { DiffVirtualProvider } from "./DiffVirtualProvider"
 import { SettingsEditorProvider } from "./SettingsEditorProvider"
@@ -16,6 +17,7 @@ import { BrowserTabProvider } from "./browser-tab/BrowserTabProvider"
 import { formatBrowserFeedback } from "./shared/browser-feedback"
 import { EXTENSION_DISPLAY_NAME } from "./constants"
 import { KiloConnectionService } from "./services/cli-backend"
+import { registerApiLog } from "./services/api-log"
 import { retention } from "./services/task-cleanup/retention"
 import { registerAutocompleteProvider } from "./services/autocomplete"
 import { ensureBackendForAutocomplete } from "./services/autocomplete/ensure-backend"
@@ -93,6 +95,9 @@ export async function activate(context: vscode.ExtensionContext) {
     () => browserBroker.env(),
     (dir): Promise<void> => browserAutomationService.ready(dir),
   )
+
+  // "kilo API" output channel: LLM / autocomplete API requests from the backend
+  context.subscriptions.push(registerApiLog(connectionService))
 
   // One MCP OAuth sign-in service for the whole extension (sidebar, Kilo tabs, Settings, Marketplace).
   // Initialize it eagerly so its MCP OAuth URL subscriptions and `onUrl`
@@ -395,6 +400,9 @@ export async function activate(context: vscode.ExtensionContext) {
       if (event.affectsConfiguration("kilo-code.new.experimental.browserAutomation")) {
         agentManagerProvider.refreshBrowserAutomation()
       }
+      if (event.affectsConfiguration("kilo-code.new.proxy")) {
+        connectionService.restart().catch((error) => console.warn("[Kilo New] proxy restart failed:", error))
+      }
     }),
   )
   context.subscriptions.push(agentManagerProvider)
@@ -548,6 +556,12 @@ export async function activate(context: vscode.ExtensionContext) {
   provider.setDocumentViewerProvider(documentViewerProvider)
   context.subscriptions.push(documentViewerProvider)
 
+  const promptTimelineProvider = new PromptTimelineProvider(context.extensionUri, connectionService, {
+    resolveDirectory: (sessionID) => provider.getSessionGitDirectory(sessionID),
+  })
+  provider.setPromptTimelineProvider(promptTimelineProvider)
+  context.subscriptions.push(promptTimelineProvider)
+
   // Create diff virtual provider (lightweight single-file diff for permission approval)
   const diffVirtualProvider = new DiffVirtualProvider(context.extensionUri)
   provider.setDiffVirtualProvider(diffVirtualProvider)
@@ -600,6 +614,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.window.registerWebviewPanelSerializer(DocumentViewerProvider.viewType, {
+      deserializeWebviewPanel(panel: vscode.WebviewPanel) {
+        panel.dispose()
+        return Promise.resolve()
+      },
+    }),
+  )
+
+  context.subscriptions.push(
+    vscode.window.registerWebviewPanelSerializer(PromptTimelineProvider.viewType, {
       deserializeWebviewPanel(panel: vscode.WebviewPanel) {
         panel.dispose()
         return Promise.resolve()

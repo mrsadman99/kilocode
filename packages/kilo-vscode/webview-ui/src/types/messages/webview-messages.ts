@@ -260,6 +260,11 @@ export interface OpenSettingsPanelRequest {
   projectId?: string
 }
 
+export interface OpenPromptTimelineRequest {
+  type: "openPromptTimeline"
+  sessionID?: string
+}
+
 export interface RequestAgentManagerSettingsMessage {
   type: "requestAgentManagerSettings"
   projectId?: string
@@ -447,6 +452,7 @@ export interface SuggestionAcceptRequest {
   requestID: string
   sessionID: string
   index: number
+  model?: ModelSelection
 }
 
 export interface SuggestionDismissRequest {
@@ -1085,6 +1091,19 @@ export interface DocumentCopyPathMessage {
   file: string
 }
 
+export interface PromptTimelineSelectSessionMessage {
+  type: "promptTimeline.selectSession"
+  sessionID: string
+}
+
+export interface PromptTimelineRefreshMessage {
+  type: "promptTimeline.refresh"
+}
+
+export interface PromptTimelineCloseMessage {
+  type: "promptTimeline.close"
+}
+
 export interface DocumentSendCommentsMessage {
   type: "document.sendComments"
   comments: ReviewCommentEntry[]
@@ -1652,6 +1671,10 @@ export interface RequestRecentsMessage {
   type: "requestRecents"
 }
 
+export interface RequestReviewModelMessage {
+  type: "requestReviewModel"
+}
+
 export interface RecordModelUsageMessage {
   type: "recordModelUsage"
   providerID: string
@@ -2024,6 +2047,7 @@ export type WebviewMessage =
   | RequestModelSelectorExpandedMessage
   | ToggleFavoriteRequest
   | RequestFavoritesMessage
+  | RequestReviewModelMessage
   | ToggleRemoteMessage
   | ToggleCaffeinationMessage
   | SetRemoteEnabledMessage
@@ -2049,6 +2073,10 @@ export type WebviewMessage =
   | AgentManagerTerminalResizeRequest
   | RequestImageModelsMessage
   | RequestSpeechToTextModelsMessage
+  | OpenPromptTimelineRequest
+  | PromptTimelineSelectSessionMessage
+  | PromptTimelineRefreshMessage
+  | PromptTimelineCloseMessage
 
 // ============================================
 // VS Code API type

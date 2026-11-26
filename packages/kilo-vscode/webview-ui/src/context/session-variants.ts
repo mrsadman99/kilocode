@@ -25,7 +25,6 @@ interface Options {
   find: (selection: ModelSelection) => Model | undefined
   post: (message: Message) => void
   listen: (handler: (message: ExtensionMessage) => void) => () => void
-  draft: (id: string) => boolean
   remember: (agent: string, model: ModelSelection, variant: string) => void
 }
 
@@ -83,7 +82,7 @@ export function createSessionVariants(options: Options) {
     if (!selection) return
     const next = value ?? DEFAULT_VARIANT
     options.set(variantKey(selection, options.agent(sid), sid), next)
-    if (options.draft(sid)) options.remember(options.agent(sid), selection, next)
+    options.remember(options.agent(sid), selection, next)
   }
 
   const carry = (selection: ModelSelection, value: string | undefined, name: string, sessionID?: string) => {

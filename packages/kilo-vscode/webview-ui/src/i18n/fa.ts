@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "انتخاب",
   "dialog.model.expand": "گسترش",
   "dialog.model.collapse": "جمع‌کردن",
+  "review.model.label": "مدل بازبینی",
 
   "dialog.provider.viewAll": "نمایش ارائه‌دهندگان بیشتر",
 
@@ -898,17 +899,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "فعال‌سازی تکمیل خودکار متن چت",
   "settings.autocomplete.chatAutocomplete.description": "نمایش پیشنهادات تکمیل خودکار در کادر متنی چت",
   "settings.autocomplete.modelsHint": "برای انتخاب مدل مورد استفاده در تکمیل خودکار، به تنظیمات مدل‌ها مراجعه کنید.",
-  "settings.autocomplete.local.model.title": "مدل محلی",
-  "settings.autocomplete.local.model.description": "نام مدل آن‌گونه که سرور محلی ارائه می‌دهد (مثلاً برچسب Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "نشانی سرور محلی",
-  "settings.autocomplete.local.baseUrl.description": "نشانی پایه سرور محلی که مدل را اجرا می‌کند",
-  "settings.autocomplete.local.template.title": "الگوی FIM",
-  "settings.autocomplete.local.template.description":
-    "قالب اعلان fill-in-the-middle؛ «خودکار» از نام مدل تشخیص داده می‌شود",
-  "settings.autocomplete.local.endpoint.title": "نقطه پایانی API",
-  "settings.autocomplete.local.endpoint.description":
-    "«خودکار» از پیش‌فرض الگو استفاده می‌کند: بومی Ollama یا سازگار با OpenAI",
-  "settings.autocomplete.local.auto": "خودکار",
+  "settings.autocomplete.custom.transport.title": "API پرامپت خام",
+  "settings.autocomplete.custom.transport.description": "کدام API تکمیل، پرامپت خام را دریافت می‌کند",
+  "settings.autocomplete.custom.mode.title": "حالت ورودی",
+  "settings.autocomplete.custom.mode.description":
+    "نحوه انتظار نقطه پایانی برای درخواست‌های تکمیل: prompt+suffix بومی، پرامپت خام الگودار یا پیام‌های چت",
+  "settings.autocomplete.custom.mode.native": "بومی",
+  "settings.autocomplete.custom.mode.raw": "خام",
+  "settings.autocomplete.custom.mode.chat": "چت",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "نمایه FIM",
+  "settings.autocomplete.custom.profile.description":
+    "نحوه کدگذاری حفره fill-in-the-middle؛ Auto آن را از نام مدل تشخیص می‌دهد",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto نتوانست نمایه‌ای برای "{{model}}" تشخیص دهد — یک نمایه صریح انتخاب کنید.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "حالت چت برای پر کردن حفره به یک مدل نیاز دارد.",
+  "settings.autocomplete.custom.auto": "خودکار",
+  "settings.autocomplete.custom.model.title": "مدل",
+  "settings.autocomplete.custom.model.description": "نام مدل در نقطه پایانی سفارشی (مثلاً deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "نشانی پایه",
+  "settings.autocomplete.custom.baseUrl.description":
+    "پایه API سازگار با OpenAI؛ درخواست‌ها با prompt+suffix به {baseURL}/completions ارسال می‌شوند",
+  "settings.autocomplete.custom.apiKey.title": "کلید API",
+  "settings.autocomplete.custom.apiKey.description":
+    "به‌صورت توکن Bearer ارسال می‌شود؛ برای فراخوانی بدون احراز هویت خالی بگذارید",
+  "settings.autocomplete.custom.apiKey.placeholder": "خالی = بدون احراز هویت",
+  "settings.autocomplete.custom.proxy.title": "پروکسی",
+  "settings.autocomplete.custom.proxy.description":
+    "پروکسی HTTP/SOCKS اختیاری برای دسترسی به نقطه پایانی؛ خالی از پروکسی سراسری استفاده می‌کند",
 
   "settings.notifications.sounds": "صداها",
   "settings.notifications.enable.title": "فعال‌سازی اعلان‌های صوتی",
@@ -948,6 +968,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "مدل تصویر",
   "settings.experimental.imageGenerationModel.description": "مدل تولید تصویر",
   "settings.experimental.imageGenerationModel.placeholder": "پیش‌فرض (مسیریاب خودکار)",
+  "settings.experimental.proxy.title": "پروکسی سراسری",
+  "settings.experimental.proxy.description":
+    "همه درخواست‌های شبکه Kilo (چت، بازار، مدل‌ها، سرورهای MCP) را از این پروکسی عبور می‌دهد. از http، https و socks5 پشتیبانی می‌کند. برای اتصال مستقیم نشانی را خالی بگذارید. ذخیره‌سازی بک‌اند Kilo را راه‌اندازی مجدد می‌کند.",
+  "settings.experimental.proxy.address.label": "نشانی پروکسی",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 یا socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "پروکسی ذخیره شد",
 
   "settings.models.speechToTextModel.customDescription":
     "شناسه مدلی که به نقطه پایانی رونویسی دلخواه شما فرستاده می‌شود، برای نمونه whisper-1.",
@@ -1097,6 +1123,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "پورتی بین ۱ تا ۶۵۵۳۵ وارد کنید.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "رمز کلاینت به شناسه کلاینت نیاز دارد.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "یک آدرس تغییرمسیر معتبر وارد کنید.",
+  "settings.agentBehaviour.editMcp.proxy": "پروکسی",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "پروکسی سراسری این سرور را بازنویسی کنید یا مستقیم متصل شوید. سرورهای محلی متغیرهای محیطی پروکسی مربوطه را دریافت می‌کنند؛ سرورهایی که آنها را نادیده می‌گیرند تحت تأثیر قرار نمی‌گیرند.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "حالت",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "پروکسی سراسری",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "پروکسی سفارشی",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "مستقیم (بدون پروکسی)",
+  "settings.agentBehaviour.editMcp.proxy.url": "نشانی پروکسی",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "یک نشانی پروکسی http، https یا socks وارد کنید.",
   "settings.agentBehaviour.addMcp.command": "دستور",
   "settings.agentBehaviour.addMcp.command.placeholder": "مثلاً npx",
   "settings.agentBehaviour.addMcp.args": "آرگومان‌ها",

@@ -1410,20 +1410,20 @@ body.am-project-dragging-active * {
 }
 
 .am-run-badge[data-run-state="running"] {
-  --am-run-accent: var(--vscode-testing-iconPassed, #34d399);
+  --am-run-accent: var(--vscode-testing-iconPassed, #73c991);
   animation: am-run-pulse 1.5s ease-in-out infinite;
 }
 
 .am-run-badge[data-run-state="stopping"] {
-  --am-run-accent: var(--vscode-charts-yellow, #fbbf24);
+  --am-run-accent: var(--vscode-charts-yellow, #cca700);
 }
 
 .am-run-badge[data-run-state="success"] {
-  --am-run-accent: var(--vscode-testing-iconPassed, #34d399);
+  --am-run-accent: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-run-badge[data-run-state="error"] {
-  --am-run-accent: var(--vscode-testing-iconFailed, #f87171);
+  --am-run-accent: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 @keyframes am-run-pulse {
@@ -1441,21 +1441,21 @@ body.am-project-dragging-active * {
 }
 
 .am-stat-additions {
-  color: var(--vscode-testing-iconPassed, #34d399);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-stat-deletions {
-  color: var(--vscode-testing-iconFailed, #f87171);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 /* PR badge accent colors via classList */
 .am-pr-accent-open,
 .am-pr-panel-badge.am-pr-accent-open {
-  --am-pr-accent: var(--vscode-testing-iconPassed, #34d399);
+  --am-pr-accent: var(--vscode-testing-iconPassed, #73c991);
 }
 .am-pr-accent-pending,
 .am-pr-panel-badge.am-pr-accent-pending {
-  --am-pr-accent: var(--vscode-charts-yellow, #fbbf24);
+  --am-pr-accent: var(--vscode-charts-yellow, #cca700);
 }
 .am-pr-accent-draft,
 .am-pr-panel-badge.am-pr-accent-draft {
@@ -1467,7 +1467,7 @@ body.am-project-dragging-active * {
 }
 .am-pr-accent-closed,
 .am-pr-panel-badge.am-pr-accent-closed {
-  --am-pr-accent: var(--vscode-testing-iconFailed, #f87171);
+  --am-pr-accent: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-pr-badge {
@@ -1503,7 +1503,7 @@ body.am-project-dragging-active * {
   color: var(--am-pr-accent);
 }
 .am-pr-badge [data-component="button"].am-pr-badge-comments {
-  --am-pr-comments-accent: var(--vscode-charts-yellow, #fbbf24);
+  --am-pr-comments-accent: var(--vscode-charts-yellow, #cca700);
   position: relative;
   height: 16px;
   min-height: 16px;
@@ -1548,13 +1548,13 @@ body.am-project-dragging-active * {
 /* Status icon overlaid on the badge — colored by CI/review result, independent
    of the badge's PR-state accent color. */
 .am-pr-badge-status[data-status="failure"] {
-  color: var(--vscode-testing-iconFailed, #f87171);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 .am-pr-badge-status[data-status="changes"] {
-  color: var(--vscode-charts-yellow, #fbbf24);
+  color: var(--vscode-charts-yellow, #cca700);
 }
 .am-pr-badge-status[data-status="approved"] {
-  color: var(--vscode-testing-iconPassed, #34d399);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 /* Checks still running — pulse the whole amber badge. */
@@ -1607,31 +1607,31 @@ body.am-project-dragging-active * {
 }
 
 .am-worktree-item-active .am-stat-additions {
-  color: var(--vscode-testing-iconPassed, #6ee7b7);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-worktree-item-active .am-stat-deletions {
-  color: var(--vscode-testing-iconFailed, #fca5a5);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-worktree-commits {
-  color: var(--vscode-testing-iconPassed, #34d399);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-worktree-behind {
-  color: var(--vscode-testing-iconFailed, #f87171);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-worktree-item-active .am-worktree-commits {
-  color: var(--vscode-testing-iconPassed, #6ee7b7);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-worktree-item-active .am-worktree-behind {
-  color: var(--vscode-testing-iconFailed, #fca5a5);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-local-item-active .am-worktree-behind {
-  color: var(--vscode-testing-iconFailed, #fca5a5);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-local-item:hover .am-worktree-stats,
@@ -1757,7 +1757,7 @@ body.am-project-dragging-active * {
 /* Context menu danger item (delete section) */
 
 .am-ctx-menu-danger {
-  color: var(--text-error, var(--vscode-errorForeground, #f44));
+  color: var(--text-error, var(--vscode-errorForeground, #f14c4c));
 }
 
 /* Pinned worktrees: a block above ungrouped worktrees and sections */
@@ -2040,11 +2040,11 @@ body.am-project-dragging-active * {
 }
 
 .am-tab-icon[data-run-status="success"] {
-  color: var(--vscode-testing-iconPassed, #34d399);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-tab-icon[data-run-status="failure"] {
-  color: var(--vscode-testing-iconFailed, #f87171);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-tab-spinner {
@@ -2268,7 +2268,7 @@ body.am-wt-dragging-active * {
 }
 
 .am-sidebar-search-status {
-  color: var(--vscode-charts-yellow, #fbbf24);
+  color: var(--vscode-charts-yellow, #cca700);
   text-transform: uppercase;
 }
 
@@ -2368,11 +2368,11 @@ body.am-wt-dragging-active * {
 }
 
 .am-diff-toggle-btn[aria-pressed="true"] .am-stat-additions {
-  color: var(--vscode-testing-iconPassed, #6ee7b7);
+  color: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-diff-toggle-btn[aria-pressed="true"] .am-stat-deletions {
-  color: var(--vscode-testing-iconFailed, #fca5a5);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
 }
 
 .am-detail-content {
@@ -3204,7 +3204,7 @@ body.am-wt-dragging-active * {
 .am-review-send-error {
   margin: 0 8px;
   font-size: var(--font-size-small);
-  color: var(--vscode-testing-iconFailed, #f87171);
+  color: var(--vscode-testing-iconFailed, #f14c4c);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4020,8 +4020,8 @@ body.am-wt-dragging-active * {
 }
 
 .am-mm-free-badge {
-  color: #fff;
-  background: var(--vscode-testing-iconPassed, #4caf50);
+  color: var(--vscode-button-foreground, #fff);
+  background: var(--vscode-testing-iconPassed, #73c991);
 }
 
 .am-mm-byok-badge {

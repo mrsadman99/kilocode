@@ -219,8 +219,8 @@
 }
 
 .model-preview-badge--free {
-  background: var(--vscode-testing-iconPassed, #4caf50);
-  color: #fff;
+  background: var(--vscode-testing-iconPassed, #73c991);
+  color: var(--vscode-button-foreground, #fff);
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -478,8 +478,8 @@
 
 .model-selector-data-badge [data-component="tag"] {
   flex-shrink: 0;
-  background: var(--vscode-testing-iconPassed, #4caf50) !important;
-  color: #fff !important;
+  background: var(--vscode-testing-iconPassed, #73c991) !important;
+  color: var(--vscode-button-foreground, #fff) !important;
   font-size: var(--kilo-font-size-10) !important;
   padding: 1px 3px !important;
   opacity: 0.8;

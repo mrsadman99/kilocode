@@ -1,44 +1,43 @@
 import { describe, expect, it } from "vitest"
 import {
-  codeLlamaTemplate,
-  fimTemplates,
-  inferFimTemplate,
-  qwenTemplate,
-  starcoderTemplate,
+  FIM_TEMPLATE_IDS,
+  matchFimProfile,
+  profiles,
+  renderFim,
+  resolveFimProfile,
 } from "../continuedev/core/autocomplete/templating/AutocompleteTemplate"
 
-describe("local FIM templates", () => {
-  it("wraps prefix and suffix with StarCoder tokens", () => {
-    expect(starcoderTemplate.template("def f():", "\n    return 1", "", "", "", [], [])).toBe(
-      "<fim_prefix>def f():<fim_suffix>\n    return 1<fim_middle>",
-    )
-    expect(starcoderTemplate.completionOptions.stop).toContain("<fim_middle>")
+describe("FIM profile registry (extension re-export)", () => {
+  it("renders prefix-first and suffix-first holes with exact markers", () => {
+    expect(renderFim("qwen", "a", "b").prompt).toBe("<|fim_prefix|>a<|fim_suffix|>b<|fim_middle|>")
+    expect(renderFim("starcoder", "a", "b").prompt).toBe("<fim_prefix>a<fim_suffix>b<fim_middle>")
+    expect(renderFim("codellama", "a", "b").prompt).toBe("<PRE> a <SUF> b <MID>")
+    expect(renderFim("mellum", "a", "b").prompt).toBe("<fim_suffix>b<fim_prefix>a<fim_middle>")
+    expect(renderFim("seed", "a", "b").prompt).toBe("<[fim-suffix]>b<[fim-prefix]>a<[fim-middle]>")
   })
 
-  it("wraps prefix and suffix with Qwen tokens", () => {
-    expect(qwenTemplate.template("def f():", "\n    return 1", "", "", "", [], [])).toBe(
-      "<|fim_prefix|>def f():<|fim_suffix|>\n    return 1<|fim_middle|>",
-    )
-    expect(qwenTemplate.completionOptions.stop).toContain("<|fim_middle|>")
+  it("stops on each profile's boundary markers", () => {
+    for (const id of FIM_TEMPLATE_IDS) {
+      expect(renderFim(id, "a", "b").stop).toContain(profiles[id].mid.trim())
+    }
   })
 
-  it("wraps prefix and suffix with CodeLlama tokens", () => {
-    expect(codeLlamaTemplate.template("def f():", "\n    return 1", "", "", "", [], [])).toBe(
-      "<PRE> def f(): <SUF> \n    return 1 <MID>",
-    )
-    expect(codeLlamaTemplate.completionOptions.stop).toContain("<MID>")
+  it("matches concrete checkpoint names without a blanket fallback", () => {
+    expect(matchFimProfile("starcoder2:7b")).toBe("starcoder")
+    expect(matchFimProfile("qwen2.5-coder:7b")).toBe("qwen")
+    expect(matchFimProfile("Qwen3-Coder-Next")).toBe("qwen3")
+    expect(matchFimProfile("codellama:7b")).toBe("codellama")
+    expect(matchFimProfile("some-unknown-model")).toBeUndefined()
   })
 
-  it("exposes all templates in the registry", () => {
-    expect(Object.keys(fimTemplates)).toEqual(["starcoder", "qwen", "codellama"])
+  it("requires an explicit profile for unknown models instead of assuming Qwen", () => {
+    expect(resolveFimProfile("auto", "qwen2.5-coder:7b")).toBe("qwen")
+    expect(resolveFimProfile("starcoder", "qwen2.5-coder:7b")).toBe("starcoder")
+    expect(() => resolveFimProfile("auto", "some-unknown-model")).toThrow()
   })
 
-  it("infers the template from model names", () => {
-    expect(inferFimTemplate("starcoder2:7b")).toBe("starcoder")
-    expect(inferFimTemplate("StarCoder2-15b")).toBe("starcoder")
-    expect(inferFimTemplate("qwen2.5-coder:7b")).toBe("qwen")
-    expect(inferFimTemplate("codellama:7b")).toBe("codellama")
-    expect(inferFimTemplate("CodeLlama-13b")).toBe("codellama")
-    expect(inferFimTemplate("some-unknown-model")).toBe("qwen")
+  it("keeps CodeGeeX chat-capable without role wrappers and Qwen3 chat system", () => {
+    expect(renderFim("codegeex", "a", "b", true).prompt).toBe("<|code_suffix|>b<|code_prefix|>a<|code_middle|>")
+    expect(renderFim("qwen3", "a", "b", true).system).toBeTruthy()
   })
 })

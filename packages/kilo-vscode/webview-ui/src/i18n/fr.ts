@@ -113,6 +113,7 @@ export const dict = {
   "dialog.model.select": "Sélectionner",
   "dialog.model.expand": "Développer",
   "dialog.model.collapse": "Réduire",
+  "review.model.label": "Modèle de revue",
 
   "dialog.provider.viewAll": "Voir plus de fournisseurs",
 
@@ -936,18 +937,37 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.description": "Afficher les suggestions d'autocomplétion dans le chat",
   "settings.autocomplete.modelsHint":
     "Pour choisir le modèle utilisé pour l'autocomplétion, consultez les paramètres des Modèles.",
-  "settings.autocomplete.local.model.title": "Modèle local",
-  "settings.autocomplete.local.model.description":
-    "Nom du modèle tel que servi par votre serveur local (p. ex. un tag Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL du serveur local",
-  "settings.autocomplete.local.baseUrl.description": "URL de base du serveur local qui exécute le modèle",
-  "settings.autocomplete.local.template.title": "Modèle FIM",
-  "settings.autocomplete.local.template.description":
-    "Format de prompt fill-in-the-middle ; « Auto » est détecté depuis le nom du modèle",
-  "settings.autocomplete.local.endpoint.title": "Point de terminaison API",
-  "settings.autocomplete.local.endpoint.description":
-    "« Auto » utilise la valeur par défaut du modèle : natif Ollama ou compatible OpenAI",
-  "settings.autocomplete.local.auto": "Auto",
+  "settings.autocomplete.custom.transport.title": "API de prompt brut",
+  "settings.autocomplete.custom.transport.description": "Quelle API de complétion reçoit le prompt brut",
+  "settings.autocomplete.custom.mode.title": "Mode d'entrée",
+  "settings.autocomplete.custom.mode.description":
+    "Comment le point de terminaison attend les complétions : prompt+suffix natifs, prompt brut templatisé ou messages de chat",
+  "settings.autocomplete.custom.mode.native": "Natif",
+  "settings.autocomplete.custom.mode.raw": "Brut",
+  "settings.autocomplete.custom.mode.chat": "Chat",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "Profil FIM",
+  "settings.autocomplete.custom.profile.description":
+    "Comment encoder le trou fill-in-the-middle ; Auto le détecte depuis le nom du modèle",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto : {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto n\'a pas détecté de profil pour "{{model}}" — choisissez un profil explicite.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Le mode chat a besoin d'un modèle pour combler le trou.",
+  "settings.autocomplete.custom.auto": "Auto",
+  "settings.autocomplete.custom.model.title": "Modèle",
+  "settings.autocomplete.custom.model.description":
+    "Nom du modèle sur le point de terminaison personnalisé (ex. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "URL de base",
+  "settings.autocomplete.custom.baseUrl.description":
+    "Base d'API compatible OpenAI ; les requêtes vont vers {baseURL}/completions avec prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Clé API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Envoyée comme jeton Bearer ; laissez vide pour appeler sans authentification",
+  "settings.autocomplete.custom.apiKey.placeholder": "Vide = sans authentification",
+  "settings.autocomplete.custom.proxy.title": "Proxy",
+  "settings.autocomplete.custom.proxy.description":
+    "Proxy HTTP/SOCKS facultatif pour joindre le point de terminaison ; vide utilise le proxy global",
   "settings.notifications.sounds": "Sons",
   "settings.notifications.enable.title": "Activer les notifications sonores",
   "settings.notifications.enable.description":
@@ -986,6 +1006,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Modèle d'image",
   "settings.experimental.imageGenerationModel.description": "Modèle de génération d'images",
   "settings.experimental.imageGenerationModel.placeholder": "Par défaut (Auto Router)",
+  "settings.experimental.proxy.title": "Proxy global",
+  "settings.experimental.proxy.description":
+    "Achemine toutes les requêtes réseau de Kilo (chat, marketplace, modèles, serveurs MCP) via ce proxy. Prend en charge http, https et socks5. Laissez l'adresse vide pour une connexion directe. L'enregistrement redémarre le backend Kilo.",
+  "settings.experimental.proxy.address.label": "Adresse du proxy",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 ou socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Proxy enregistré",
 
   "settings.models.speechToTextModel.customDescription":
     "Identifiant de modèle envoyé à votre point de terminaison de transcription personnalisé, par exemple whisper-1.",
@@ -1150,6 +1176,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Entrez un port entre 1 et 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Un secret client nécessite un ID client.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Entrez un URI de redirection valide.",
+  "settings.agentBehaviour.editMcp.proxy": "Proxy",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Remplace le proxy global pour ce serveur, ou connectez-vous directement. Les serveurs locaux reçoivent les variables d'environnement de proxy correspondantes ; les serveurs qui les ignorent ne sont pas affectés.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Mode",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Proxy global",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Proxy personnalisé",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Direct (sans proxy)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL du proxy",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Saisissez une URL de proxy http, https ou socks.",
   "settings.agentBehaviour.addMcp.command": "Commande",
   "settings.agentBehaviour.addMcp.command.placeholder": "e.g. npx",
   "settings.agentBehaviour.addMcp.args": "Arguments",

@@ -321,6 +321,65 @@ describe("session.retry.retryable", () => {
     expect(SessionRetry.retryable(error, retryProvider)).toBeUndefined()
   })
 
+  // kilocode_change start - status-first classification, no bare-number false positives
+  test("does not retry prose that merely contains a transient number", () => {
+    for (const message of ["read 500 lines", "error at line 429", "processed 502 items", "offset 503 out of range"]) {
+      expect(SessionRetry.retryable(wrap(message), retryProvider)).toBeUndefined()
+    }
+  })
+
+  test("does not retry a 400 whose message mentions a number in prose", () => {
+    const error = Schema.decodeUnknownSync(SessionV1.APIError.Schema)(
+      new SessionV1.APIError({
+        message: "Failed to process 500 items",
+        isRetryable: false,
+        statusCode: 400,
+      }).toObject(),
+    )
+    expect(SessionRetry.retryable(error, retryProvider)).toBeUndefined()
+  })
+
+  test("retries 429 even when isRetryable is false", () => {
+    const error = Schema.decodeUnknownSync(SessionV1.APIError.Schema)(
+      new SessionV1.APIError({
+        message: "Rate limited",
+        isRetryable: false,
+        statusCode: 429,
+      }).toObject(),
+    )
+    expect(SessionRetry.retryable(error, retryProvider)).toEqual({ message: "Rate limited" })
+  })
+
+  test("retries 529 overloaded status", () => {
+    const error = Schema.decodeUnknownSync(SessionV1.APIError.Schema)(
+      new SessionV1.APIError({
+        message: "Overloaded",
+        isRetryable: false,
+        statusCode: 529,
+      }).toObject(),
+    )
+    expect(SessionRetry.retryable(error, retryProvider)).toEqual({ message: "Provider is overloaded" })
+  })
+
+  test("retries a structured transient code in the response body", () => {
+    const error = Schema.decodeUnknownSync(SessionV1.APIError.Schema)(
+      new SessionV1.APIError({
+        message: "Request failed",
+        isRetryable: false,
+        statusCode: 400,
+        responseBody: JSON.stringify({ error: { code: 503 } }),
+      }).toObject(),
+    )
+    expect(SessionRetry.retryable(error, retryProvider)).toEqual({ message: "Request failed" })
+  })
+
+  test("retries a labeled status code in plain text", () => {
+    expect(SessionRetry.retryable(wrap("upstream returned status 524"), retryProvider)).toEqual({
+      message: "upstream returned status 524",
+    })
+  })
+  // kilocode_change end
+
   test("retries ZlibError decompression failures", () => {
     const error = Schema.decodeUnknownSync(SessionV1.APIError.Schema)(
       new SessionV1.APIError({

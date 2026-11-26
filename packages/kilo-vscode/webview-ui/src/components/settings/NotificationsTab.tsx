@@ -155,7 +155,7 @@ const NotificationsTab: Component = () => {
                       testState() === "error"
                         ? "var(--vscode-errorForeground)"
                         : testState() === "success"
-                          ? "var(--vscode-testing-iconPassed, #89d185)"
+                          ? "var(--vscode-testing-iconPassed, #73c991)"
                           : undefined,
                   }}
                 >

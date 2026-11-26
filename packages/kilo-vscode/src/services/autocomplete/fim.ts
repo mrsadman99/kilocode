@@ -1,9 +1,30 @@
 import { ResponseMetaData } from "./types"
 import type { KiloConnectionService } from "../cli-backend"
+import type { AutocompleteModelDef } from "@kilocode/kilo-gateway/autocomplete"
 import { getAutocompleteModelById } from "../../shared/autocomplete-models"
 import { localFimOptions } from "./local-fim"
+import { customFimOptions, customPrompt } from "./custom-fim"
 
 const FIM_MAX_TOKENS = 256
+
+/** Assemble the provider-specific FIM request fields (prompt wrapping, endpoint options). */
+function fimPrompt(info: AutocompleteModelDef, prefix: string, suffix: string, filename?: string) {
+  if (info.providerID === "local") {
+    const local = localFimOptions(info.modelID)
+    return {
+      prefix: local.wrap(prefix, suffix),
+      suffix: "",
+      baseURL: local.baseURL,
+      endpoint: local.endpoint,
+      stop: local.stop,
+      proxy: local.proxy || undefined,
+    }
+  }
+  if (info.providerID === "custom") {
+    return customPrompt(customFimOptions(), info.modelID, prefix, suffix, filename)
+  }
+  return { prefix, suffix }
+}
 
 /**
  * Generate a FIM (Fill-in-the-Middle) completion via the CLI backend.
@@ -16,17 +37,18 @@ const FIM_MAX_TOKENS = 256
  * @param signal - Optional AbortSignal to cancel the SSE stream early (e.g. when the user types again)
  */
 export async function generateFim(
-  connectionService: KiloConnectionService,
+  connectionService: Pick<KiloConnectionService, "getClientAsync">,
   modelId: string,
   prefix: string,
   suffix: string,
   onChunk: (text: string) => void,
   signal?: AbortSignal,
+  filename?: string,
 ): Promise<ResponseMetaData> {
-  const client = await connectionService.getClientAsync()
   const info = getAutocompleteModelById(modelId)
   if (!info) throw new Error(`Unknown autocomplete model: ${modelId}`)
-  const local = info.providerID === "local" ? localFimOptions(info.modelID) : undefined
+  const prompt = fimPrompt(info, prefix, suffix, filename)
+  const client = await connectionService.getClientAsync()
   let cost = 0
   let inputTokens = 0
   let outputTokens = 0
@@ -40,13 +62,11 @@ export async function generateFim(
 
   const { stream } = await client.kilo.fim(
     {
-      prefix: local ? local.wrap(prefix, suffix) : prefix,
-      suffix: local ? "" : suffix,
+      ...prompt,
       provider: info.providerID,
       model: info.modelID,
       maxTokens: FIM_MAX_TOKENS,
       temperature: info.temperature,
-      ...(local ? { baseURL: local.baseURL, endpoint: local.endpoint, stop: local.stop } : {}),
     },
     {
       signal,

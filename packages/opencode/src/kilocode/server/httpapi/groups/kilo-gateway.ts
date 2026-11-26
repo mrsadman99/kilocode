@@ -128,12 +128,20 @@ export const FimBody = Schema.Struct({
   model: Schema.optional(Schema.String),
   maxTokens: Schema.optional(Schema.Finite),
   temperature: Schema.optional(Schema.Finite),
-  /** Local provider only: base URL of the local server (e.g. Ollama). */
+  /** Local and custom providers: base URL of the upstream server. */
   baseURL: Schema.optional(Schema.String),
-  /** Local provider only: which local API to call. */
-  endpoint: Schema.optional(Schema.Union([Schema.Literal("completions"), Schema.Literal("generate")])),
-  /** Local provider only: stop sequences for the assembled FIM prompt. */
+  /** Local provider and templated custom formats: which server API to call; `chat` posts chat messages. */
+  endpoint: Schema.optional(
+    Schema.Union([Schema.Literal("completions"), Schema.Literal("generate"), Schema.Literal("chat")]),
+  ),
+  /** Local provider and templated custom formats: stop sequences for the assembled FIM prompt. */
   stop: Schema.optional(Schema.Array(Schema.String)),
+  /** Local and custom providers: HTTP/SOCKS proxy URL used to reach the server. */
+  proxy: Schema.optional(Schema.String),
+  /** Custom provider only: Bearer API key; omitted/empty sends no Authorization header. */
+  apiKey: Schema.optional(Schema.String),
+  /** Custom chat transport: system prompt prepended to the messages array. */
+  system: Schema.optional(Schema.String),
 })
 
 export const AudioTranscriptionsBody = Schema.Struct({

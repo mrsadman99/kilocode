@@ -112,6 +112,7 @@ export const dict = {
   "dialog.model.select": "Вибрати",
   "dialog.model.expand": "Розгорнути",
   "dialog.model.collapse": "Згорнути",
+  "review.model.label": "Модель рев'ю",
 
   "dialog.provider.viewAll": "Показати більше провайдерів",
 
@@ -905,17 +906,36 @@ export const dict = {
   "settings.autocomplete.chatAutocomplete.title": "Увімкнути автодоповнення в полі чату",
   "settings.autocomplete.chatAutocomplete.description": "Показувати підказки автодоповнення в полі введення чату",
   "settings.autocomplete.modelsHint": "Щоб вибрати модель для автодоповнення, див. Налаштування моделей.",
-  "settings.autocomplete.local.model.title": "Локальна модель",
-  "settings.autocomplete.local.model.description": "Ім'я моделі на вашому локальному сервері (наприклад, тег Ollama)",
-  "settings.autocomplete.local.baseUrl.title": "URL локального сервера",
-  "settings.autocomplete.local.baseUrl.description": "Базовий URL локального сервера, на якому запущено модель",
-  "settings.autocomplete.local.template.title": "Шаблон FIM",
-  "settings.autocomplete.local.template.description":
-    "Формат fill-in-the-middle промпту; «Авто» визначається за назвою моделі",
-  "settings.autocomplete.local.endpoint.title": "Ендпоінт API",
-  "settings.autocomplete.local.endpoint.description":
-    "«Авто» використовує типове значення шаблону: Ollama або OpenAI-сумісний",
-  "settings.autocomplete.local.auto": "Авто",
+  "settings.autocomplete.custom.transport.title": "API сирого промпту",
+  "settings.autocomplete.custom.transport.description": "Який completions-API отримує сирий промпт",
+  "settings.autocomplete.custom.mode.title": "Режим введення",
+  "settings.autocomplete.custom.mode.description":
+    "Як ендпойнт очікує запити доповнення: нативні prompt+suffix, шаблонний сирий промпт або повідомлення чату",
+  "settings.autocomplete.custom.mode.native": "Нативний",
+  "settings.autocomplete.custom.mode.raw": "Сирий",
+  "settings.autocomplete.custom.mode.chat": "Чат",
+  "settings.autocomplete.custom.transport.completions": "OpenAI /v1/completions",
+  "settings.autocomplete.custom.transport.generate": "Ollama /api/generate",
+  "settings.autocomplete.custom.profile.title": "FIM-профіль",
+  "settings.autocomplete.custom.profile.description":
+    "Як кодується пропуск fill-in-the-middle; Auto визначає за назвою моделі",
+  "settings.autocomplete.custom.profile.autoResolved": "Auto: {{label}}",
+  "settings.autocomplete.custom.profile.autoUnknown":
+    'Auto не вдалося визначити профіль для "{{model}}" — оберіть профіль явно.',
+  "settings.autocomplete.custom.profile.chatUnconfigured": "Для режиму чату потрібна модель, щоб заповнити пропуск.",
+  "settings.autocomplete.custom.auto": "Авто",
+  "settings.autocomplete.custom.model.title": "Модель",
+  "settings.autocomplete.custom.model.description": "Назва моделі на власному ендпойнті (напр. deepseek-chat)",
+  "settings.autocomplete.custom.baseUrl.title": "Базовий URL",
+  "settings.autocomplete.custom.baseUrl.description":
+    "База OpenAI-сумісного API; запити надсилаються на {baseURL}/completions з prompt+suffix",
+  "settings.autocomplete.custom.apiKey.title": "Ключ API",
+  "settings.autocomplete.custom.apiKey.description":
+    "Надсилається як Bearer-токен; залиште порожнім для виклику без автентифікації",
+  "settings.autocomplete.custom.apiKey.placeholder": "Порожньо = без автентифікації",
+  "settings.autocomplete.custom.proxy.title": "Проксі",
+  "settings.autocomplete.custom.proxy.description":
+    "Необов'язковий HTTP/SOCKS-проксі для доступу до ендпойнта; порожньо — використовується глобальний проксі",
 
   "settings.notifications.sounds": "Звуки",
   "settings.notifications.enable.title": "Увімкнути звукові сповіщення",
@@ -956,6 +976,12 @@ export const dict = {
   "settings.experimental.imageGenerationModel.title": "Модель зображень",
   "settings.experimental.imageGenerationModel.description": "Модель генерації зображень",
   "settings.experimental.imageGenerationModel.placeholder": "За замовчуванням (Auto Router)",
+  "settings.experimental.proxy.title": "Глобальний проксі",
+  "settings.experimental.proxy.description":
+    "Спрямовує всі мережеві запити Kilo (чат, маркетплейс, моделі, MCP-сервери) через цей проксі. Підтримує http, https і socks5. Залиште адресу порожньою для прямого підключення. Збереження перезапускає бекенд Kilo.",
+  "settings.experimental.proxy.address.label": "Адреса проксі",
+  "settings.experimental.proxy.address.placeholder": "http://127.0.0.1:8118 або socks5://127.0.0.1:1080",
+  "settings.experimental.proxy.toast": "Проксі збережено",
 
   "settings.models.speechToTextModel.customDescription":
     "Ідентифікатор моделі, який надсилається до вашої власної кінцевої точки транскрипції, наприклад whisper-1.",
@@ -1114,6 +1140,15 @@ export const dict = {
   "settings.agentBehaviour.editMcp.oauth.port.invalid": "Введіть порт від 1 до 65535.",
   "settings.agentBehaviour.editMcp.oauth.secret.invalid": "Для секрету клієнта потрібен ID клієнта.",
   "settings.agentBehaviour.editMcp.oauth.redirectUri.invalid": "Введіть дійсний URI перенаправлення.",
+  "settings.agentBehaviour.editMcp.proxy": "Проксі",
+  "settings.agentBehaviour.editMcp.proxy.help":
+    "Перевизначте глобальний проксі для цього сервера або підключайтеся напряму. Локальні сервери отримують відповідні змінні середовища проксі; сервери, що ігнорують їх, не зачіпаються.",
+  "settings.agentBehaviour.editMcp.proxy.mode": "Режим",
+  "settings.agentBehaviour.editMcp.proxy.mode.global": "Глобальний проксі",
+  "settings.agentBehaviour.editMcp.proxy.mode.custom": "Власний проксі",
+  "settings.agentBehaviour.editMcp.proxy.mode.direct": "Напряму (без проксі)",
+  "settings.agentBehaviour.editMcp.proxy.url": "URL проксі",
+  "settings.agentBehaviour.editMcp.proxy.invalid": "Введіть URL проксі http, https або socks.",
   "settings.agentBehaviour.addMcp.command": "Команда",
   "settings.agentBehaviour.addMcp.command.placeholder": "напр. npx",
   "settings.agentBehaviour.addMcp.args": "Аргументи",

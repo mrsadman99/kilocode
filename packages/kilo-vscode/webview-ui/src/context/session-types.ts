@@ -170,6 +170,7 @@ export interface SessionContextValue {
   recentModels: Accessor<ModelSelection[]>
   modelUsageHistory: Accessor<ModelUsageMap>
   favoriteModels: Accessor<ModelSelection[]>
+  reviewModel: Accessor<ModelSelection | null>
   toggleFavorite: (providerID: string, modelID: string) => void
 
   // Revert/undo state for the current session
@@ -221,7 +222,7 @@ export interface SessionContextValue {
   replyToQuestion: (requestID: string, answers: string[][]) => void
   rejectQuestion: (requestID: string) => void
   closeQuestion: (requestID: string) => void
-  acceptSuggestion: (requestID: string, index: number) => void
+  acceptSuggestion: (requestID: string, index: number, model?: ModelSelection | null) => void
   dismissSuggestion: (requestID: string) => void
   createSession: () => void
   clearCurrentSession: () => void

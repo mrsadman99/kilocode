@@ -9,6 +9,7 @@ import { errorMessage } from "@/util/error"
 import { ChildProcess } from "effect/unstable/process"
 import { AppProcess } from "@opencode-ai/core/process"
 import path from "path"
+import os from "os" // kilocode_change
 import { makeRuntime } from "@opencode-ai/core/effect/runtime"
 import semver from "semver"
 import { InstallationChannel, InstallationVersion } from "@opencode-ai/core/installation/version"
@@ -268,13 +269,22 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
           detectedMethod === "bun" ||
           detectedMethod === "pnpm"
         ) {
-          // kilocode_change
-          const response = yield* httpOk.execute(
-            HttpClientRequest.get(
-              `${yield* NpmConfig.registry(process.cwd())}/${KiloNpm.path}/${InstallationChannel}`, // kilocode_change
-            ).pipe(HttpClientRequest.acceptJson),
-          )
-          const data = yield* HttpClientResponse.schemaBodyJson(NpmPackage)(response)
+          // kilocode_change start - a project .npmrc can point at a registry that does not
+          // carry @kilocode/cli; fall back to the public registry so version checks survive
+          const registry = yield* NpmConfig.registry(process.cwd())
+          const resolve = (base: string) =>
+            Effect.gen(function* () {
+              const response = yield* httpOk.execute(
+                HttpClientRequest.get(`${base}/${KiloNpm.path}/${InstallationChannel}`).pipe(
+                  HttpClientRequest.acceptJson,
+                ),
+              )
+              return yield* HttpClientResponse.schemaBodyJson(NpmPackage)(response)
+            })
+          const data = yield* (registry === "https://registry.npmjs.org"
+            ? resolve(registry)
+            : resolve(registry).pipe(Effect.catch(() => resolve("https://registry.npmjs.org"))))
+          // kilocode_change end
           return data.version
         }
 
@@ -305,6 +315,20 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
         return yield* kiloLatest(httpOk, KiloNpm.path, InstallationChannel) // kilocode_change
       }, Effect.orDie),
       upgrade: Effect.fn("Installation.upgrade")(function* (m: Method, target: string) {
+        // kilocode_change start - global installs run outside the project so its .npmrc is
+        // not consulted, and retry against the public registry when the configured one fails
+        const home = os.homedir()
+        const registry = {
+          npm_config_registry: "https://registry.npmjs.org/",
+          "npm_config_@kilocode:registry": "https://registry.npmjs.org/",
+        }
+        const pm = (cmd: string[]) =>
+          Effect.gen(function* () {
+            const first = yield* run(cmd, { cwd: home })
+            if (first.code === 0) return first
+            return yield* run(cmd, { cwd: home, env: registry })
+          })
+        // kilocode_change end
         let upgradeResult: { code: number; stdout: string; stderr: string } | undefined
         switch (m) {
           case "curl":
@@ -312,17 +336,17 @@ const layer: Layer.Layer<Service, never, HttpClient.HttpClient | AppProcess.Serv
             break
           // kilocode_change start
           case "npm":
-            upgradeResult = yield* run(["npm", "install", "-g", `${KiloNpm.name}@${target}`])
+            upgradeResult = yield* pm(["npm", "install", "-g", `${KiloNpm.name}@${target}`])
             break
           case "yarn":
-            upgradeResult = yield* run(["yarn", "global", "add", `${KiloNpm.name}@${target}`])
+            upgradeResult = yield* pm(["yarn", "global", "add", `${KiloNpm.name}@${target}`])
             break
           // kilocode_change end
           case "pnpm":
-            upgradeResult = yield* run(["pnpm", "install", "-g", `${KiloNpm.name}@${target}`]) // kilocode_change
+            upgradeResult = yield* pm(["pnpm", "install", "-g", `${KiloNpm.name}@${target}`]) // kilocode_change
             break
           case "bun":
-            upgradeResult = yield* run(["bun", "install", "-g", `${KiloNpm.name}@${target}`]) // kilocode_change
+            upgradeResult = yield* pm(["bun", "install", "-g", `${KiloNpm.name}@${target}`]) // kilocode_change
             break
           case "brew": {
             const formula = yield* getBrewFormula()

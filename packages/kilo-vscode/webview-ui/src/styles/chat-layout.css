@@ -304,6 +304,11 @@
   color: var(--vscode-foreground);
 }
 
+.working-cancel[data-component="button"] {
+  font-weight: 600;
+  color: var(--vscode-errorForeground, #f14c4c);
+}
+
 /* On a wide surface (Agent Manager) the dock spans the whole composer. The lane
    caps how far a long status label may stretch before it ellipsizes, so the
    indicator stays a centered cluster on the same axis as the actions row instead
