@@ -1,6 +1,8 @@
 import * as vscode from "vscode"
 import {
   extractPrefixSuffix,
+  extractContextWindow,
+  windowOf,
   AutocompleteSuggestionContext,
   contextToAutocompleteInput,
   AutocompleteContextProvider,
@@ -145,6 +147,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   private telemetry: AutocompleteTelemetry | null
   /** Information about the last suggestion shown to the user */
   private lastSuggestion: LastSuggestionInfo | null = null
+  private hasSuggestions: boolean | undefined
   /** Circuit breaker / exponential backoff for API errors */
   public readonly backoff = new ErrorBackoff()
   /** Optional callback fired once when a fatal (non-retriable) error is first detected */
@@ -198,17 +201,29 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
 
     this.acceptedCommand = vscode.commands.registerCommand(INLINE_COMPLETION_ACCEPTED_COMMAND, () => {
       this.telemetry?.captureAcceptSuggestion(this.lastSuggestion?.length)
-      vscode.commands.executeCommand("setContext", "kilo-code.new.autocomplete.hasSuggestions", false)
+      this.setHasSuggestions(false)
     })
   }
 
+  private setHasSuggestions(value: boolean): void {
+    if (this.hasSuggestions === value) return
+    this.hasSuggestions = value
+    void vscode.commands.executeCommand("setContext", "kilo-code.new.autocomplete.hasSuggestions", value)
+  }
+
+  public setTracking(enabled: boolean): void {
+    this.recentlyVisitedRangesService.setEnabled(enabled)
+    this.recentlyEditedTracker.setEnabled(enabled)
+  }
+
   public updateSuggestions(fillInAtCursor: FillInAtCursorSuggestion): void {
+    const entry = { ...fillInAtCursor, ...windowOf(fillInAtCursor.prefix, fillInAtCursor.suffix) }
     const isDuplicate = this.suggestionsHistory.some(
       (existing) =>
-        existing.scope === fillInAtCursor.scope &&
-        existing.text === fillInAtCursor.text &&
-        existing.prefix === fillInAtCursor.prefix &&
-        existing.suffix === fillInAtCursor.suffix,
+        existing.scope === entry.scope &&
+        existing.text === entry.text &&
+        existing.prefix === entry.prefix &&
+        existing.suffix === entry.suffix,
     )
 
     if (isDuplicate) {
@@ -216,7 +231,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     }
 
     // Add to the end of the array (most recent)
-    this.suggestionsHistory.push(fillInAtCursor)
+    this.suggestionsHistory.push(entry)
 
     // Remove oldest if we exceed the limit
     if (this.suggestionsHistory.length > MAX_SUGGESTIONS_HISTORY) {
@@ -239,7 +254,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       recentlyEditedRanges,
     }
 
-    const input = contextToAutocompleteInput(context)
+    const { prefix, suffix } = extractPrefixSuffix(document, position)
+    const input = contextToAutocompleteInput(context, { prefix, suffix })
     const notebook = getNotebookContext(document, position)
     const autocompleteInput = notebook
       ? {
@@ -247,10 +263,11 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
           filepath: notebook.filepath,
           pos: { line: notebook.position.line, character: notebook.position.character },
           manuallyPassFileContents: notebook.contents,
+          manuallyPassPrefix: undefined,
+          manuallyPassSuffix: undefined,
         }
       : input
 
-    const { prefix, suffix } = extractPrefixSuffix(document, position)
     const languageId = document.languageId
 
     const prompt = await this.fimPromptBuilder.getFimPrompts(autocompleteInput)
@@ -443,7 +460,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     _context: vscode.InlineCompletionContext,
     _token: vscode.CancellationToken,
   ): Promise<vscode.InlineCompletionItem[] | vscode.InlineCompletionList> {
-    vscode.commands.executeCommand("setContext", "kilo-code.new.autocomplete.hasSuggestions", false)
+    this.setHasSuggestions(false)
     if (!supportsNotebook(document)) return []
 
     // Build telemetry context
@@ -487,12 +504,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     // (e.g. the user typed again), so a superseded stream is not cached.
     const cancel = _token.onCancellationRequested(() => this.fimAbortControllers.get(scope)?.abort())
     try {
-      // Check if file is ignored (for manual trigger via codeSuggestion)
-      if (await this.excluded(document)) {
-        return []
-      }
-
-      const { prefix, suffix } = extractPrefixSuffix(document, position)
+      const { prefix, suffix } = extractContextWindow(document, position)
 
       // Check cache first - allow mid-word lookups from cache
       const matchingResult = applyFirstLineOnly(
@@ -507,7 +519,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         }
         this.telemetry?.captureCacheHit(matchingResult.matchType, telemetryContext, matchingResult.text.length)
         this.telemetry?.startVisibilityTracking(matchingResult.fillInAtCursor, "cache", telemetryContext)
-        vscode.commands.executeCommand("setContext", "kilo-code.new.autocomplete.hasSuggestions", true)
+        this.setHasSuggestions(true)
         return stringToInlineCompletions(matchingResult.text, position)
       }
 
@@ -516,6 +528,12 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       // Only skip new LLM requests during mid-word typing or at end of statement
       // Cache lookups above are still allowed
       if (shouldSkipAutocomplete(prefix, suffix, document.languageId)) {
+        return []
+      }
+
+      // Ignore rules gate any code leaving the machine; the cache above is
+      // cleared whenever ignore files change, so a hit cannot outlive them.
+      if (await this.excluded(document)) {
         return []
       }
 
@@ -534,7 +552,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         }
         this.telemetry?.captureLlmSuggestionReturned(telemetryContext, cachedResult.text.length)
         this.telemetry?.startVisibilityTracking(cachedResult.fillInAtCursor, "llm", telemetryContext)
-        vscode.commands.executeCommand("setContext", "kilo-code.new.autocomplete.hasSuggestions", true)
+        this.setHasSuggestions(true)
       } else {
         this.telemetry?.cancelVisibilityTracking() // No suggestion to show - cancel any pending visibility tracking
       }

@@ -23,8 +23,20 @@ export class RecentlyEditedTracker {
   private static maxRecentlyEditedDocuments = 10
   private disposable: vscode.Disposable | undefined
   private cleanupInterval: NodeJS.Timeout | undefined
+  private enabled = false
 
-  constructor(private ide: IDE) {
+  constructor(private ide: IDE) {}
+
+  public setEnabled(enabled: boolean): void {
+    if (this.enabled === enabled) return
+    this.enabled = enabled
+    if (!enabled) {
+      this.disposable?.dispose()
+      this.disposable = undefined
+      if (this.cleanupInterval) clearInterval(this.cleanupInterval)
+      this.cleanupInterval = undefined
+      return
+    }
     this.disposable = vscode.workspace.onDidChangeTextDocument((event) => {
       event.contentChanges.forEach((change) => {
         const editedRange = {
@@ -108,15 +120,10 @@ export class RecentlyEditedTracker {
   }
 
   private async _getContentsForRange(entry: Omit<VsCodeRecentlyEditedRange, "lines" | "symbols">): Promise<string> {
-    const content = await this.ide.readFile(entry.uri.toString())
-    if (content === null) {
-      return ""
-    }
-    return content
-      .toString()
-      .split("\n")
-      .slice(entry.range.start.line, entry.range.end.line + 1)
-      .join("\n")
+    return this.ide.readRangeInFile(entry.uri.toString(), {
+      start: { line: entry.range.start.line, character: 0 },
+      end: { line: entry.range.end.line, character: Number.MAX_SAFE_INTEGER },
+    })
   }
 
   public async getRecentlyEditedRanges(): Promise<RecentlyEditedRange[]> {
@@ -129,10 +136,7 @@ export class RecentlyEditedTracker {
   }
 
   public dispose(): void {
-    this.disposable?.dispose()
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval)
-    }
+    this.setEnabled(false)
     this.recentlyEditedRanges = []
     this.recentlyEditedDocuments = []
   }

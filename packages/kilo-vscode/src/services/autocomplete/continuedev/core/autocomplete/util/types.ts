@@ -19,6 +19,7 @@ export interface AutocompleteInput {
   manuallyPassFileContents?: string
   // Used for VS Code git commit input box
   manuallyPassPrefix?: string
+  manuallyPassSuffix?: string
   selectedCompletionInfo?: {
     text: string
     range: Range

@@ -1,5 +1,6 @@
 import * as vscode from "vscode"
 import * as URI from "uri-js"
+import QuickLRU from "quick-lru"
 import { DocumentSymbol, FileStatsMap, IDE, IdeInfo, Location, Range, RangeInFile, SignatureHelp } from "../.."
 import { executeGotoProvider, executeSignatureHelpProvider, executeSymbolProvider } from "./autocomplete/lsp"
 
@@ -35,6 +36,14 @@ async function readFile(uri: vscode.Uri): Promise<Uint8Array | null> {
 
 function documentIsCode(uri: vscode.Uri): boolean {
   return uri.scheme === "file" || uri.scheme === "vscode-remote"
+}
+
+const reads = new QuickLRU<string, string>({ maxSize: 32 })
+const CACHEABLE = 128_000
+
+function cached(key: string, text: string): string {
+  if (text.length <= CACHEABLE) reads.set(key, text)
+  return text
 }
 
 export class VsCodeIde implements IDE {
@@ -115,13 +124,20 @@ export class VsCodeIde implements IDE {
         URI.equal(doc.uri.toString(), uri.toString()),
       )
       if (openTextDocument !== undefined) {
-        return openTextDocument.getText()
+        const key = `${uri.toString()}@${openTextDocument.version}`
+        const hit = reads.get(key)
+        if (hit !== undefined) return hit
+        return cached(key, openTextDocument.getText())
       }
 
       const fileStats = await stat(uri)
       if (fileStats === null || fileStats.size > 10 * VsCodeIde.MAX_BYTES) {
         return ""
       }
+
+      const key = `${uri.toString()}@${fileStats.mtime}:${fileStats.size}`
+      const hit = reads.get(key)
+      if (hit !== undefined) return hit
 
       const bytes = await readFile(uri)
       if (bytes === null) {
@@ -131,14 +147,23 @@ export class VsCodeIde implements IDE {
       // Truncate the buffer to the first MAX_BYTES
       const truncatedBytes = bytes.slice(0, VsCodeIde.MAX_BYTES)
       const contents = new TextDecoder().decode(truncatedBytes)
-      return contents
+      return cached(key, contents)
     } catch (e) {
       return ""
     }
   }
 
   async readRangeInFile(fileUri: string, range: Range): Promise<string> {
-    const buffer = await readFile(vscode.Uri.parse(fileUri))
+    const uri = vscode.Uri.parse(fileUri)
+    const doc = vscode.workspace.textDocuments.find((item) => URI.equal(item.uri.toString(), uri.toString()))
+    if (doc) {
+      const end = Math.min(range.end.line, doc.lineCount - 1)
+      const parts: string[] = []
+      for (let i = range.start.line; i < end; i++) parts.push(doc.lineAt(i).text)
+      const tail = doc.lineAt(end).text.slice(0, range.end.character)
+      return `${parts.join("\n")}\n${tail}`
+    }
+    const buffer = await readFile(uri)
     if (buffer === null) {
       return ""
     }

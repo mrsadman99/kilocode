@@ -4,55 +4,67 @@ import { isSecurityConcern } from "../../../indexing/ignore"
 import { LRUCache } from "lru-cache"
 import * as vscode from "vscode"
 
+const DELAY = 250
+
 /**
  * Service to keep track of recently visited ranges in files.
  */
 export class RecentlyVisitedRangesService {
   private cache: LRUCache<string, Array<AutocompleteCodeSnippet & { timestamp: number }>>
-  // Default value, we override in initWithPostHog
   private numSurroundingLines = 20
   private maxRecentFiles = 3
   private maxSnippetsPerFile = 3
-  private isEnabled = true
   private disposable: vscode.Disposable | undefined
+  private timer: NodeJS.Timeout | undefined
+  private pending: vscode.TextEditorSelectionChangeEvent | undefined
+  private enabled = false
 
   constructor(private readonly ide: IDE) {
     this.cache = new LRUCache<string, Array<AutocompleteCodeSnippet & { timestamp: number }>>({
       max: this.maxRecentFiles,
     })
-
-    void this.initWithPostHog()
   }
 
-  private async initWithPostHog() {
-    const recentlyVisitedRangesNumSurroundingLinesOptions = [null, 5, 10, 15, 20] // was feature flagged
-    const recentlyVisitedRangesNumSurroundingLines = recentlyVisitedRangesNumSurroundingLinesOptions[0]
-
-    if (recentlyVisitedRangesNumSurroundingLines) {
-      this.isEnabled = true
-      this.numSurroundingLines = recentlyVisitedRangesNumSurroundingLines
+  public setEnabled(enabled: boolean): void {
+    if (this.enabled === enabled) return
+    this.enabled = enabled
+    if (!enabled) {
+      this.disposable?.dispose()
+      this.disposable = undefined
+      if (this.timer) clearTimeout(this.timer)
+      this.timer = undefined
+      this.pending = undefined
+      return
     }
-
-    this.disposable = vscode.window.onDidChangeTextEditorSelection(this.cacheCurrentSelectionContext)
+    this.disposable = vscode.window.onDidChangeTextEditorSelection((event) => {
+      this.pending = event
+      if (this.timer) return
+      this.timer = setTimeout(() => {
+        this.timer = undefined
+        const next = this.pending
+        this.pending = undefined
+        if (next) void this.capture(next)
+      }, DELAY)
+    })
   }
 
-  private cacheCurrentSelectionContext = async (event: vscode.TextEditorSelectionChangeEvent) => {
+  private async capture(event: vscode.TextEditorSelectionChangeEvent): Promise<void> {
     const fsPath = event.textEditor.document.fileName
     if (isSecurityConcern(fsPath)) {
       return
     }
     const filepath = event.textEditor.document.uri.toString()
-    const line = event.selections[0].active.line
+    const line = event.selections.at(0)?.active.line
+    if (line === undefined) return
     const startLine = Math.max(0, line - this.numSurroundingLines)
     const endLine = Math.min(line + this.numSurroundingLines, event.textEditor.document.lineCount - 1)
 
     try {
-      const fileContents = await this.ide.readFile(filepath)
-      const lines = fileContents.split("\n")
-      const relevantLines = lines
-        .slice(startLine, endLine + 1)
-        .join("\n")
-        .trim()
+      const content = await this.ide.readRangeInFile(filepath, {
+        start: { line: startLine, character: 0 },
+        end: { line: endLine, character: Number.MAX_SAFE_INTEGER },
+      })
+      const relevantLines = content.trim()
 
       const snippet: AutocompleteCodeSnippet & { timestamp: number } = {
         filepath,
@@ -79,10 +91,6 @@ export class RecentlyVisitedRangesService {
    * @returns Array of code snippets from recently visited files
    */
   public getSnippets(): AutocompleteCodeSnippet[] {
-    if (!this.isEnabled) {
-      return []
-    }
-
     const currentFilepath = vscode.window.activeTextEditor?.document.uri.toString()
     let allSnippets: Array<AutocompleteCodeSnippet & { timestamp: number }> = []
 
@@ -108,7 +116,7 @@ export class RecentlyVisitedRangesService {
   }
 
   public dispose(): void {
-    this.disposable?.dispose()
+    this.setEnabled(false)
     this.cache.clear()
   }
 }
