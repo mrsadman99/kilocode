@@ -1,4 +1,5 @@
 import { Tiktoken, encodingForModel as _encodingForModel } from "js-tiktoken"
+import QuickLRU from "quick-lru"
 import type { MessageContent } from "../index.js"
 import { llamaTokenizer } from "./llamaTokenizer.js"
 
@@ -59,42 +60,42 @@ export function countTokens(
   return encoding.encode(content ?? "", "all", []).length
 }
 
+const lineCache = new QuickLRU<string, number>({ maxSize: 4096 })
+const CACHEABLE_LINE = 1000
+
+function lineTokens(line: string, modelName: string): number {
+  if (line.length > CACHEABLE_LINE) return countTokens(line, modelName)
+  const key = `${modelUsesGptTokenizer(modelName) ? "g" : "l"}\0${line}`
+  const hit = lineCache.get(key)
+  if (hit !== undefined) return hit
+  const count = countTokens(line, modelName)
+  lineCache.set(key, count)
+  return count
+}
+
 export function pruneLinesFromTop(prompt: string, maxTokens: number, modelName: string): string {
   const lines = prompt.split("\n")
-  const lineTokens = lines.map((line) => countTokens(line, modelName))
-  let totalTokens = lineTokens.reduce((sum, tokens) => sum + tokens, 0)
-  let start = 0
-  const currentLines = lines.length
-
-  totalTokens += Math.max(0, currentLines - 1)
-
-  while (totalTokens > maxTokens && start < currentLines) {
-    totalTokens -= lineTokens[start] ?? 0
-    if (currentLines - start > 1) {
-      totalTokens--
-    }
-    start++
+  let acc = 0
+  let start = lines.length
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const next = acc + lineTokens(lines[i]!, modelName) + (i < lines.length - 1 ? 1 : 0)
+    if (next > maxTokens) break
+    acc = next
+    start = i
   }
-
   return lines.slice(start).join("\n")
 }
 
 export function pruneLinesFromBottom(prompt: string, maxTokens: number, modelName: string): string {
   const lines = prompt.split("\n")
-  const lineTokens = lines.map((line) => countTokens(line, modelName))
-  let totalTokens = lineTokens.reduce((sum, tokens) => sum + tokens, 0)
-  let end = lines.length
-
-  totalTokens += Math.max(0, end - 1)
-
-  while (totalTokens > maxTokens && end > 0) {
-    end--
-    totalTokens -= lineTokens[end] ?? 0
-    if (end > 0) {
-      totalTokens--
-    }
+  let acc = 0
+  let end = 0
+  for (let i = 0; i < lines.length; i++) {
+    const next = acc + lineTokens(lines[i]!, modelName) + (i > 0 ? 1 : 0)
+    if (next > maxTokens) break
+    acc = next
+    end = i + 1
   }
-
   return lines.slice(0, end).join("\n")
 }
 

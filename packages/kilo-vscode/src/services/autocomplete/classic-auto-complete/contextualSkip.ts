@@ -88,7 +88,8 @@ export function getTerminatorsForLanguage(languageId: string | undefined): strin
 
 function isAtEndOfStatement(prefix: string, suffix: string, languageId?: string): boolean {
   // Get the current line's content after the cursor
-  const suffixFirstLine = suffix.split("\n")[0]
+  const breakIndex = suffix.indexOf("\n")
+  const suffixFirstLine = breakIndex === -1 ? suffix : suffix.slice(0, breakIndex)
 
   // If there's non-whitespace content after the cursor, we're not at end of line
   if (suffixFirstLine.trim().length > 0) {
@@ -96,8 +97,7 @@ function isAtEndOfStatement(prefix: string, suffix: string, languageId?: string)
   }
 
   // Get the last character before the cursor (excluding trailing whitespace)
-  const prefixLines = prefix.split("\n")
-  const currentLinePrefix = prefixLines[prefixLines.length - 1]
+  const currentLinePrefix = prefix.slice(prefix.lastIndexOf("\n") + 1)
   const trimmedLinePrefix = currentLinePrefix.trimEnd()
 
   // Empty line - not at end of statement

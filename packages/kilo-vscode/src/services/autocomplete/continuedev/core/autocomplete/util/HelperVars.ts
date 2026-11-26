@@ -37,7 +37,9 @@ export const HelperVars = {
   ): Promise<HelperVars> => {
     const lang = (input.languageId && languageForId(input.languageId)) || languageForFilepath(input.filepath)
     const workspaceUris = await ide.getWorkspaceDirs()
-    const fileContents = input.manuallyPassFileContents ?? (await ide.readFile(input.filepath))
+    const fileContents = options.experimental_enableStaticContextualization
+      ? (input.manuallyPassFileContents ?? (await ide.readFile(input.filepath)))
+      : ""
     const fileLines = fileContents.split("\n")
 
     // Construct full prefix/suffix (a few edge cases handled in here)

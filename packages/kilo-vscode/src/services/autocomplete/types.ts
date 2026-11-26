@@ -1,4 +1,5 @@
 import * as vscode from "vscode"
+import { Buffer } from "node:buffer"
 import type { AutocompleteCodeSnippet } from "./continuedev/core/autocomplete/types"
 import type { Position, Range, RangeInFile } from "./continuedev/core"
 import type { FileIgnoreController } from "./shims/FileIgnoreController"
@@ -38,6 +39,7 @@ export interface AutocompleteInput {
   recentlyEditedRanges: RecentlyEditedRange[]
   manuallyPassFileContents?: string
   manuallyPassPrefix?: string
+  manuallyPassSuffix?: string
   selectedCompletionInfo?: {
     text: string
     range: Range
@@ -191,9 +193,37 @@ export function extractPrefixSuffix(
   }
 }
 
-export function contextToAutocompleteInput(context: AutocompleteSuggestionContext): AutocompleteInput {
+export const PREFIX_WINDOW = 32_000
+export const SUFFIX_WINDOW = 16_000
+
+export function extractContextWindow(
+  document: vscode.TextDocument,
+  position: vscode.Position,
+): { prefix: string; suffix: string } {
+  const offset = document.offsetAt(position)
+  const start = document.positionAt(Math.max(0, offset - PREFIX_WINDOW))
+  const end = document.positionAt(offset + SUFFIX_WINDOW)
+  return {
+    prefix: document.getText(new vscode.Range(start, position)),
+    suffix: document.getText(new vscode.Range(position, end)),
+  }
+}
+
+const detach = (text: string) => Buffer.from(text, "utf8").toString("utf8")
+
+export function windowOf(prefix: string, suffix: string): { prefix: string; suffix: string } {
+  return {
+    prefix: detach(prefix.slice(-PREFIX_WINDOW)),
+    suffix: detach(suffix.slice(0, SUFFIX_WINDOW)),
+  }
+}
+
+export function contextToAutocompleteInput(
+  context: AutocompleteSuggestionContext,
+  extracted?: { prefix: string; suffix: string },
+): AutocompleteInput {
   const position = context.range?.start ?? context.document.positionAt(0)
-  const { prefix, suffix } = extractPrefixSuffix(context.document, position)
+  const { prefix, suffix } = extracted ?? extractPrefixSuffix(context.document, position)
 
   // Get recently visited and edited ranges from context, with empty arrays as fallback
   const recentlyVisitedRanges = context.recentlyVisitedRanges ?? []
@@ -209,6 +239,7 @@ export function contextToAutocompleteInput(context: AutocompleteSuggestionContex
     recentlyEditedRanges,
     manuallyPassFileContents: undefined,
     manuallyPassPrefix: prefix,
+    manuallyPassSuffix: suffix,
   }
 }
 

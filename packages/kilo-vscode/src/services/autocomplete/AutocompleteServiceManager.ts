@@ -195,6 +195,10 @@ export class AutocompleteServiceManager {
     await this.updateGlobalContext()
     this.updateStatusBar()
     await this.ensureInlineCompletionProviderRegistration()
+    this.inlineCompletionProvider.setTracking(
+      !!getAutocompleteModel(this.settings?.provider, this.settings?.model) &&
+        ((this.settings?.enableAutoTrigger ?? false) || (this.settings?.enableSmartInlineTaskKeybinding ?? false)),
+    )
     this.setupSnoozeTimerIfNeeded()
   }
 
