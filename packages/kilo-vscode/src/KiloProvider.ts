@@ -74,6 +74,7 @@ import { handleFileSearch, type SearchRoot } from "./kilo-provider/file-search"
 import { handleSessionSearch } from "./kilo-provider/session-search"
 import { handleFilePicker } from "./kilo-provider/file-picker"
 import { watchFontSizeConfig } from "./kilo-provider/font-size"
+import { watchPromptTimeline } from "./prompt-timeline/message"
 import { getTerminalContents } from "./services/terminal/context"
 import { disposeGitChangesTarget } from "./kilo-provider/git-changes-target"
 import { interceptMessage } from "./kilo-provider/git-changes-request"
@@ -608,6 +609,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   private diffVirtualProvider: import("./DiffVirtualProvider").DiffVirtualProvider | undefined
   private diffViewerProvider: import("./diff/DiffViewerProvider").DiffViewerProvider | undefined
   private documentViewerProvider: import("./DocumentViewerProvider").DocumentViewerProvider | undefined
+  private promptTimelineProvider: import("./PromptTimelineProvider").PromptTimelineProvider | undefined
   private remoteService: RemoteStatusService | null = null
   private unsubscribeRemote: (() => void) | null = null
 
@@ -765,6 +767,15 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
   public setDocumentViewerProvider(provider: import("./DocumentViewerProvider").DocumentViewerProvider): void {
     this.documentViewerProvider = provider
+  }
+
+  public setPromptTimelineProvider(provider: import("./PromptTimelineProvider").PromptTimelineProvider): void {
+    this.promptTimelineProvider = provider
+  }
+
+  private openPromptTimeline(sessionID?: string): void {
+    const id = sessionID ?? this.currentSession?.id
+    if (id) this.promptTimelineProvider?.open(id, this.getSessionGitDirectory(id))
   }
 
   getTelemetryProperties(): Record<string, unknown> {
@@ -938,7 +949,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     }
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, true)
-    this.setupWebviewMessageHandler(webviewView.webview)
+    this.setupMessages(webviewView.webview)
 
     this.setSidebarVisible(webviewView.visible)
     this.visibilityDisposable?.dispose()
@@ -974,7 +985,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
     panel.webview.html = this._getHtmlForWebview(panel.webview)
 
-    this.setupWebviewMessageHandler(panel.webview)
+    this.setupMessages(panel.webview)
     this.viewStateDisposable?.dispose()
     this.viewStateDisposable = this.visibleTaskStreams.bindPanel(panel, () => {
       this.setStatsVisible(panel.visible)
@@ -1234,7 +1245,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.isWebviewReady = false
     this.webview = webview
     if (!this.autoApproveBridge) this.onBeforeMessage = options?.onBeforeMessage ?? null
-    this.setupWebviewMessageHandler(webview)
+    this.setupMessages(webview)
     this.initializeConnection()
   }
 
@@ -1782,6 +1793,18 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     })
     this.webviewMessageDisposable = watchFontSizeConfig((msg) => this.postMessage(msg), this.webviewMessageDisposable)
     this.webviewMessageDisposable = watchWorkStyleConfig((msg) => this.postMessage(msg), this.webviewMessageDisposable)
+  }
+
+  /**
+   * Production entry point: the main message handler plus the dedicated
+   * Prompt Timeline listener. Tests drive setupWebviewMessageHandler directly
+   * with a single-handler mock, so the extra listener stays out of it.
+   */
+  private setupMessages(webview: vscode.Webview): void {
+    this.setupWebviewMessageHandler(webview)
+    const timeline = watchPromptTimeline(webview, (id) => this.openPromptTimeline(id))
+    const main = this.webviewMessageDisposable
+    this.webviewMessageDisposable = main ? vscode.Disposable.from(main, timeline) : timeline
   }
 
   private async sendWebviewMessage(message: SendWebviewMessage): Promise<void> {

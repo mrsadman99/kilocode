@@ -260,6 +260,11 @@ export interface OpenSettingsPanelRequest {
   projectId?: string
 }
 
+export interface OpenPromptTimelineRequest {
+  type: "openPromptTimeline"
+  sessionID?: string
+}
+
 export interface RequestAgentManagerSettingsMessage {
   type: "requestAgentManagerSettings"
   projectId?: string
@@ -1084,6 +1089,19 @@ export interface DocumentCloseMessage {
 export interface DocumentCopyPathMessage {
   type: "document.copyPath"
   file: string
+}
+
+export interface PromptTimelineSelectSessionMessage {
+  type: "promptTimeline.selectSession"
+  sessionID: string
+}
+
+export interface PromptTimelineRefreshMessage {
+  type: "promptTimeline.refresh"
+}
+
+export interface PromptTimelineCloseMessage {
+  type: "promptTimeline.close"
 }
 
 export interface DocumentSendCommentsMessage {
@@ -2055,6 +2073,10 @@ export type WebviewMessage =
   | AgentManagerTerminalResizeRequest
   | RequestImageModelsMessage
   | RequestSpeechToTextModelsMessage
+  | OpenPromptTimelineRequest
+  | PromptTimelineSelectSessionMessage
+  | PromptTimelineRefreshMessage
+  | PromptTimelineCloseMessage
 
 // ============================================
 // VS Code API type

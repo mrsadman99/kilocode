@@ -261,6 +261,17 @@ export const TaskHeader: Component<TaskHeaderProps> = (props) => {
                 aria-label={language.t("command.session.compact")}
               />
             </Tooltip>
+            <Tooltip value={language.t("promptTimeline.button.tooltip")} placement="bottom">
+              <IconButton
+                icon="checklist"
+                size="small"
+                variant="ghost"
+                onClick={() =>
+                  vscode.postMessage({ type: "openPromptTimeline", sessionID: session.currentSession()?.id })
+                }
+                aria-label={language.t("promptTimeline.button.tooltip")}
+              />
+            </Tooltip>
           </Show>
           <Show when={hasMessages()}>
             <Tooltip value={language.t("chat.search.toggle")} placement="bottom">

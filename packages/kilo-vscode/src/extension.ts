@@ -6,6 +6,7 @@ import { AgentManagerProvider } from "./agent-manager/AgentManagerProvider"
 import { VscodeHost } from "./agent-manager/vscode-host"
 import { DiffViewerProvider } from "./diff/DiffViewerProvider"
 import { DocumentViewerProvider } from "./DocumentViewerProvider"
+import { PromptTimelineProvider } from "./PromptTimelineProvider"
 import { DiffSourceCatalog } from "./diff/sources/catalog"
 import { DiffVirtualProvider } from "./DiffVirtualProvider"
 import { SettingsEditorProvider } from "./SettingsEditorProvider"
@@ -555,6 +556,12 @@ export async function activate(context: vscode.ExtensionContext) {
   provider.setDocumentViewerProvider(documentViewerProvider)
   context.subscriptions.push(documentViewerProvider)
 
+  const promptTimelineProvider = new PromptTimelineProvider(context.extensionUri, connectionService, {
+    resolveDirectory: (sessionID) => provider.getSessionGitDirectory(sessionID),
+  })
+  provider.setPromptTimelineProvider(promptTimelineProvider)
+  context.subscriptions.push(promptTimelineProvider)
+
   // Create diff virtual provider (lightweight single-file diff for permission approval)
   const diffVirtualProvider = new DiffVirtualProvider(context.extensionUri)
   provider.setDiffVirtualProvider(diffVirtualProvider)
@@ -607,6 +614,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.window.registerWebviewPanelSerializer(DocumentViewerProvider.viewType, {
+      deserializeWebviewPanel(panel: vscode.WebviewPanel) {
+        panel.dispose()
+        return Promise.resolve()
+      },
+    }),
+  )
+
+  context.subscriptions.push(
+    vscode.window.registerWebviewPanelSerializer(PromptTimelineProvider.viewType, {
       deserializeWebviewPanel(panel: vscode.WebviewPanel) {
         panel.dispose()
         return Promise.resolve()
